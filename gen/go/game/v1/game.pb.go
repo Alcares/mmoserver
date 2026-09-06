@@ -21,6 +21,174 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type PowerUpType int32
+
+const (
+	PowerUpType_POWER_UP_TYPE_UNSPECIFIED PowerUpType = 0
+	PowerUpType_POWER_UP_TYPE_FULL_VISION PowerUpType = 1
+)
+
+// Enum value maps for PowerUpType.
+var (
+	PowerUpType_name = map[int32]string{
+		0: "POWER_UP_TYPE_UNSPECIFIED",
+		1: "POWER_UP_TYPE_FULL_VISION",
+	}
+	PowerUpType_value = map[string]int32{
+		"POWER_UP_TYPE_UNSPECIFIED": 0,
+		"POWER_UP_TYPE_FULL_VISION": 1,
+	}
+)
+
+func (x PowerUpType) Enum() *PowerUpType {
+	p := new(PowerUpType)
+	*p = x
+	return p
+}
+
+func (x PowerUpType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PowerUpType) Descriptor() protoreflect.EnumDescriptor {
+	return file_game_v1_game_proto_enumTypes[0].Descriptor()
+}
+
+func (PowerUpType) Type() protoreflect.EnumType {
+	return &file_game_v1_game_proto_enumTypes[0]
+}
+
+func (x PowerUpType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PowerUpType.Descriptor instead.
+func (PowerUpType) EnumDescriptor() ([]byte, []int) {
+	return file_game_v1_game_proto_rawDescGZIP(), []int{0}
+}
+
+// Client -> Server: What power-ups to render
+type PowerUp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	X             int32                  `protobuf:"varint,2,opt,name=x,proto3" json:"x,omitempty"`
+	Y             int32                  `protobuf:"varint,3,opt,name=y,proto3" json:"y,omitempty"`
+	Type          PowerUpType            `protobuf:"varint,4,opt,name=type,proto3,enum=game.v1.PowerUpType" json:"type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PowerUp) Reset() {
+	*x = PowerUp{}
+	mi := &file_game_v1_game_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PowerUp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PowerUp) ProtoMessage() {}
+
+func (x *PowerUp) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_game_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PowerUp.ProtoReflect.Descriptor instead.
+func (*PowerUp) Descriptor() ([]byte, []int) {
+	return file_game_v1_game_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *PowerUp) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *PowerUp) GetX() int32 {
+	if x != nil {
+		return x.X
+	}
+	return 0
+}
+
+func (x *PowerUp) GetY() int32 {
+	if x != nil {
+		return x.Y
+	}
+	return 0
+}
+
+func (x *PowerUp) GetType() PowerUpType {
+	if x != nil {
+		return x.Type
+	}
+	return PowerUpType_POWER_UP_TYPE_UNSPECIFIED
+}
+
+// Client -> Server: What power-ups are attached to the player
+type ActiveEffect struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Type              PowerUpType            `protobuf:"varint,1,opt,name=type,proto3,enum=game.v1.PowerUpType" json:"type,omitempty"`
+	DurationTicksLeft uint32                 `protobuf:"varint,2,opt,name=duration_ticks_left,json=durationTicksLeft,proto3" json:"duration_ticks_left,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ActiveEffect) Reset() {
+	*x = ActiveEffect{}
+	mi := &file_game_v1_game_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ActiveEffect) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ActiveEffect) ProtoMessage() {}
+
+func (x *ActiveEffect) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_game_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ActiveEffect.ProtoReflect.Descriptor instead.
+func (*ActiveEffect) Descriptor() ([]byte, []int) {
+	return file_game_v1_game_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ActiveEffect) GetType() PowerUpType {
+	if x != nil {
+		return x.Type
+	}
+	return PowerUpType_POWER_UP_TYPE_UNSPECIFIED
+}
+
+func (x *ActiveEffect) GetDurationTicksLeft() uint32 {
+	if x != nil {
+		return x.DurationTicksLeft
+	}
+	return 0
+}
+
 // Client -> Server: Sent whenever a key is pressed
 type InputCommand struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -32,7 +200,7 @@ type InputCommand struct {
 
 func (x *InputCommand) Reset() {
 	*x = InputCommand{}
-	mi := &file_game_v1_game_proto_msgTypes[0]
+	mi := &file_game_v1_game_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -44,7 +212,7 @@ func (x *InputCommand) String() string {
 func (*InputCommand) ProtoMessage() {}
 
 func (x *InputCommand) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_game_proto_msgTypes[0]
+	mi := &file_game_v1_game_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +225,7 @@ func (x *InputCommand) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InputCommand.ProtoReflect.Descriptor instead.
 func (*InputCommand) Descriptor() ([]byte, []int) {
-	return file_game_v1_game_proto_rawDescGZIP(), []int{0}
+	return file_game_v1_game_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *InputCommand) GetDx() int32 {
@@ -81,13 +249,14 @@ type PlayerState struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	X             int32                  `protobuf:"varint,3,opt,name=x,proto3" json:"x,omitempty"`
 	Y             int32                  `protobuf:"varint,4,opt,name=y,proto3" json:"y,omitempty"`
+	ActiveEffects []*ActiveEffect        `protobuf:"bytes,5,rep,name=active_effects,json=activeEffects,proto3" json:"active_effects,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PlayerState) Reset() {
 	*x = PlayerState{}
-	mi := &file_game_v1_game_proto_msgTypes[1]
+	mi := &file_game_v1_game_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -99,7 +268,7 @@ func (x *PlayerState) String() string {
 func (*PlayerState) ProtoMessage() {}
 
 func (x *PlayerState) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_game_proto_msgTypes[1]
+	mi := &file_game_v1_game_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -112,7 +281,7 @@ func (x *PlayerState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayerState.ProtoReflect.Descriptor instead.
 func (*PlayerState) Descriptor() ([]byte, []int) {
-	return file_game_v1_game_proto_rawDescGZIP(), []int{1}
+	return file_game_v1_game_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *PlayerState) GetId() uint32 {
@@ -143,18 +312,26 @@ func (x *PlayerState) GetY() int32 {
 	return 0
 }
 
+func (x *PlayerState) GetActiveEffects() []*ActiveEffect {
+	if x != nil {
+		return x.ActiveEffects
+	}
+	return nil
+}
+
 // Server -> Client: Broadcasted every tick
 type WorldSnapshot struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Tick          uint64                 `protobuf:"varint,1,opt,name=tick,proto3" json:"tick,omitempty"`
 	Players       []*PlayerState         `protobuf:"bytes,2,rep,name=players,proto3" json:"players,omitempty"`
+	PowerUps      []*PowerUp             `protobuf:"bytes,3,rep,name=power_ups,json=powerUps,proto3" json:"power_ups,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *WorldSnapshot) Reset() {
 	*x = WorldSnapshot{}
-	mi := &file_game_v1_game_proto_msgTypes[2]
+	mi := &file_game_v1_game_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -166,7 +343,7 @@ func (x *WorldSnapshot) String() string {
 func (*WorldSnapshot) ProtoMessage() {}
 
 func (x *WorldSnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_game_proto_msgTypes[2]
+	mi := &file_game_v1_game_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -179,7 +356,7 @@ func (x *WorldSnapshot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorldSnapshot.ProtoReflect.Descriptor instead.
 func (*WorldSnapshot) Descriptor() ([]byte, []int) {
-	return file_game_v1_game_proto_rawDescGZIP(), []int{2}
+	return file_game_v1_game_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *WorldSnapshot) GetTick() uint64 {
@@ -196,22 +373,42 @@ func (x *WorldSnapshot) GetPlayers() []*PlayerState {
 	return nil
 }
 
+func (x *WorldSnapshot) GetPowerUps() []*PowerUp {
+	if x != nil {
+		return x.PowerUps
+	}
+	return nil
+}
+
 var File_game_v1_game_proto protoreflect.FileDescriptor
 
 const file_game_v1_game_proto_rawDesc = "" +
 	"\n" +
-	"\x12game/v1/game.proto\x12\agame.v1\".\n" +
+	"\x12game/v1/game.proto\x12\agame.v1\"_\n" +
+	"\aPowerUp\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12\f\n" +
+	"\x01x\x18\x02 \x01(\x05R\x01x\x12\f\n" +
+	"\x01y\x18\x03 \x01(\x05R\x01y\x12(\n" +
+	"\x04type\x18\x04 \x01(\x0e2\x14.game.v1.PowerUpTypeR\x04type\"h\n" +
+	"\fActiveEffect\x12(\n" +
+	"\x04type\x18\x01 \x01(\x0e2\x14.game.v1.PowerUpTypeR\x04type\x12.\n" +
+	"\x13duration_ticks_left\x18\x02 \x01(\rR\x11durationTicksLeft\".\n" +
 	"\fInputCommand\x12\x0e\n" +
 	"\x02dx\x18\x01 \x01(\x05R\x02dx\x12\x0e\n" +
-	"\x02dy\x18\x02 \x01(\x05R\x02dy\"M\n" +
+	"\x02dy\x18\x02 \x01(\x05R\x02dy\"\x8b\x01\n" +
 	"\vPlayerState\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\f\n" +
 	"\x01x\x18\x03 \x01(\x05R\x01x\x12\f\n" +
-	"\x01y\x18\x04 \x01(\x05R\x01y\"S\n" +
+	"\x01y\x18\x04 \x01(\x05R\x01y\x12<\n" +
+	"\x0eactive_effects\x18\x05 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffects\"\x82\x01\n" +
 	"\rWorldSnapshot\x12\x12\n" +
 	"\x04tick\x18\x01 \x01(\x04R\x04tick\x12.\n" +
-	"\aplayers\x18\x02 \x03(\v2\x14.game.v1.PlayerStateR\aplayersB4Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1b\x06proto3"
+	"\aplayers\x18\x02 \x03(\v2\x14.game.v1.PlayerStateR\aplayers\x12-\n" +
+	"\tpower_ups\x18\x03 \x03(\v2\x10.game.v1.PowerUpR\bpowerUps*K\n" +
+	"\vPowerUpType\x12\x1d\n" +
+	"\x19POWER_UP_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
+	"\x19POWER_UP_TYPE_FULL_VISION\x10\x01B4Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1b\x06proto3"
 
 var (
 	file_game_v1_game_proto_rawDescOnce sync.Once
@@ -225,19 +422,27 @@ func file_game_v1_game_proto_rawDescGZIP() []byte {
 	return file_game_v1_game_proto_rawDescData
 }
 
-var file_game_v1_game_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_game_v1_game_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_game_v1_game_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_game_v1_game_proto_goTypes = []any{
-	(*InputCommand)(nil),  // 0: game.v1.InputCommand
-	(*PlayerState)(nil),   // 1: game.v1.PlayerState
-	(*WorldSnapshot)(nil), // 2: game.v1.WorldSnapshot
+	(PowerUpType)(0),      // 0: game.v1.PowerUpType
+	(*PowerUp)(nil),       // 1: game.v1.PowerUp
+	(*ActiveEffect)(nil),  // 2: game.v1.ActiveEffect
+	(*InputCommand)(nil),  // 3: game.v1.InputCommand
+	(*PlayerState)(nil),   // 4: game.v1.PlayerState
+	(*WorldSnapshot)(nil), // 5: game.v1.WorldSnapshot
 }
 var file_game_v1_game_proto_depIdxs = []int32{
-	1, // 0: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
+	0, // 1: game.v1.ActiveEffect.type:type_name -> game.v1.PowerUpType
+	2, // 2: game.v1.PlayerState.active_effects:type_name -> game.v1.ActiveEffect
+	4, // 3: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
+	1, // 4: game.v1.WorldSnapshot.power_ups:type_name -> game.v1.PowerUp
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_game_proto_init() }
@@ -250,13 +455,14 @@ func file_game_v1_game_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_game_proto_rawDesc), len(file_game_v1_game_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   3,
+			NumEnums:      1,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_game_v1_game_proto_goTypes,
 		DependencyIndexes: file_game_v1_game_proto_depIdxs,
+		EnumInfos:         file_game_v1_game_proto_enumTypes,
 		MessageInfos:      file_game_v1_game_proto_msgTypes,
 	}.Build()
 	File_game_v1_game_proto = out.File
