@@ -279,7 +279,7 @@ func (w *World) Run() {
 				continue
 			}
 
-			candidates := grid.QueryRadius(player.Pos, 20)
+			candidates := grid.QueryRadius(player.Pos, 10)
 
 			protoPlayers := make([]*pb.PlayerState, 0, len(candidates))
 			// Add self first so client always recognizes its identity
