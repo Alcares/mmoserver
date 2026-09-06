@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package game.v1;
+option go_package = "github.com/alcares/mmoserver/gen/go/game/v1;gamev1";
+
+// Client -> Server: Sent whenever a key is pressed
+message InputCommand {
+  int32 dx = 1;
+  int32 dy = 2;
+}
+
+// Server -> Client: Represents an individual player's state
+message PlayerState {
+  uint32 id = 1;
+  string name = 2;
+  int32 x = 3;
+  int32 y = 4;
+}
+
+
+// Server -> Client: Broadcasted every tick
+message WorldSnapshot {
+  uint64 tick = 1;
+  repeated PlayerState players = 2;
+}
+
+

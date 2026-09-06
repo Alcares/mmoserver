@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Grid / Chessboard MMO</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/protobufjs/7.2.6/protobuf.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #status {
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    canvas {
+      border: 3px solid #475569;
+      border-radius: 6px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div id="status">Status: Connecting...</div>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const statusDiv = document.getElementById("status");
+
+    // Grid Configuration
+    const TILE_SIZE = 50; // 50x50 px per square
+    const GRID_COLS = canvas.width / TILE_SIZE; // 16 columns (0 to 15)
+    const GRID_ROWS = canvas.height / TILE_SIZE; // 12 rows (0 to 11)
+
+    let players = [];
+    let InputCommand = null;
+    let WorldSnapshot = null;
+    let socket = null;
+
+    protobuf.load("game.proto", (err, root) => {
+      if (err) {
+        statusDiv.innerText = "Error loading proto: " + err.message;
+        return;
+      }
+
+      InputCommand = root.lookupType("game.v1.InputCommand");
+      WorldSnapshot = root.lookupType("game.v1.WorldSnapshot");
+      initNetwork();
+    });
+
+    function initNetwork() {
+      const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+      socket = new WebSocket(`${proto}//${window.location.host}/ws`);
+      socket.binaryType = "arraybuffer";
+
+      socket.onopen = () => {
+        statusDiv.innerText = "Status: Connected. Use WASD / Arrow Keys to move tile-by-tile.";
+      };
+
+      socket.onclose = () => {
+        statusDiv.innerText = "Status: Disconnected. Server stopped.";
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const uint8Array = new Uint8Array(event.data);
+          const decoded = WorldSnapshot.decode(uint8Array);
+          const message = WorldSnapshot.toObject(decoded, { defaults: true });
+          players = message.players || [];
+        } catch (e) {
+          console.error("Failed to decode snapshot:", e);
+        }
+      };
+    }
+
+    // Capture key inputs
+    window.addEventListener("keydown", (e) => {
+      if (!socket || socket.readyState !== WebSocket.OPEN || !InputCommand) return;
+
+      let dx = 0;
+      let dy = 0;
+
+      switch (e.key) {
+        case "ArrowUp":
+        case "w":
+        case "W":
+          dy = -1; break;
+        case "ArrowDown":
+        case "s":
+        case "S":
+          dy = 1; break;
+        case "ArrowLeft":
+        case "a":
+        case "A":
+          dx = -1; break;
+        case "ArrowRight":
+        case "d":
+        case "D":
+          dx = 1; break;
+        default:
+          return;
+      }
+
+      e.preventDefault();
+
+      const payload = InputCommand.encode({ dx, dy }).finish();
+      socket.send(payload);
+    });
+
+    // Render loop
+    function render() {
+      // 1. Draw Alternating Chessboard Tiles
+      for (let row = 0; row < GRID_ROWS; row++) {
+        for (let col = 0; col < GRID_COLS; col++) {
+          const isEven = (row + col) % 2 === 0;
+          ctx.fillStyle = isEven ? "#1e293b" : "#0f172a";
+          ctx.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
+      }
+
+      // 2. Draw Board Border / Coordinate Lines
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= canvas.width; x += TILE_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= canvas.height; y += TILE_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // 3. Draw Players inside Tiles
+      for (const p of players) {
+        // Convert grid tile coordinate to pixel center
+        const centerX = (p.x * TILE_SIZE) + (TILE_SIZE / 2);
+        const centerY = (p.y * TILE_SIZE) + (TILE_SIZE / 2);
+
+        // Player Token (Circle)
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, TILE_SIZE * 0.35, 0, Math.PI * 2);
+        ctx.fillStyle = "#38bdf8";
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#f8fafc";
+        ctx.stroke();
+
+        // Player Label
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "bold 11px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(p.name || `P${p.id}`, centerX, centerY - (TILE_SIZE * 0.45));
+      }
+
+      requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>
