@@ -3,6 +3,25 @@ syntax = "proto3";
 package game.v1;
 option go_package = "github.com/alcares/mmoserver/gen/go/game/v1;gamev1";
 
+enum PowerUpType {
+  POWER_UP_TYPE_UNSPECIFIED = 0;
+  POWER_UP_TYPE_FULL_VISION = 1;
+}
+
+// Client -> Server: What power-ups to render
+message PowerUp {
+  uint32 id = 1;
+  int32 x = 2;
+  int32 y = 3;
+  PowerUpType type = 4;
+}
+
+// Client -> Server: What power-ups are attached to the player
+message ActiveEffect {
+  PowerUpType type = 1;
+  uint32 duration_ticks_left = 2;
+}
+
 // Client -> Server: Sent whenever a key is pressed
 message InputCommand {
   int32 dx = 1;
@@ -15,13 +34,14 @@ message PlayerState {
   string name = 2;
   int32 x = 3;
   int32 y = 4;
+  repeated ActiveEffect active_effects = 5;
 }
-
 
 // Server -> Client: Broadcasted every tick
 message WorldSnapshot {
   uint64 tick = 1;
   repeated PlayerState players = 2;
+  repeated PowerUp power_ups = 3;
 }
 
 
