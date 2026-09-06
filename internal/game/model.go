@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"log"
+	"math"
 	"sync"
 	"time"
 
@@ -14,6 +15,52 @@ import (
 type Vec2 struct {
 	X int32
 	Y int32
+}
+
+func CompactCoordinates(x, y int32) uint64 {
+	return (uint64(uint32(x)) << 32) | uint64(uint32(y))
+}
+
+const CellSize = 10 // Each cell is 10x10 tiles
+
+type SpatialGrid struct {
+	cellToPlayers map[uint64][]uint32
+}
+
+func NewSpatialGrid() *SpatialGrid {
+	return &SpatialGrid{
+		cellToPlayers: make(map[uint64][]uint32),
+	}
+}
+
+func (sg *SpatialGrid) Clear() {
+	clear(sg.cellToPlayers)
+}
+
+func (sg *SpatialGrid) Insert(player *Player) {
+	cx := int32(player.Pos.X) / CellSize
+	cy := int32(player.Pos.Y) / CellSize
+	key := CompactCoordinates(cx, cy)
+
+	sg.cellToPlayers[key] = append(sg.cellToPlayers[key], player.ID)
+}
+
+func (sg *SpatialGrid) QueryRadius(pos Vec2, radius int32) []uint32 {
+	minX := (pos.X - radius) / CellSize
+	maxX := (pos.X + radius) / CellSize
+	minY := (pos.Y - radius) / CellSize
+	maxY := (pos.Y + radius) / CellSize
+
+	var candidates []uint32
+
+	for cx := minX; cx <= maxX; cx++ {
+		for cy := minY; cy <= maxY; cy++ {
+			key := CompactCoordinates(cx, cy)
+			candidates = append(candidates, sg.cellToPlayers[key]...)
+		}
+	}
+
+	return candidates
 }
 
 type Player struct {
@@ -115,15 +162,16 @@ type World struct {
 
 func NewWorld() *World {
 	// Predefined fixed spawn positions (e.g. within an 800x600 canvas)
-	initialSpawns := []Vec2{
-		{X: 1, Y: 1},
-		{X: 14, Y: 1},
-		{X: 1, Y: 10},
-		{X: 14, Y: 10},
-		{X: 8, Y: 6}, // Center tile
-		{X: 4, Y: 6},
-		{X: 11, Y: 6},
-		{X: 8, Y: 3},
+	// Generates 50 spawns scattered in a radius around the central town (250, 250)
+	initialSpawns := make([]Vec2, 0, 50)
+	for i := 0; i < 50; i++ {
+		// Rings of 10, 20, 30 tiles out
+		ring := float64((i%5 + 1) * 5)
+		angle := float64(i) * 0.7
+		initialSpawns = append(initialSpawns, Vec2{
+			X: int32(math.Floor(250 + ring*math.Cos(angle))),
+			Y: int32(math.Floor(250 + ring*math.Sin(angle))),
+		})
 	}
 
 	return &World{
@@ -181,6 +229,8 @@ func (w *World) Run() {
 	ticker := time.NewTicker(50 * time.Millisecond)
 	defer ticker.Stop()
 
+	grid := NewSpatialGrid()
+
 	for range ticker.C {
 		w.Mu.Lock()
 		w.tick++
@@ -203,14 +253,14 @@ func (w *World) Run() {
 				if player.Pos.X < 0 {
 					player.Pos.X = 0
 				}
-				if player.Pos.X > 15 {
-					player.Pos.X = 15
+				if player.Pos.X > 499 {
+					player.Pos.X = 499
 				}
 				if player.Pos.Y < 0 {
 					player.Pos.Y = 0
 				}
-				if player.Pos.Y > 11 {
-					player.Pos.Y = 11
+				if player.Pos.Y > 499 {
+					player.Pos.Y = 499
 				}
 
 			default:
@@ -218,28 +268,44 @@ func (w *World) Run() {
 			}
 		}
 
-		protoPlayers := make([]*pb.PlayerState, 0, len(w.players))
-		for _, p := range w.players {
-			protoPlayers = append(protoPlayers, p.ToProto())
-		}
-
-		snapshot := &pb.WorldSnapshot{
-			Tick:    w.tick,
-			Players: protoPlayers,
-		}
-
-		payload, err := proto.Marshal(snapshot)
-		if err != nil {
-			log.Printf("Marshal error: %v", err)
-			w.Mu.Unlock()
-			continue
+		grid.Clear()
+		for _, player := range w.players {
+			grid.Insert(player)
 		}
 
 		for _, c := range w.clients {
+			player, exists := w.players[c.ID]
+			if !exists {
+				continue
+			}
+
+			candidates := grid.QueryRadius(player.Pos, 20)
+
+			protoPlayers := make([]*pb.PlayerState, 0, len(candidates))
+			// Add self first so client always recognizes its identity
+			protoPlayers = append(protoPlayers, player.ToProto())
+			// Add others visible withing fog of war
+			for _, id := range candidates {
+				if other, ok := w.players[id]; ok {
+					protoPlayers = append(protoPlayers, other.ToProto())
+				}
+			}
+
+			snapshot := &pb.WorldSnapshot{
+				Tick:    w.tick,
+				Players: protoPlayers,
+			}
+
+			payload, err := proto.Marshal(snapshot)
+			if err != nil {
+				log.Printf("Marshal error: %v", err)
+				continue
+			}
+
 			select {
 			case c.Send <- payload:
 			default:
-				// client buffer full
+				// Client buffer is full; drop this frame to keep tick rate steady
 			}
 		}
 
