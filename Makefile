@@ -1,7 +1,7 @@
 MODULE := github.com/alcares/mmoserver
 PROTO_DIR := api/proto
 
-.PHONY: proto clean
+.PHONY: proto clean run
 
 proto:
 	protoc \
@@ -12,3 +12,6 @@ proto:
 
 clean:
 	rm -rf gen/
+
+run:
+	go run ./cmd/server

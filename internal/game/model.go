@@ -12,16 +12,26 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-type Vec2 struct {
-	X int32
-	Y int32
+type Vec2f struct {
+	X float64
+	Y float64
 }
 
 func CompactCoordinates(x, y int32) uint64 {
 	return (uint64(uint32(x)) << 32) | uint64(uint32(y))
 }
 
-const CellSize = 10 // Each cell is 10x10 tiles
+const (
+	CellSize         = 10.0 // 10x10 world units per cell
+	MoveSpeed        = 8.0  // World units per second
+	PlayerRadius     = 0.5  // Collision boundary size
+	DefaultFOVRadius = 15.0 // Float-based vision circle
+	WorldMinX        = 0.0
+	WorldMaxX        = 500.0
+	WorldMinY        = 0.0
+	WorldMaxY        = 500.0
+	TickDuration     = 0.05 // 50ms = 20Hz
+)
 
 type SpatialGrid struct {
 	cellToPlayers map[uint64][]uint32
@@ -38,18 +48,18 @@ func (sg *SpatialGrid) Clear() {
 }
 
 func (sg *SpatialGrid) Insert(player *Player) {
-	cx := int32(player.Pos.X) / CellSize
-	cy := int32(player.Pos.Y) / CellSize
+	cx := int32(math.Floor(player.Pos.X / CellSize))
+	cy := int32(math.Floor(player.Pos.Y / CellSize))
 	key := CompactCoordinates(cx, cy)
 
 	sg.cellToPlayers[key] = append(sg.cellToPlayers[key], player.ID)
 }
 
-func (sg *SpatialGrid) QueryRadius(pos Vec2, radius int32) []uint32 {
-	minX := (pos.X - radius) / CellSize
-	maxX := (pos.X + radius) / CellSize
-	minY := (pos.Y - radius) / CellSize
-	maxY := (pos.Y + radius) / CellSize
+func (sg *SpatialGrid) QueryRadius(pos Vec2f, radius float64) []uint32 {
+	minX := int32(math.Floor((pos.X - radius) / CellSize))
+	maxX := int32(math.Floor((pos.X + radius) / CellSize))
+	minY := int32(math.Floor((pos.Y - radius) / CellSize))
+	maxY := int32(math.Floor((pos.Y + radius) / CellSize))
 
 	var candidates []uint32
 
@@ -64,9 +74,11 @@ func (sg *SpatialGrid) QueryRadius(pos Vec2, radius int32) []uint32 {
 }
 
 type Player struct {
-	ID   uint32
-	Name string
-	Pos  Vec2
+	ID        uint32
+	Name      string
+	Pos       Vec2f
+	TargetDir Vec2f // Current intended movement heading (-1 to 1)
+	Speed     float64
 }
 
 // ToProto maps internal domain state to wire DTO
@@ -74,16 +86,16 @@ func (p *Player) ToProto() *pb.PlayerState {
 	return &pb.PlayerState{
 		Id:   p.ID,
 		Name: p.Name,
-		X:    int32(p.Pos.X),
-		Y:    int32(p.Pos.Y),
+		X:    float32(p.Pos.X),
+		Y:    float32(p.Pos.Y),
 	}
 }
 
 // PlayerInput bundles the command with who sent it
 type PlayerInput struct {
 	PlayerID uint32
-	Dx       int32
-	Dy       int32
+	Vx       float64
+	Vy       float64
 }
 
 // Client represents an active WebSocket connection
@@ -130,15 +142,14 @@ func (c *Client) ReadPump(w *World) {
 		select {
 		case w.inputQueue <- PlayerInput{
 			PlayerID: c.ID,
-			Dx:       cmd.GetDx(),
-			Dy:       cmd.GetDy(),
+			Vx:       float64(cmd.GetVx()),
+			Vy:       float64(cmd.GetVy()),
 		}:
 		default:
 			// Buffer full (client spamming inputs faster than server ticks)
 			// Drop input to maintain server stability
 		}
 	}
-
 }
 
 // World represents the central authoritative game state
@@ -149,28 +160,25 @@ type World struct {
 	tick    uint64
 	players map[uint32]*Player
 	clients map[uint32]*Client
-
 	// Communication channels
 	register   chan *Client
 	unregister chan *Client
 	inputQueue chan PlayerInput
-
 	// ID generator counter
-	availableSpawns []Vec2
+	availableSpawns []Vec2f
 	nextPlayerID    uint32
 }
 
 func NewWorld() *World {
 	// Predefined fixed spawn positions (e.g. within an 800x600 canvas)
 	// Generates 50 spawns scattered in a radius around the central town (250, 250)
-	initialSpawns := make([]Vec2, 0, 50)
+	initialSpawns := make([]Vec2f, 0, 50)
 	for i := 0; i < 50; i++ {
-		// Rings of 10, 20, 30 tiles out
-		ring := float64((i%5 + 1) * 5)
+		ring := float64((i%5 + 1) * 8)
 		angle := float64(i) * 0.7
-		initialSpawns = append(initialSpawns, Vec2{
-			X: int32(math.Floor(250 + ring*math.Cos(angle))),
-			Y: int32(math.Floor(250 + ring*math.Sin(angle))),
+		initialSpawns = append(initialSpawns, Vec2f{
+			X: 250.0 + ring*math.Cos(angle),
+			Y: 250.0 + ring*math.Sin(angle),
 		})
 	}
 
@@ -180,7 +188,7 @@ func NewWorld() *World {
 		clients:         make(map[uint32]*Client),
 		register:        make(chan *Client),
 		unregister:      make(chan *Client),
-		inputQueue:      make(chan PlayerInput, 1024), // Buffered to hanlde bursts
+		inputQueue:      make(chan PlayerInput, 1024), // Buffered to handle bursts
 		availableSpawns: initialSpawns,
 		nextPlayerID:    1,
 	}
@@ -198,12 +206,10 @@ func (w *World) AddPlayer(client *Client) (*Player, error) {
 	w.nextPlayerID++
 
 	player := &Player{
-		ID:   playerID,
-		Name: fmt.Sprintf("Player %d", playerID),
-		Pos: Vec2{
-			X: spawnPos.X,
-			Y: spawnPos.Y,
-		},
+		ID:    playerID,
+		Name:  fmt.Sprintf("Player %d", playerID),
+		Pos:   spawnPos,
+		Speed: MoveSpeed,
 	}
 
 	client.ID = playerID
@@ -220,13 +226,12 @@ func (w *World) removePlayer(playerID uint32) {
 	}
 
 	w.availableSpawns = append(w.availableSpawns, player.Pos)
-
 	delete(w.players, playerID)
 	delete(w.clients, playerID)
 }
 
 func (w *World) Run() {
-	ticker := time.NewTicker(50 * time.Millisecond)
+	ticker := time.NewTicker(time.Duration(TickDuration * float64(time.Second)))
 	defer ticker.Stop()
 
 	grid := NewSpatialGrid()
@@ -235,6 +240,7 @@ func (w *World) Run() {
 		w.Mu.Lock()
 		w.tick++
 
+		// 1. Drain input and store latest target direction vector
 	drainInputs:
 		for {
 			select {
@@ -244,49 +250,77 @@ func (w *World) Run() {
 					continue
 				}
 
-				dx := clamp(input.Dx, -1, 1)
-				dy := clamp(input.Dy, -1, 1)
+				dirX := clampFloat(input.Vx, -1.0, 1.0)
+				dirY := clampFloat(input.Vy, -1.0, 1.0)
 
-				player.Pos.X += dx
-				player.Pos.Y += dy
+				// Normalize diagonal movement to prevent moving faster diagonally
+				lenSq := dirX*dirX + dirY*dirY
+				if lenSq > 1.0 {
+					invLen := 1.0 / math.Sqrt(lenSq)
+					dirX *= invLen
+					dirY *= invLen
+				}
 
-				if player.Pos.X < 0 {
-					player.Pos.X = 0
-				}
-				if player.Pos.X > 499 {
-					player.Pos.X = 499
-				}
-				if player.Pos.Y < 0 {
-					player.Pos.Y = 0
-				}
-				if player.Pos.Y > 499 {
-					player.Pos.Y = 499
-				}
+				player.TargetDir.X = dirX
+				player.TargetDir.Y = dirY
 
 			default:
 				break drainInputs
 			}
 		}
 
+		// 2. Continuous Physics Update: Pos += Velocity * dt
+		for _, player := range w.players {
+			player.Pos.X += player.TargetDir.X * player.Speed * TickDuration
+			player.Pos.Y += player.TargetDir.Y * player.Speed * TickDuration
+
+			// Keep within map boundaries
+			if player.Pos.X < WorldMinX {
+				player.Pos.X = WorldMinX
+			}
+			if player.Pos.X > WorldMaxX {
+				player.Pos.X = WorldMaxX
+			}
+			if player.Pos.Y < WorldMinY {
+				player.Pos.Y = WorldMinY
+			}
+			if player.Pos.Y > WorldMaxY {
+				player.Pos.Y = WorldMaxY
+			}
+		}
+
+		// 3. Re-index positions into spatial partitions
 		grid.Clear()
 		for _, player := range w.players {
 			grid.Insert(player)
 		}
 
+		// 4. Per-client Area of Interest replication
 		for _, c := range w.clients {
 			player, exists := w.players[c.ID]
 			if !exists {
 				continue
 			}
 
-			candidates := grid.QueryRadius(player.Pos, 6)
+			candidates := grid.QueryRadius(player.Pos, DefaultFOVRadius)
 
-			protoPlayers := make([]*pb.PlayerState, 0, len(candidates))
-			// Add self first so client always recognizes its identity
-			protoPlayers = append(protoPlayers, player.ToProto())
-			// Add others visible withing fog of war
+			// Add self first
+			protoPlayers := []*pb.PlayerState{player.ToProto()}
+
+			// Fine-grained narrow phase: Euclidean distance filter
+			maxDistSq := DefaultFOVRadius * DefaultFOVRadius
 			for _, id := range candidates {
-				if other, ok := w.players[id]; ok {
+				if id == player.ID {
+					continue // Skip self (already added)
+				}
+				other, ok := w.players[id]
+				if !ok {
+					continue
+				}
+
+				dx := other.Pos.X - player.Pos.X
+				dy := other.Pos.Y - player.Pos.Y
+				if (dx*dx + dy*dy) <= maxDistSq {
 					protoPlayers = append(protoPlayers, other.ToProto())
 				}
 			}
@@ -311,10 +345,9 @@ func (w *World) Run() {
 
 		w.Mu.Unlock()
 	}
-
 }
 
-func clamp(val, min, max int32) int32 {
+func clampFloat(val, min, max float64) float64 {
 	if val < min {
 		return min
 	}

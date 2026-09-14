@@ -55,7 +55,7 @@
   // Grid & Vision Configuration
   const TILE_SIZE = 22;
   const WORLD_TILES = 500;
-  const VISION_RADIUS_TILES = 12; // Aligned with server's QueryRadius (20 tiles)
+  const VISION_RADIUS_TILES = 15; // Matches server DefaultFOVRadius (15.0 world units)
 
   let players = [];
   let myPlayerId = null;
@@ -103,38 +103,44 @@
     };
   }
 
-  // Capture key inputs
-  window.addEventListener("keydown", (e) => {
+  // Capture key inputs as a continuous velocity vector (vx, vy).
+  // The server persists the last direction received, so we must send
+  // { vx: 0, vy: 0 } on key release to stop moving.
+  const pressedKeys = new Set();
+  const CONTROL_KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d", "W", "A", "S", "D"];
+
+  function sendInput() {
     if (!socket || socket.readyState !== WebSocket.OPEN || !InputCommand) return;
 
-    let dx = 0;
-    let dy = 0;
+    let vx = 0;
+    let vy = 0;
+    if (pressedKeys.has("ArrowUp") || pressedKeys.has("w") || pressedKeys.has("W")) vy = -1;
+    if (pressedKeys.has("ArrowDown") || pressedKeys.has("s") || pressedKeys.has("S")) vy = 1;
+    if (pressedKeys.has("ArrowLeft") || pressedKeys.has("a") || pressedKeys.has("A")) vx = -1;
+    if (pressedKeys.has("ArrowRight") || pressedKeys.has("d") || pressedKeys.has("D")) vx = 1;
 
-    switch (e.key) {
-      case "ArrowUp":
-      case "w":
-      case "W":
-        dy = -1; break;
-      case "ArrowDown":
-      case "s":
-      case "S":
-        dy = 1; break;
-      case "ArrowLeft":
-      case "a":
-      case "A":
-        dx = -1; break;
-      case "ArrowRight":
-      case "d":
-      case "D":
-        dx = 1; break;
-      default:
-        return;
+    // Normalize diagonal movement so speed stays consistent in all directions
+    const length = Math.hypot(vx, vy);
+    if (length > 1) {
+      vx /= length;
+      vy /= length;
     }
 
-    e.preventDefault();
-
-    const payload = InputCommand.encode({ dx, dy }).finish();
+    const payload = InputCommand.encode({ vx, vy }).finish();
     socket.send(payload);
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if (!CONTROL_KEYS.includes(e.key)) return;
+    e.preventDefault();
+    pressedKeys.add(e.key);
+    sendInput();
+  });
+
+  window.addEventListener("keyup", (e) => {
+    if (!pressedKeys.has(e.key)) return;
+    pressedKeys.delete(e.key);
+    sendInput();
   });
 
   // Render loop
@@ -234,7 +240,7 @@
       ctx.fillStyle = "#38bdf8";
       ctx.font = "12px monospace";
       ctx.textAlign = "left";
-      ctx.fillText(`Pos: [${me.x}, ${me.y}]`, 26, 35);
+      ctx.fillText(`Pos: [${me.x.toFixed(1)}, ${me.y.toFixed(1)}]`, 26, 35);
     }
 
     requestAnimationFrame(render);

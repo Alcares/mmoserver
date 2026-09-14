@@ -24,17 +24,17 @@ message ActiveEffect {
 
 // Client -> Server: Sent whenever a key is pressed
 message InputCommand {
-  int32 dx = 1;
-  int32 dy = 2;
+  float vx = 1;
+  float vy = 2;
 }
 
 // Server -> Client: Represents an individual player's state
 message PlayerState {
   uint32 id = 1;
   string name = 2;
-  int32 x = 3;
-  int32 y = 4;
-  repeated ActiveEffect active_effects = 5;
+  float x = 3;
+  float y = 4;
+  repeated ActiveEffect active_effects = 6;
 }
 
 // Server -> Client: Broadcasted every tick

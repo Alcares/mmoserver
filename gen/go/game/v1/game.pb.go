@@ -192,8 +192,8 @@ func (x *ActiveEffect) GetDurationTicksLeft() uint32 {
 // Client -> Server: Sent whenever a key is pressed
 type InputCommand struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Dx            int32                  `protobuf:"varint,1,opt,name=dx,proto3" json:"dx,omitempty"`
-	Dy            int32                  `protobuf:"varint,2,opt,name=dy,proto3" json:"dy,omitempty"`
+	Vx            float32                `protobuf:"fixed32,1,opt,name=vx,proto3" json:"vx,omitempty"`
+	Vy            float32                `protobuf:"fixed32,2,opt,name=vy,proto3" json:"vy,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -228,16 +228,16 @@ func (*InputCommand) Descriptor() ([]byte, []int) {
 	return file_game_v1_game_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *InputCommand) GetDx() int32 {
+func (x *InputCommand) GetVx() float32 {
 	if x != nil {
-		return x.Dx
+		return x.Vx
 	}
 	return 0
 }
 
-func (x *InputCommand) GetDy() int32 {
+func (x *InputCommand) GetVy() float32 {
 	if x != nil {
-		return x.Dy
+		return x.Vy
 	}
 	return 0
 }
@@ -247,9 +247,9 @@ type PlayerState struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	X             int32                  `protobuf:"varint,3,opt,name=x,proto3" json:"x,omitempty"`
-	Y             int32                  `protobuf:"varint,4,opt,name=y,proto3" json:"y,omitempty"`
-	ActiveEffects []*ActiveEffect        `protobuf:"bytes,5,rep,name=active_effects,json=activeEffects,proto3" json:"active_effects,omitempty"`
+	X             float32                `protobuf:"fixed32,3,opt,name=x,proto3" json:"x,omitempty"`
+	Y             float32                `protobuf:"fixed32,4,opt,name=y,proto3" json:"y,omitempty"`
+	ActiveEffects []*ActiveEffect        `protobuf:"bytes,6,rep,name=active_effects,json=activeEffects,proto3" json:"active_effects,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -298,14 +298,14 @@ func (x *PlayerState) GetName() string {
 	return ""
 }
 
-func (x *PlayerState) GetX() int32 {
+func (x *PlayerState) GetX() float32 {
 	if x != nil {
 		return x.X
 	}
 	return 0
 }
 
-func (x *PlayerState) GetY() int32 {
+func (x *PlayerState) GetY() float32 {
 	if x != nil {
 		return x.Y
 	}
@@ -394,14 +394,14 @@ const file_game_v1_game_proto_rawDesc = "" +
 	"\x04type\x18\x01 \x01(\x0e2\x14.game.v1.PowerUpTypeR\x04type\x12.\n" +
 	"\x13duration_ticks_left\x18\x02 \x01(\rR\x11durationTicksLeft\".\n" +
 	"\fInputCommand\x12\x0e\n" +
-	"\x02dx\x18\x01 \x01(\x05R\x02dx\x12\x0e\n" +
-	"\x02dy\x18\x02 \x01(\x05R\x02dy\"\x8b\x01\n" +
+	"\x02vx\x18\x01 \x01(\x02R\x02vx\x12\x0e\n" +
+	"\x02vy\x18\x02 \x01(\x02R\x02vy\"\x8b\x01\n" +
 	"\vPlayerState\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\f\n" +
-	"\x01x\x18\x03 \x01(\x05R\x01x\x12\f\n" +
-	"\x01y\x18\x04 \x01(\x05R\x01y\x12<\n" +
-	"\x0eactive_effects\x18\x05 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffects\"\x82\x01\n" +
+	"\x01x\x18\x03 \x01(\x02R\x01x\x12\f\n" +
+	"\x01y\x18\x04 \x01(\x02R\x01y\x12<\n" +
+	"\x0eactive_effects\x18\x06 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffects\"\x82\x01\n" +
 	"\rWorldSnapshot\x12\x12\n" +
 	"\x04tick\x18\x01 \x01(\x04R\x04tick\x12.\n" +
 	"\aplayers\x18\x02 \x03(\v2\x14.game.v1.PlayerStateR\aplayers\x12-\n" +
