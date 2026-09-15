@@ -85,11 +85,14 @@ message ServerMessage {
     MarketState market_state = 2;
 
     // Discrete events
-    TradeReceipt trade                  = 3;
-    PowerUpSpawned power_up_spawned     = 4;
-    PowerUpDespawned power_up_despawned = 5;
+    PowerUpSpawned power_up_spawned     = 3;
+    PowerUpDespawned power_up_despawned = 4;
 
-    // Initial join / reconnect
-    InitialGameState initial_state      = 6;
+    // Initial join/reconnect
+    InitialGameState initial_state      = 5;
+
+    // Private inventory updates (sent only to owning player)
+    TradeReceipt trade                  = 6;
+    PlayerInventory player_inventory    = 7;
   }
 }

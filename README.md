@@ -1,3 +1,2 @@
 ### Project Setup
-- make proto
-- make run
+`make proto && make run`

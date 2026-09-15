@@ -17,13 +17,17 @@ message OwnedCommodity {
     uint32 amount = 2;
 }
 
-// Server -> Client: Represents an individual player's state
+// Server -> Client: Represents an individual player's state (position only, sent every tick)
 message PlayerState {
   uint32 id = 1;
   string name = 2;
   float x = 3;
   float y = 4;
-  repeated ActiveEffect active_effects = 6;
-  repeated OwnedCommodity owned_commodities = 7;
-  uint64 balance = 8;
+}
+
+// Server -> Client: Private inventory sent only to the owning player (on connect and on change)
+message PlayerInventory {
+  uint64 balance = 1;
+  repeated OwnedCommodity commodities = 2;
+  repeated ActiveEffect active_effects = 3;
 }
