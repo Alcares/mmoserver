@@ -91,11 +91,20 @@ func (p *Player) ToProto() *pb.PlayerState {
 	}
 }
 
-// PlayerInput bundles the command with who sent it
-type PlayerInput struct {
+// PlayerMovementInput bundles the movement command with who sent it
+type PlayerMovementInput struct {
 	PlayerID uint32
 	Vx       float64
 	Vy       float64
+}
+
+// TradeOrder created out of proto TradeRequest
+type TradeOrder struct {
+	PlayerID    uint32
+	SequenceID  uint32
+	Intent      pb.OrderIntent
+	CashAmount  uint64
+	BasisPoints uint32
 }
 
 // Client represents an active WebSocket connection
@@ -106,7 +115,10 @@ type Client struct {
 }
 
 func (c *Client) WritePump() {
-	defer c.Conn.Close()
+	defer func(Conn *websocket.Conn) {
+		if err := Conn.Close(); err != nil {
+		}
+	}(c.Conn)
 
 	for msg := range c.Send {
 		if err := c.Conn.WriteMessage(websocket.BinaryMessage, msg); err != nil {
@@ -134,21 +146,42 @@ func (c *Client) ReadPump(w *World) {
 			continue
 		}
 
-		var cmd pb.InputCommand
-		if err := proto.Unmarshal(payload, &cmd); err != nil {
+		var msg pb.ClientMessage
+		if err := proto.Unmarshal(payload, &msg); err != nil {
 			continue
 		}
 
-		select {
-		case w.inputQueue <- PlayerInput{
-			PlayerID: c.ID,
-			Vx:       float64(cmd.GetVx()),
-			Vy:       float64(cmd.GetVy()),
-		}:
-		default:
-			// Buffer full (client spamming inputs faster than server ticks)
-			// Drop input to maintain server stability
+		switch cmd := msg.Cmd.(type) {
+		case *pb.ClientMessage_Input:
+			select {
+			case w.movementQueue <- PlayerMovementInput{
+				PlayerID: c.ID,
+				Vx:       float64(cmd.Input.GetVx()),
+				Vy:       float64(cmd.Input.GetVy()),
+			}:
+			default:
+				// Buffer full
+			}
+		case *pb.ClientMessage_Trade:
+			o := TradeOrder{
+				PlayerID:   c.ID,
+				SequenceID: cmd.Trade.SequenceId,
+				Intent:     cmd.Trade.Intent,
+			}
+			switch v := cmd.Trade.GetValue().(type) {
+			case *pb.TradeRequest_CashAmount:
+				o.CashAmount = v.CashAmount
+			case *pb.TradeRequest_BasisPoints:
+				o.BasisPoints = v.BasisPoints
+			}
+
+			select {
+			case w.tradeQueue <- o:
+			default:
+				// Buffer full
+			}
 		}
+
 	}
 }
 
@@ -160,10 +193,11 @@ type World struct {
 	tick    uint64
 	players map[uint32]*Player
 	clients map[uint32]*Client
+
 	// Communication channels
-	register   chan *Client
-	unregister chan *Client
-	inputQueue chan PlayerInput
+	movementQueue chan PlayerMovementInput
+	tradeQueue    chan TradeOrder
+
 	// ID generator counter
 	availableSpawns []Vec2f
 	nextPlayerID    uint32
@@ -186,9 +220,8 @@ func NewWorld() *World {
 		tick:            0,
 		players:         make(map[uint32]*Player),
 		clients:         make(map[uint32]*Client),
-		register:        make(chan *Client),
-		unregister:      make(chan *Client),
-		inputQueue:      make(chan PlayerInput, 1024), // Buffered to handle bursts
+		movementQueue:   make(chan PlayerMovementInput, 1024), // Buffered to handle bursts
+		tradeQueue:      make(chan TradeOrder, 64),
 		availableSpawns: initialSpawns,
 		nextPlayerID:    1,
 	}
@@ -244,7 +277,7 @@ func (w *World) Run() {
 	drainInputs:
 		for {
 			select {
-			case input := <-w.inputQueue:
+			case input := <-w.movementQueue:
 				player, exists := w.players[input.PlayerID]
 				if !exists {
 					continue
@@ -264,6 +297,13 @@ func (w *World) Run() {
 				player.TargetDir.X = dirX
 				player.TargetDir.Y = dirY
 
+			// TODO: execute trade
+			case trade := <-w.tradeQueue:
+				// 1. Find out if player is near a trading station
+				// 2. Find out if player has enough cash for the transaction
+				// 3. Commit transaction
+				// 4. Update balances
+				// 5. Broadcast changes
 			default:
 				break drainInputs
 			}

@@ -5,9 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/websocket"
-
+	pb "github.com/alcares/mmoserver/gen/go/game/v1"
 	"github.com/alcares/mmoserver/internal/game"
+	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
 var upgrader = websocket.Upgrader{
@@ -24,6 +25,19 @@ func handleWS(world *game.World, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Marshal the initial state before registering the player, so a failure
+	// here touches neither the world state nor the connection.
+	payload, err := proto.Marshal(&pb.ServerMessage{
+		Msg: &pb.ServerMessage_InitialState{
+			InitialState: &pb.InitialGameState{StationLayout: &pb.StationLayout{}},
+		},
+	})
+	if err != nil {
+		log.Printf("Marshal initial state: %v", err)
+		conn.Close()
+		return
+	}
+
 	client := &game.Client{
 		Conn: conn,
 		Send: make(chan []byte, 32),
@@ -31,6 +45,12 @@ func handleWS(world *game.World, w http.ResponseWriter, r *http.Request) {
 
 	world.Mu.Lock()
 	player, err := world.AddPlayer(client)
+	if err == nil {
+		// Enqueue under the world lock: the tick loop only sends snapshots
+		// while holding the same lock, so FIFO ordering guarantees the
+		// initial state hits the wire before any snapshot for this player.
+		client.Send <- payload
+	}
 	world.Mu.Unlock()
 
 	if err != nil {
@@ -43,7 +63,7 @@ func handleWS(world *game.World, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Player %d (%s) joined at (%d, %d)", player.ID, player.Name, player.Pos.X, player.Pos.Y)
+	log.Printf("Player %d (%s) joined at (%.1f, %.1f)", player.ID, player.Name, player.Pos.X, player.Pos.Y)
 
 	// Spin up dedicated reader and writer routines
 	go client.WritePump()
