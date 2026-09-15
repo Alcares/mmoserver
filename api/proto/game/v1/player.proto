@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package game.v1;
+option go_package = "github.com/alcares/mmoserver/gen/go/game/v1;gamev1";
+
+import "game/v1/common.proto";
+
+// Server -> Client: What power-ups are attached to the player
+message ActiveEffect {
+  PowerUpType type = 1;
+  uint32 duration_ticks_left = 2;
+}
+
+// Server -> Client: What commodities in what quantities is the player holding
+message OwnedCommodity {
+    CommodityType type = 1;
+    uint32 amount = 2;
+}
+
+// Server -> Client: Represents an individual player's state
+message PlayerState {
+  uint32 id = 1;
+  string name = 2;
+  float x = 3;
+  float y = 4;
+  repeated ActiveEffect active_effects = 6;
+  repeated OwnedCommodity owned_commodities = 7;
+  uint64 balance = 8;
+}

@@ -1,1 +1,4 @@
+# IDE cache
 .idea
+# Secrets
+.env

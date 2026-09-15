@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package game.v1;
+option go_package = "github.com/alcares/mmoserver/gen/go/game/v1;gamev1";
+
+enum PowerUpType {
+  POWER_UP_TYPE_UNSPECIFIED = 0;
+  POWER_UP_TYPE_FULL_VISION = 1;
+}
+
+enum CommodityType {
+  COMMODITY_UNSPECIFIED = 0;
+  COMMODITY_WHEAT = 1;
+  COMMODITY_COFFEE = 2;
+  COMMODITY_LITHIUM = 3;
+  COMMODITY_GOLD = 5;
+}
+
+enum OrderIntent {
+  INTENT_UNSPECIFIED = 0;
+  INTENT_ALLOCATE_FIXED = 1; // Spend exact micro-dollar amount
+  INTENT_ALLOCATE_RATIO = 2; // Spend e.g. 10%, 25%, 50%, 100% of wallet
+  INTENT_SELL_RATIO     = 3; // Sell e.g. 25%, 50%, 100% of holdings
+  INTENT_DUMP_ALL       = 4; // Complete liquidation
+}
+

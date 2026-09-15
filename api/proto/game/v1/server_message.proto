@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package game.v1;
+option go_package = "github.com/alcares/mmoserver/gen/go/game/v1;gamev1";
+
+import "game/v1/common.proto";
+import "game/v1/player.proto";
+
+// Server -> Client: Where a power-up is spawned in the world
+message PowerUp {
+  uint32 id = 1;
+  int32 x = 2;
+  int32 y = 3;
+  PowerUpType type = 4;
+}
+
+// Discrete event: A new power up appears on the floor
+message PowerUpSpawned {
+  PowerUp power_up = 1;
+}
+
+// Discrete event: Someone picked it up or it expired
+message PowerUpDespawned {
+  uint32 id = 1;
+  uint32 collected_by_player_id = 2; // 0 if it simply timed out
+}
+
+// Server -> Client: Broadcasted every tick
+message WorldSnapshot {
+  uint64 tick = 1;
+  repeated PlayerState players = 2;
+}
+
+message MarketState {
+  uint64 tick = 1;
+  repeated PriceQuote quotes = 2;
+}
+
+message PriceQuote {
+  CommodityType commodity   = 1;
+  uint32 spot_price_cents   = 2; // e.g., $14.50 = 1450
+  int32  delta_basis_points = 3; // Shift since last tick (+350 = +3.5%)
+  // Total units left in the AMM pool (or total circulating units held by players)
+  uint32 available_pool_units   = 4;
+  // Optional: ID of the biggest bagholder in this pit for client visuals
+  uint32 dominant_whale_id      = 5;
+}
+
+// Server -> Client: After successfully executing a trade
+message TradeReceipt {
+  uint32 sequence_id = 1;         // Matches incoming TradeRequest sequence_id
+  bool success = 2;
+
+  uint64 total_balance_change = 3; // Actual cash spent or gained
+  uint64 units_transacted = 4;    // Micro-units added/removed (scaled by 1e6)
+  uint64 spot_price_cents = 5;    // Execution price per unit
+
+  uint64 new_cash_balance_cents = 6;
+  uint64 new_holding_units = 7;
+}
+
+
+message TradingStation {
+  CommodityType commodity = 1;
+  float x = 2;
+  float y = 3;
+  string label = 4;
+}
+
+message StationLayout {
+  repeated TradingStation stations = 2;
+}
+
+message InitialGameState {
+  StationLayout station_layout = 1;
+}
+
+
+// Server -> Client: Discriminated wrapper for all server messages.
+// Add new server message types as new oneof members.
+message ServerMessage {
+  oneof msg {
+    // Continuous streams
+    WorldSnapshot world_snapshot = 1;
+    MarketState market_state = 2;
+
+    // Discrete events
+    TradeReceipt trade                  = 3;
+    PowerUpSpawned power_up_spawned     = 4;
+    PowerUpDespawned power_up_despawned = 5;
+
+    // Initial join / reconnect
+    InitialGameState initial_state      = 6;
+  }
+}
