@@ -628,10 +628,10 @@ type ServerMessage struct {
 	//
 	//	*ServerMessage_WorldSnapshot
 	//	*ServerMessage_MarketState
-	//	*ServerMessage_Trade
 	//	*ServerMessage_PowerUpSpawned
 	//	*ServerMessage_PowerUpDespawned
 	//	*ServerMessage_InitialState
+	//	*ServerMessage_Trade
 	//	*ServerMessage_PlayerInventory
 	Msg           isServerMessage_Msg `protobuf_oneof:"msg"`
 	unknownFields protoimpl.UnknownFields
@@ -693,15 +693,6 @@ func (x *ServerMessage) GetMarketState() *MarketState {
 	return nil
 }
 
-func (x *ServerMessage) GetTrade() *TradeReceipt {
-	if x != nil {
-		if x, ok := x.Msg.(*ServerMessage_Trade); ok {
-			return x.Trade
-		}
-	}
-	return nil
-}
-
 func (x *ServerMessage) GetPowerUpSpawned() *PowerUpSpawned {
 	if x != nil {
 		if x, ok := x.Msg.(*ServerMessage_PowerUpSpawned); ok {
@@ -729,6 +720,15 @@ func (x *ServerMessage) GetInitialState() *InitialGameState {
 	return nil
 }
 
+func (x *ServerMessage) GetTrade() *TradeReceipt {
+	if x != nil {
+		if x, ok := x.Msg.(*ServerMessage_Trade); ok {
+			return x.Trade
+		}
+	}
+	return nil
+}
+
 func (x *ServerMessage) GetPlayerInventory() *PlayerInventory {
 	if x != nil {
 		if x, ok := x.Msg.(*ServerMessage_PlayerInventory); ok {
@@ -751,26 +751,26 @@ type ServerMessage_MarketState struct {
 	MarketState *MarketState `protobuf:"bytes,2,opt,name=market_state,json=marketState,proto3,oneof"`
 }
 
-type ServerMessage_Trade struct {
-	// Discrete events
-	Trade *TradeReceipt `protobuf:"bytes,3,opt,name=trade,proto3,oneof"`
-}
-
 type ServerMessage_PowerUpSpawned struct {
-	PowerUpSpawned *PowerUpSpawned `protobuf:"bytes,4,opt,name=power_up_spawned,json=powerUpSpawned,proto3,oneof"`
+	// Discrete events
+	PowerUpSpawned *PowerUpSpawned `protobuf:"bytes,3,opt,name=power_up_spawned,json=powerUpSpawned,proto3,oneof"`
 }
 
 type ServerMessage_PowerUpDespawned struct {
-	PowerUpDespawned *PowerUpDespawned `protobuf:"bytes,5,opt,name=power_up_despawned,json=powerUpDespawned,proto3,oneof"`
+	PowerUpDespawned *PowerUpDespawned `protobuf:"bytes,4,opt,name=power_up_despawned,json=powerUpDespawned,proto3,oneof"`
 }
 
 type ServerMessage_InitialState struct {
-	// Initial join / reconnect
-	InitialState *InitialGameState `protobuf:"bytes,6,opt,name=initial_state,json=initialState,proto3,oneof"`
+	// Initial join/reconnect
+	InitialState *InitialGameState `protobuf:"bytes,5,opt,name=initial_state,json=initialState,proto3,oneof"`
+}
+
+type ServerMessage_Trade struct {
+	// Private inventory updates (sent only to owning player)
+	Trade *TradeReceipt `protobuf:"bytes,6,opt,name=trade,proto3,oneof"`
 }
 
 type ServerMessage_PlayerInventory struct {
-	// Private inventory updates (sent only to owning player)
 	PlayerInventory *PlayerInventory `protobuf:"bytes,7,opt,name=player_inventory,json=playerInventory,proto3,oneof"`
 }
 
@@ -778,13 +778,13 @@ func (*ServerMessage_WorldSnapshot) isServerMessage_Msg() {}
 
 func (*ServerMessage_MarketState) isServerMessage_Msg() {}
 
-func (*ServerMessage_Trade) isServerMessage_Msg() {}
-
 func (*ServerMessage_PowerUpSpawned) isServerMessage_Msg() {}
 
 func (*ServerMessage_PowerUpDespawned) isServerMessage_Msg() {}
 
 func (*ServerMessage_InitialState) isServerMessage_Msg() {}
+
+func (*ServerMessage_Trade) isServerMessage_Msg() {}
 
 func (*ServerMessage_PlayerInventory) isServerMessage_Msg() {}
 
@@ -836,11 +836,11 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\x0estation_layout\x18\x01 \x01(\v2\x16.game.v1.StationLayoutR\rstationLayout\"\xda\x03\n" +
 	"\rServerMessage\x12?\n" +
 	"\x0eworld_snapshot\x18\x01 \x01(\v2\x16.game.v1.WorldSnapshotH\x00R\rworldSnapshot\x129\n" +
-	"\fmarket_state\x18\x02 \x01(\v2\x14.game.v1.MarketStateH\x00R\vmarketState\x12-\n" +
-	"\x05trade\x18\x03 \x01(\v2\x15.game.v1.TradeReceiptH\x00R\x05trade\x12C\n" +
-	"\x10power_up_spawned\x18\x04 \x01(\v2\x17.game.v1.PowerUpSpawnedH\x00R\x0epowerUpSpawned\x12I\n" +
-	"\x12power_up_despawned\x18\x05 \x01(\v2\x19.game.v1.PowerUpDespawnedH\x00R\x10powerUpDespawned\x12@\n" +
-	"\rinitial_state\x18\x06 \x01(\v2\x19.game.v1.InitialGameStateH\x00R\finitialState\x12E\n" +
+	"\fmarket_state\x18\x02 \x01(\v2\x14.game.v1.MarketStateH\x00R\vmarketState\x12C\n" +
+	"\x10power_up_spawned\x18\x03 \x01(\v2\x17.game.v1.PowerUpSpawnedH\x00R\x0epowerUpSpawned\x12I\n" +
+	"\x12power_up_despawned\x18\x04 \x01(\v2\x19.game.v1.PowerUpDespawnedH\x00R\x10powerUpDespawned\x12@\n" +
+	"\rinitial_state\x18\x05 \x01(\v2\x19.game.v1.InitialGameStateH\x00R\finitialState\x12-\n" +
+	"\x05trade\x18\x06 \x01(\v2\x15.game.v1.TradeReceiptH\x00R\x05trade\x12E\n" +
 	"\x10player_inventory\x18\a \x01(\v2\x18.game.v1.PlayerInventoryH\x00R\x0fplayerInventoryB\x05\n" +
 	"\x03msgB4Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1b\x06proto3"
 
@@ -885,10 +885,10 @@ var file_game_v1_server_message_proto_depIdxs = []int32{
 	8,  // 7: game.v1.InitialGameState.station_layout:type_name -> game.v1.StationLayout
 	3,  // 8: game.v1.ServerMessage.world_snapshot:type_name -> game.v1.WorldSnapshot
 	4,  // 9: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
-	6,  // 10: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
-	1,  // 11: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
-	2,  // 12: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
-	9,  // 13: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
+	1,  // 10: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
+	2,  // 11: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
+	9,  // 12: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
+	6,  // 13: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
 	14, // 14: game.v1.ServerMessage.player_inventory:type_name -> game.v1.PlayerInventory
 	15, // [15:15] is the sub-list for method output_type
 	15, // [15:15] is the sub-list for method input_type
@@ -907,10 +907,10 @@ func file_game_v1_server_message_proto_init() {
 	file_game_v1_server_message_proto_msgTypes[10].OneofWrappers = []any{
 		(*ServerMessage_WorldSnapshot)(nil),
 		(*ServerMessage_MarketState)(nil),
-		(*ServerMessage_Trade)(nil),
 		(*ServerMessage_PowerUpSpawned)(nil),
 		(*ServerMessage_PowerUpDespawned)(nil),
 		(*ServerMessage_InitialState)(nil),
+		(*ServerMessage_Trade)(nil),
 		(*ServerMessage_PlayerInventory)(nil),
 	}
 	type x struct{}
