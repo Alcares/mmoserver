@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -79,6 +81,14 @@ type Player struct {
 	Pos       Vec2f
 	TargetDir Vec2f // Current intended movement heading (-1 to 1)
 	Speed     float64
+	// private
+	balance     uint64
+	commodities []OwnedCommodity
+}
+
+type OwnedCommodity struct {
+	cType  pb.CommodityType
+	amount uint32
 }
 
 // ToProto maps internal domain state to wire DTO
@@ -96,6 +106,61 @@ type PlayerMovementInput struct {
 	PlayerID uint32
 	Vx       float64
 	Vy       float64
+}
+
+// ellipsePoints assign visually evenly distributed position around central point
+// in an elliptical orbit
+func ellipsePoints(cx, cy, a, b float64, n int) []Vec2f {
+	pts := make([]Vec2f, n)
+	for i := 0; i < n; i++ {
+		theta := 2 * math.Pi * float64(i) / float64(n)
+		pts[i] = Vec2f{
+			X: cx + a*math.Cos(theta),
+			Y: cy + b*math.Sin(theta),
+		}
+	}
+	return pts
+}
+
+type TradingStation struct {
+	Label     string
+	Commodity pb.CommodityType
+	Pos       Vec2f
+}
+
+// ToProto maps internal domain state to wire DTO
+func (t *TradingStation) ToProto() *pb.TradingStation {
+	return &pb.TradingStation{
+		Label:     t.Label,
+		Commodity: t.Commodity,
+		X:         float32(t.Pos.X),
+		Y:         float32(t.Pos.Y),
+	}
+}
+
+func NewTradingStations() []*TradingStation {
+	types := make([]int32, 0, len(pb.CommodityType_name))
+	for v := range pb.CommodityType_name {
+		if v == int32(pb.CommodityType_COMMODITY_UNSPECIFIED) {
+			continue
+		}
+		types = append(types, v)
+	}
+
+	positions := ellipsePoints(WorldMaxX/2.0, WorldMaxY/2.0, 25, 16, len(types))
+	rand.Shuffle(len(positions), func(i, j int) {
+		positions[i], positions[j] = positions[j], positions[i]
+	})
+
+	stations := make([]*TradingStation, len(types))
+	for i, label := range types {
+		stations[i] = &TradingStation{
+			Label:     strings.ToUpper(strings.Split(pb.CommodityType_name[label], "_")[1]),
+			Commodity: pb.CommodityType(label),
+			Pos:       positions[i],
+		}
+	}
+	return stations
 }
 
 // TradeOrder created out of proto TradeRequest
@@ -190,9 +255,10 @@ type World struct {
 	Mu sync.RWMutex
 
 	// Game state
-	tick    uint64
-	players map[uint32]*Player
-	clients map[uint32]*Client
+	tick     uint64
+	players  map[uint32]*Player
+	clients  map[uint32]*Client
+	Stations []*TradingStation
 
 	// Communication channels
 	movementQueue chan PlayerMovementInput
@@ -204,7 +270,7 @@ type World struct {
 }
 
 func NewWorld() *World {
-	// Predefined fixed spawn positions (e.g. within an 800x600 canvas)
+	// Predefined fixed spawn positions
 	// Generates 50 spawns scattered in a radius around the central town (250, 250)
 	initialSpawns := make([]Vec2f, 0, 50)
 	for i := 0; i < 50; i++ {
@@ -220,6 +286,7 @@ func NewWorld() *World {
 		tick:            0,
 		players:         make(map[uint32]*Player),
 		clients:         make(map[uint32]*Client),
+		Stations:        NewTradingStations(),
 		movementQueue:   make(chan PlayerMovementInput, 1024), // Buffered to handle bursts
 		tradeQueue:      make(chan TradeOrder, 64),
 		availableSpawns: initialSpawns,
@@ -298,12 +365,12 @@ func (w *World) Run() {
 				player.TargetDir.Y = dirY
 
 			// TODO: execute trade
-			case trade := <-w.tradeQueue:
-				// 1. Find out if player is near a trading station
-				// 2. Find out if player has enough cash for the transaction
-				// 3. Commit transaction
-				// 4. Update balances
-				// 5. Broadcast changes
+			// case trade := <-w.tradeQueue:
+			// 1. Find out if player is near a trading station
+			// 2. Find out if player has enough cash for the transaction
+			// 3. Commit transaction
+			// 4. Update balances
+			// 5. Broadcast changes
 			default:
 				break drainInputs
 			}
@@ -365,12 +432,16 @@ func (w *World) Run() {
 				}
 			}
 
-			snapshot := &pb.WorldSnapshot{
-				Tick:    w.tick,
-				Players: protoPlayers,
+			msg := &pb.ServerMessage{
+				Msg: &pb.ServerMessage_WorldSnapshot{
+					WorldSnapshot: &pb.WorldSnapshot{
+						Tick:    w.tick,
+						Players: protoPlayers,
+					},
+				},
 			}
 
-			payload, err := proto.Marshal(snapshot)
+			payload, err := proto.Marshal(msg)
 			if err != nil {
 				log.Printf("Marshal error: %v", err)
 				continue

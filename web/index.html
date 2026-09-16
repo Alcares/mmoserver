@@ -57,23 +57,38 @@
   const WORLD_PIXEL_WIDTH = WORLD_TILES * TILE_SIZE;
 
   let players = [];
+  let stations = [];
   let myPlayerId = null;
-  let InputCommand = null;
-  let WorldSnapshot = null;
+  let ClientMessage = null;
+  let ServerMessage = null;
   let socket = null;
 
   const facingDirections = new Map();
   const lastPositions = new Map();
 
-  protobuf.load("game.proto", (err, root) => {
-    if (err) {
-      statusDiv.innerText = "Error loading proto: " + err.message;
-      return;
+  // The proto sources import each other using paths relative to the protoc
+  // -I root (e.g. "game/v1/common.proto"), and are served at those same
+  // relative paths, so just resolve import targets as-is.
+  const root = new protobuf.Root();
+  root.resolvePath = (origin, target) => target;
+  root.load(
+    [
+      "game/v1/common.proto",
+      "game/v1/player.proto",
+      "game/v1/client_message.proto",
+      "game/v1/server_message.proto",
+    ],
+    (err) => {
+      if (err) {
+        statusDiv.innerText = "Error loading proto: " + err.message;
+        return;
+      }
+      root.resolveAll();
+      ClientMessage = root.lookupType("game.v1.ClientMessage");
+      ServerMessage = root.lookupType("game.v1.ServerMessage");
+      initNetwork();
     }
-    InputCommand = root.lookupType("game.v1.InputCommand");
-    WorldSnapshot = root.lookupType("game.v1.WorldSnapshot");
-    initNetwork();
-  });
+  );
 
   function initNetwork() {
     const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -86,31 +101,39 @@
     socket.onmessage = (event) => {
       try {
         const uint8Array = new Uint8Array(event.data);
-        const decoded = WorldSnapshot.decode(uint8Array);
-        const message = WorldSnapshot.toObject(decoded, { defaults: true });
+        const decoded = ServerMessage.decode(uint8Array);
+        const message = ServerMessage.toObject(decoded, { defaults: true, oneofs: true });
 
-        const nextPlayers = message.players || [];
-        for (const p of nextPlayers) {
-          const last = lastPositions.get(p.id);
-          if (last) {
-            p.vx = p.x - last.x;
-            p.vy = p.y - last.y;
-          } else {
-            p.vx = 0;
-            p.vy = 0;
-          }
-          lastPositions.set(p.id, { x: p.x, y: p.y });
-        }
-
-        players = nextPlayers;
-
-        if (myPlayerId === null && players.length > 0) {
-          myPlayerId = players[0].id;
+        if (message.msg === "worldSnapshot") {
+          handleWorldSnapshot(message.worldSnapshot);
+        } else if (message.msg === "initialState") {
+          stations = message.initialState.stationLayout || [];
         }
       } catch (e) {
-        console.error("Failed to decode snapshot:", e);
+        console.error("Failed to decode message:", e);
       }
     };
+
+    function handleWorldSnapshot(snapshot) {
+      const nextPlayers = snapshot.players || [];
+      for (const p of nextPlayers) {
+        const last = lastPositions.get(p.id);
+        if (last) {
+          p.vx = p.x - last.x;
+          p.vy = p.y - last.y;
+        } else {
+          p.vx = 0;
+          p.vy = 0;
+        }
+        lastPositions.set(p.id, { x: p.x, y: p.y });
+      }
+
+      players = nextPlayers;
+
+      if (myPlayerId === null && players.length > 0) {
+        myPlayerId = players[0].id;
+      }
+    }
   }
 
   const pressedKeys = new Set();
@@ -132,9 +155,9 @@
   }
 
   function sendInput() {
-    if (!socket || socket.readyState !== WebSocket.OPEN || !InputCommand) return;
+    if (!socket || socket.readyState !== WebSocket.OPEN || !ClientMessage) return;
     const { vx, vy } = getLocalInputVector();
-    const payload = InputCommand.encode({ vx, vy }).finish();
+    const payload = ClientMessage.encode({ input: { vx, vy } }).finish();
     socket.send(payload);
   }
 
@@ -198,7 +221,26 @@
         ctx.stroke();
       }
 
-      // 3. Draw Players
+      // 3. Draw Trading Stations (blobs only, visuals TBD)
+      for (const s of stations) {
+        const sx = (s.x * TILE_SIZE) + (TILE_SIZE / 2);
+        const sy = (s.y * TILE_SIZE) + (TILE_SIZE / 2);
+
+        ctx.fillStyle = "#f59e0b";
+        ctx.beginPath();
+        ctx.arc(sx, sy, TILE_SIZE * 0.9, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = "bold 10px monospace";
+        ctx.textAlign = "center";
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(15, 23, 42, 0.85)";
+        ctx.strokeText(s.label, sx, sy - (TILE_SIZE * 1.1));
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(s.label, sx, sy - (TILE_SIZE * 1.1));
+      }
+
+      // 4. Draw Players
       const localInput = getLocalInputVector();
 
       for (const p of players) {
@@ -243,7 +285,7 @@
 
       ctx.restore();
 
-      // 4. HUD Overlay
+      // 5. HUD Overlay
       ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
       ctx.fillRect(16, 16, 160, 30);
       ctx.strokeStyle = "#475569";

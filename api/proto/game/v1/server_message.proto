@@ -67,12 +67,8 @@ message TradingStation {
   string label = 4;
 }
 
-message StationLayout {
-  repeated TradingStation stations = 2;
-}
-
 message InitialGameState {
-  StationLayout station_layout = 1;
+  repeated TradingStation station_layout = 1;
 }
 
 

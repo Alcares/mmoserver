@@ -18,7 +18,18 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func handleWS(world *game.World, w http.ResponseWriter, r *http.Request) {
+func buildInitialState(world *game.World) *pb.ServerMessage_InitialState {
+	stations := make([]*pb.TradingStation, 0, len(world.Stations))
+	for _, s := range world.Stations {
+		stations = append(stations, s.ToProto())
+	}
+
+	return &pb.ServerMessage_InitialState{
+		InitialState: &pb.InitialGameState{StationLayout: stations},
+	}
+}
+
+func handleWS(world *game.World, initialState *pb.ServerMessage_InitialState, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("Upgrade failed: %v", err)
@@ -27,11 +38,7 @@ func handleWS(world *game.World, w http.ResponseWriter, r *http.Request) {
 
 	// Marshal the initial state before registering the player, so a failure
 	// here touches neither the world state nor the connection.
-	payload, err := proto.Marshal(&pb.ServerMessage{
-		Msg: &pb.ServerMessage_InitialState{
-			InitialState: &pb.InitialGameState{StationLayout: &pb.StationLayout{}},
-		},
-	})
+	payload, err := proto.Marshal(&pb.ServerMessage{Msg: initialState})
 	if err != nil {
 		log.Printf("Marshal initial state: %v", err)
 		conn.Close()
@@ -72,24 +79,23 @@ func handleWS(world *game.World, w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	world := game.NewWorld()
+	initialState := buildInitialState(world)
 
 	go world.Run()
 	fmt.Println("Server initialized")
 
 	// Static file delivery
 	http.Handle("/", http.FileServer(http.Dir("./web")))
-	http.HandleFunc("/game.proto", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./api/proto/game/v1/game.proto")
-	})
+	// Serve the proto sources under the same relative paths used by their
+	// `import "game/v1/...proto"` statements, so protobufjs can resolve them.
+	http.Handle("/game/", http.StripPrefix("/game/", http.FileServer(http.Dir("./api/proto/game"))))
 
-	// Pass world to handleWS
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		handleWS(world, w, r)
+		handleWS(world, initialState, w, r)
 	})
 
 	log.Println("Listening on http://localhost:8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("Server failed: %v", err)
 	}
-
 }

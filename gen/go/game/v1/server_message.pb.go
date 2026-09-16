@@ -532,60 +532,16 @@ func (x *TradingStation) GetLabel() string {
 	return ""
 }
 
-type StationLayout struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Stations      []*TradingStation      `protobuf:"bytes,2,rep,name=stations,proto3" json:"stations,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StationLayout) Reset() {
-	*x = StationLayout{}
-	mi := &file_game_v1_server_message_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StationLayout) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StationLayout) ProtoMessage() {}
-
-func (x *StationLayout) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_server_message_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StationLayout.ProtoReflect.Descriptor instead.
-func (*StationLayout) Descriptor() ([]byte, []int) {
-	return file_game_v1_server_message_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *StationLayout) GetStations() []*TradingStation {
-	if x != nil {
-		return x.Stations
-	}
-	return nil
-}
-
 type InitialGameState struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	StationLayout *StationLayout         `protobuf:"bytes,1,opt,name=station_layout,json=stationLayout,proto3" json:"station_layout,omitempty"`
+	StationLayout []*TradingStation      `protobuf:"bytes,1,rep,name=station_layout,json=stationLayout,proto3" json:"station_layout,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *InitialGameState) Reset() {
 	*x = InitialGameState{}
-	mi := &file_game_v1_server_message_proto_msgTypes[9]
+	mi := &file_game_v1_server_message_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -597,7 +553,7 @@ func (x *InitialGameState) String() string {
 func (*InitialGameState) ProtoMessage() {}
 
 func (x *InitialGameState) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_server_message_proto_msgTypes[9]
+	mi := &file_game_v1_server_message_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -610,10 +566,10 @@ func (x *InitialGameState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InitialGameState.ProtoReflect.Descriptor instead.
 func (*InitialGameState) Descriptor() ([]byte, []int) {
-	return file_game_v1_server_message_proto_rawDescGZIP(), []int{9}
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *InitialGameState) GetStationLayout() *StationLayout {
+func (x *InitialGameState) GetStationLayout() []*TradingStation {
 	if x != nil {
 		return x.StationLayout
 	}
@@ -640,7 +596,7 @@ type ServerMessage struct {
 
 func (x *ServerMessage) Reset() {
 	*x = ServerMessage{}
-	mi := &file_game_v1_server_message_proto_msgTypes[10]
+	mi := &file_game_v1_server_message_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -652,7 +608,7 @@ func (x *ServerMessage) String() string {
 func (*ServerMessage) ProtoMessage() {}
 
 func (x *ServerMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_server_message_proto_msgTypes[10]
+	mi := &file_game_v1_server_message_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -665,7 +621,7 @@ func (x *ServerMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerMessage.ProtoReflect.Descriptor instead.
 func (*ServerMessage) Descriptor() ([]byte, []int) {
-	return file_game_v1_server_message_proto_rawDescGZIP(), []int{10}
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ServerMessage) GetMsg() isServerMessage_Msg {
@@ -829,11 +785,9 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\tcommodity\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x12\f\n" +
 	"\x01x\x18\x02 \x01(\x02R\x01x\x12\f\n" +
 	"\x01y\x18\x03 \x01(\x02R\x01y\x12\x14\n" +
-	"\x05label\x18\x04 \x01(\tR\x05label\"D\n" +
-	"\rStationLayout\x123\n" +
-	"\bstations\x18\x02 \x03(\v2\x17.game.v1.TradingStationR\bstations\"Q\n" +
-	"\x10InitialGameState\x12=\n" +
-	"\x0estation_layout\x18\x01 \x01(\v2\x16.game.v1.StationLayoutR\rstationLayout\"\xda\x03\n" +
+	"\x05label\x18\x04 \x01(\tR\x05label\"R\n" +
+	"\x10InitialGameState\x12>\n" +
+	"\x0estation_layout\x18\x01 \x03(\v2\x17.game.v1.TradingStationR\rstationLayout\"\xda\x03\n" +
 	"\rServerMessage\x12?\n" +
 	"\x0eworld_snapshot\x18\x01 \x01(\v2\x16.game.v1.WorldSnapshotH\x00R\rworldSnapshot\x129\n" +
 	"\fmarket_state\x18\x02 \x01(\v2\x14.game.v1.MarketStateH\x00R\vmarketState\x12C\n" +
@@ -856,7 +810,7 @@ func file_game_v1_server_message_proto_rawDescGZIP() []byte {
 	return file_game_v1_server_message_proto_rawDescData
 }
 
-var file_game_v1_server_message_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_game_v1_server_message_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_game_v1_server_message_proto_goTypes = []any{
 	(*PowerUp)(nil),          // 0: game.v1.PowerUp
 	(*PowerUpSpawned)(nil),   // 1: game.v1.PowerUpSpawned
@@ -866,35 +820,33 @@ var file_game_v1_server_message_proto_goTypes = []any{
 	(*PriceQuote)(nil),       // 5: game.v1.PriceQuote
 	(*TradeReceipt)(nil),     // 6: game.v1.TradeReceipt
 	(*TradingStation)(nil),   // 7: game.v1.TradingStation
-	(*StationLayout)(nil),    // 8: game.v1.StationLayout
-	(*InitialGameState)(nil), // 9: game.v1.InitialGameState
-	(*ServerMessage)(nil),    // 10: game.v1.ServerMessage
-	(PowerUpType)(0),         // 11: game.v1.PowerUpType
-	(*PlayerState)(nil),      // 12: game.v1.PlayerState
-	(CommodityType)(0),       // 13: game.v1.CommodityType
-	(*PlayerInventory)(nil),  // 14: game.v1.PlayerInventory
+	(*InitialGameState)(nil), // 8: game.v1.InitialGameState
+	(*ServerMessage)(nil),    // 9: game.v1.ServerMessage
+	(PowerUpType)(0),         // 10: game.v1.PowerUpType
+	(*PlayerState)(nil),      // 11: game.v1.PlayerState
+	(CommodityType)(0),       // 12: game.v1.CommodityType
+	(*PlayerInventory)(nil),  // 13: game.v1.PlayerInventory
 }
 var file_game_v1_server_message_proto_depIdxs = []int32{
-	11, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
+	10, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
 	0,  // 1: game.v1.PowerUpSpawned.power_up:type_name -> game.v1.PowerUp
-	12, // 2: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
+	11, // 2: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
 	5,  // 3: game.v1.MarketState.quotes:type_name -> game.v1.PriceQuote
-	13, // 4: game.v1.PriceQuote.commodity:type_name -> game.v1.CommodityType
-	13, // 5: game.v1.TradingStation.commodity:type_name -> game.v1.CommodityType
-	7,  // 6: game.v1.StationLayout.stations:type_name -> game.v1.TradingStation
-	8,  // 7: game.v1.InitialGameState.station_layout:type_name -> game.v1.StationLayout
-	3,  // 8: game.v1.ServerMessage.world_snapshot:type_name -> game.v1.WorldSnapshot
-	4,  // 9: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
-	1,  // 10: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
-	2,  // 11: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
-	9,  // 12: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
-	6,  // 13: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
-	14, // 14: game.v1.ServerMessage.player_inventory:type_name -> game.v1.PlayerInventory
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	12, // 4: game.v1.PriceQuote.commodity:type_name -> game.v1.CommodityType
+	12, // 5: game.v1.TradingStation.commodity:type_name -> game.v1.CommodityType
+	7,  // 6: game.v1.InitialGameState.station_layout:type_name -> game.v1.TradingStation
+	3,  // 7: game.v1.ServerMessage.world_snapshot:type_name -> game.v1.WorldSnapshot
+	4,  // 8: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
+	1,  // 9: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
+	2,  // 10: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
+	8,  // 11: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
+	6,  // 12: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
+	13, // 13: game.v1.ServerMessage.player_inventory:type_name -> game.v1.PlayerInventory
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_server_message_proto_init() }
@@ -904,7 +856,7 @@ func file_game_v1_server_message_proto_init() {
 	}
 	file_game_v1_common_proto_init()
 	file_game_v1_player_proto_init()
-	file_game_v1_server_message_proto_msgTypes[10].OneofWrappers = []any{
+	file_game_v1_server_message_proto_msgTypes[9].OneofWrappers = []any{
 		(*ServerMessage_WorldSnapshot)(nil),
 		(*ServerMessage_MarketState)(nil),
 		(*ServerMessage_PowerUpSpawned)(nil),
@@ -919,7 +871,7 @@ func file_game_v1_server_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_server_message_proto_rawDesc), len(file_game_v1_server_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
