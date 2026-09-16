@@ -61,6 +61,7 @@
   let myPlayerId = null;
   let myBalance = null;
   let myCommodities = [];
+  let commodityPrices = {}; // type string -> PriceQuote, from the latest MarketState
   let tradeSequenceId = 0;
   let ClientMessage = null;
   let ServerMessage = null;
@@ -121,6 +122,10 @@
           myCommodities = (message.playerInventory.commodities || [])
             .slice()
             .sort((a, b) => a.type.localeCompare(b.type));
+        } else if (message.msg === "marketState") {
+          for (const q of message.marketState.quotes || []) {
+            commodityPrices[q.commodity] = q;
+          }
         }
       } catch (e) {
         console.error("Failed to decode message:", e);
@@ -268,13 +273,16 @@
         ctx.arc(sx, sy, TILE_SIZE * 0.9, 0, Math.PI * 2);
         ctx.fill();
 
+        const price = commodityPrices[s.commodity];
+        const stationLabel = price ? `${s.label} ($${price.spotPriceCents})` : s.label;
+
         ctx.font = "bold 10px monospace";
         ctx.textAlign = "center";
         ctx.lineWidth = 3;
         ctx.strokeStyle = "rgba(15, 23, 42, 0.85)";
-        ctx.strokeText(s.label, sx, sy - (TILE_SIZE * 1.1));
+        ctx.strokeText(stationLabel, sx, sy - (TILE_SIZE * 1.1));
         ctx.fillStyle = "#ffffff";
-        ctx.fillText(s.label, sx, sy - (TILE_SIZE * 1.1));
+        ctx.fillText(stationLabel, sx, sy - (TILE_SIZE * 1.1));
       }
 
       // 4. Draw Players
@@ -323,18 +331,28 @@
       ctx.restore();
 
       // 5. HUD Overlay
+      // Value is computed here from the latest MarketState quotes rather
+      // than sent by the server, so there's one live source of truth for
+      // price instead of a snapshot that could go stale as the market moves.
+      function commodityValue(c) {
+        const price = commodityPrices[c.type];
+        return price ? c.amount * price.spotPriceCents : 0;
+      }
+      const portfolioValue = myCommodities.reduce((sum, c) => sum + commodityValue(c), 0);
       const hudLines = [
         `Pos: [${me.x.toFixed(1)}, ${me.y.toFixed(1)}]`,
         `Balance: ${myBalance === null ? "..." : myBalance}`,
-        ...myCommodities.map(c => `${commodityLabel(c.type)}: ${c.amount}`),
+        `Portfolio: ${portfolioValue}`,
+        ...myCommodities.map(c => `${commodityLabel(c.type)}: ${c.amount} ($${commodityValue(c)})`),
       ];
       const hudLineHeight = 18;
+      const hudWidth = 190;
       const hudHeight = 12 + hudLines.length * hudLineHeight;
 
       ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
-      ctx.fillRect(16, 16, 160, hudHeight);
+      ctx.fillRect(16, 16, hudWidth, hudHeight);
       ctx.strokeStyle = "#475569";
-      ctx.strokeRect(16, 16, 160, hudHeight);
+      ctx.strokeRect(16, 16, hudWidth, hudHeight);
       ctx.fillStyle = "#38bdf8";
       ctx.font = "12px monospace";
       ctx.textAlign = "left";

@@ -24,13 +24,7 @@ func (t *TradingStation) ToProto() *pb.TradingStation {
 }
 
 func NewTradingStations() []*TradingStation {
-	types := make([]int32, 0, len(pb.CommodityType_name))
-	for v := range pb.CommodityType_name {
-		if v == int32(pb.CommodityType_COMMODITY_UNSPECIFIED) {
-			continue
-		}
-		types = append(types, v)
-	}
+	types := GetCommodityTypes()
 
 	positions := ellipsePoints(WorldMaxX/2.0, WorldMaxY/2.0, 25, 16, len(types))
 	rand.Shuffle(len(positions), func(i, j int) {
@@ -38,10 +32,10 @@ func NewTradingStations() []*TradingStation {
 	})
 
 	stations := make([]*TradingStation, len(types))
-	for i, label := range types {
+	for i, cType := range types {
 		stations[i] = &TradingStation{
-			Label:     strings.ToUpper(strings.Split(pb.CommodityType_name[label], "_")[1]),
-			Commodity: pb.CommodityType(label),
+			Label:     strings.ToUpper(strings.Split(pb.CommodityType_name[int32(cType)], "_")[1]),
+			Commodity: cType,
 			Pos:       positions[i],
 		}
 	}

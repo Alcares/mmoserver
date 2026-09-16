@@ -17,9 +17,8 @@ type Player struct {
 	TargetDir Vec2f // Current intended movement heading (-1 to 1)
 	Speed     float64
 	// private
-	balance        uint64
-	portfolioValue uint64
-	commodities    map[pb.CommodityType]uint32
+	balance     uint64
+	commodities map[pb.CommodityType]uint32
 }
 
 func NewPlayer(id uint32, pos Vec2f) *Player {
@@ -31,13 +30,12 @@ func NewPlayer(id uint32, pos Vec2f) *Player {
 	}
 
 	return &Player{
-		ID:             id,
-		Name:           fmt.Sprintf("Player %d", id),
-		Pos:            pos,
-		Speed:          MoveSpeed,
-		balance:        StartingBalance,
-		portfolioValue: 0,
-		commodities:    ownedCommodities,
+		ID:          id,
+		Name:        fmt.Sprintf("Player %d", id),
+		Pos:         pos,
+		Speed:       MoveSpeed,
+		balance:     StartingBalance,
+		commodities: ownedCommodities,
 	}
 }
 
@@ -51,15 +49,7 @@ func (p *Player) ToProtoState() *pb.PlayerState {
 	}
 }
 
-func (p *Player) CalculatePortfolioValue(world *World) uint64 {
-	totalValue := uint64(0)
-	for cType, amount := range p.commodities {
-		totalValue += uint64(amount) * world.Commodities[cType].price
-	}
-	return totalValue
-}
-
-func (p *Player) ToProtoInventory(portfolioValue uint64) *pb.PlayerInventory {
+func (p *Player) ToProtoInventory() *pb.PlayerInventory {
 	commodities := make([]*pb.OwnedCommodity, 0, len(p.commodities))
 
 	for cType, amount := range p.commodities {
@@ -70,10 +60,9 @@ func (p *Player) ToProtoInventory(portfolioValue uint64) *pb.PlayerInventory {
 	}
 
 	return &pb.PlayerInventory{
-		Balance:        p.balance,
-		PortfolioValue: portfolioValue,
-		ActiveEffects:  make([]*pb.ActiveEffect, 0),
-		Commodities:    commodities,
+		Balance:       p.balance,
+		ActiveEffects: make([]*pb.ActiveEffect, 0),
+		Commodities:   commodities,
 	}
 }
 

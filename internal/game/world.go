@@ -156,11 +156,11 @@ func (w *World) Run() {
 				// 2. Find out if player has enough cash for the transaction
 				switch trade.Intent {
 				case pb.OrderIntent_INTENT_ALLOCATE_FIXED:
-					if trade.CashAmount < 0 {
-						continue
-					}
 					if player.balance < trade.CashAmount {
 						// TODO: return an invalid trade to the client
+						continue
+					}
+					if w.Commodities[targetStation.Commodity].amount == 0 {
 						continue
 					}
 					player.balance -= trade.CashAmount
@@ -175,6 +175,8 @@ func (w *World) Run() {
 					continue
 				case pb.OrderIntent_INTENT_UNSPECIFIED:
 					continue
+				default:
+					continue
 				}
 
 				client, exists := w.clients[trade.PlayerID]
@@ -184,7 +186,7 @@ func (w *World) Run() {
 
 				msg := &pb.ServerMessage{
 					Msg: &pb.ServerMessage_PlayerInventory{
-						PlayerInventory: player.ToProtoInventory(player.CalculatePortfolioValue(w)),
+						PlayerInventory: player.ToProtoInventory(),
 					},
 				}
 
@@ -283,6 +285,36 @@ func (w *World) Run() {
 			case c.Send <- payload:
 			default:
 				// Client buffer is full; drop this frame to keep tick rate steady
+			}
+		}
+
+		// 5. Broadcast market state: identical for every client, so marshal once
+		quotes := make([]*pb.PriceQuote, 0, len(w.Commodities))
+		for cType, state := range w.Commodities {
+			quotes = append(quotes, &pb.PriceQuote{
+				Commodity:          cType,
+				SpotPriceCents:     uint32(state.price),
+				AvailablePoolUnits: state.amount,
+			})
+		}
+
+		marketPayload, err := proto.Marshal(&pb.ServerMessage{
+			Msg: &pb.ServerMessage_MarketState{
+				MarketState: &pb.MarketState{
+					Tick:   w.tick,
+					Quotes: quotes,
+				},
+			},
+		})
+		if err != nil {
+			log.Printf("Marshal error: %v", err)
+		} else {
+			for _, c := range w.clients {
+				select {
+				case c.Send <- marketPayload:
+				default:
+					// Client buffer is full; drop this frame to keep tick rate steady
+				}
 			}
 		}
 

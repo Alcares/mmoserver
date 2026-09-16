@@ -28,7 +28,6 @@ message PlayerState {
 // Server -> Client: Private inventory sent only to the owning player (on connect and on change)
 message PlayerInventory {
   uint64 balance = 1;
-  uint64 portfolioValue = 2;
-  repeated OwnedCommodity commodities = 3;
-  repeated ActiveEffect active_effects = 4;
+  repeated OwnedCommodity commodities = 2;
+  repeated ActiveEffect active_effects = 3;
 }
