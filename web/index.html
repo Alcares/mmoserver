@@ -59,12 +59,20 @@
   let players = [];
   let stations = [];
   let myPlayerId = null;
+  let myBalance = null;
+  let myCommodities = [];
+  let tradeSequenceId = 0;
   let ClientMessage = null;
   let ServerMessage = null;
   let socket = null;
 
   const facingDirections = new Map();
   const lastPositions = new Map();
+
+  // "COMMODITY_WHEAT" -> "WHEAT", matching the label stations already render
+  function commodityLabel(typeName) {
+    return typeName.split("_")[1] || typeName;
+  }
 
   // The proto sources import each other using paths relative to the protoc
   // -I root (e.g. "game/v1/common.proto"), and are served at those same
@@ -102,12 +110,17 @@
       try {
         const uint8Array = new Uint8Array(event.data);
         const decoded = ServerMessage.decode(uint8Array);
-        const message = ServerMessage.toObject(decoded, { defaults: true, oneofs: true });
+        const message = ServerMessage.toObject(decoded, { defaults: true, oneofs: true, longs: Number, enums: String });
 
         if (message.msg === "worldSnapshot") {
           handleWorldSnapshot(message.worldSnapshot);
         } else if (message.msg === "initialState") {
           stations = message.initialState.stationLayout || [];
+        } else if (message.msg === "playerInventory") {
+          myBalance = message.playerInventory.balance;
+          myCommodities = (message.playerInventory.commodities || [])
+            .slice()
+            .sort((a, b) => a.type.localeCompare(b.type));
         }
       } catch (e) {
         console.error("Failed to decode message:", e);
@@ -161,7 +174,31 @@
     socket.send(payload);
   }
 
+  // Fixed test trade: buy $10.00 of whatever station the player is standing
+  // on. The server silently drops this if no station is in range (TODO on
+  // its end to report that back), so nothing renders differently on failure.
+  const TRADE_TEST_CASH_AMOUNT = 10; // players start with a balance of 100 (world.go StartingBalance)
+  const INTENT_ALLOCATE_FIXED = 1;
+
+  function sendTrade() {
+    if (!socket || socket.readyState !== WebSocket.OPEN || !ClientMessage) return;
+    tradeSequenceId += 1;
+    const payload = ClientMessage.encode({
+      trade: {
+        sequenceId: tradeSequenceId,
+        intent: INTENT_ALLOCATE_FIXED,
+        cashAmount: TRADE_TEST_CASH_AMOUNT,
+      },
+    }).finish();
+    socket.send(payload);
+  }
+
   window.addEventListener("keydown", (e) => {
+    if (e.key === "e" || e.key === "E") {
+      e.preventDefault();
+      sendTrade();
+      return;
+    }
     if (!CONTROL_KEYS.includes(e.key)) return;
     e.preventDefault();
     pressedKeys.add(e.key);
@@ -286,14 +323,24 @@
       ctx.restore();
 
       // 5. HUD Overlay
+      const hudLines = [
+        `Pos: [${me.x.toFixed(1)}, ${me.y.toFixed(1)}]`,
+        `Balance: ${myBalance === null ? "..." : myBalance}`,
+        ...myCommodities.map(c => `${commodityLabel(c.type)}: ${c.amount}`),
+      ];
+      const hudLineHeight = 18;
+      const hudHeight = 12 + hudLines.length * hudLineHeight;
+
       ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
-      ctx.fillRect(16, 16, 160, 30);
+      ctx.fillRect(16, 16, 160, hudHeight);
       ctx.strokeStyle = "#475569";
-      ctx.strokeRect(16, 16, 160, 30);
+      ctx.strokeRect(16, 16, 160, hudHeight);
       ctx.fillStyle = "#38bdf8";
       ctx.font = "12px monospace";
       ctx.textAlign = "left";
-      ctx.fillText(`Pos: [${me.x.toFixed(1)}, ${me.y.toFixed(1)}]`, 26, 35);
+      hudLines.forEach((line, i) => {
+        ctx.fillText(line, 26, 35 + i * hudLineHeight);
+      });
     }
 
     requestAnimationFrame(render);

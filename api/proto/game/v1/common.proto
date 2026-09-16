@@ -14,6 +14,8 @@ enum CommodityType {
   COMMODITY_COFFEE = 2;
   COMMODITY_LITHIUM = 3;
   COMMODITY_GOLD = 5;
+  COMMODITY_OIL = 6;
+  COMMODITY_SILVER = 7;
 }
 
 enum OrderIntent {

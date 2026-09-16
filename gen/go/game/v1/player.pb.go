@@ -198,12 +198,13 @@ func (x *PlayerState) GetY() float32 {
 
 // Server -> Client: Private inventory sent only to the owning player (on connect and on change)
 type PlayerInventory struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Balance       uint64                 `protobuf:"varint,1,opt,name=balance,proto3" json:"balance,omitempty"`
-	Commodities   []*OwnedCommodity      `protobuf:"bytes,2,rep,name=commodities,proto3" json:"commodities,omitempty"`
-	ActiveEffects []*ActiveEffect        `protobuf:"bytes,3,rep,name=active_effects,json=activeEffects,proto3" json:"active_effects,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Balance        uint64                 `protobuf:"varint,1,opt,name=balance,proto3" json:"balance,omitempty"`
+	PortfolioValue uint64                 `protobuf:"varint,2,opt,name=portfolioValue,proto3" json:"portfolioValue,omitempty"`
+	Commodities    []*OwnedCommodity      `protobuf:"bytes,3,rep,name=commodities,proto3" json:"commodities,omitempty"`
+	ActiveEffects  []*ActiveEffect        `protobuf:"bytes,4,rep,name=active_effects,json=activeEffects,proto3" json:"active_effects,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *PlayerInventory) Reset() {
@@ -243,6 +244,13 @@ func (x *PlayerInventory) GetBalance() uint64 {
 	return 0
 }
 
+func (x *PlayerInventory) GetPortfolioValue() uint64 {
+	if x != nil {
+		return x.PortfolioValue
+	}
+	return 0
+}
+
 func (x *PlayerInventory) GetCommodities() []*OwnedCommodity {
 	if x != nil {
 		return x.Commodities
@@ -272,11 +280,12 @@ const file_game_v1_player_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\f\n" +
 	"\x01x\x18\x03 \x01(\x02R\x01x\x12\f\n" +
-	"\x01y\x18\x04 \x01(\x02R\x01y\"\xa4\x01\n" +
+	"\x01y\x18\x04 \x01(\x02R\x01y\"\xcc\x01\n" +
 	"\x0fPlayerInventory\x12\x18\n" +
-	"\abalance\x18\x01 \x01(\x04R\abalance\x129\n" +
-	"\vcommodities\x18\x02 \x03(\v2\x17.game.v1.OwnedCommodityR\vcommodities\x12<\n" +
-	"\x0eactive_effects\x18\x03 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffectsB4Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1b\x06proto3"
+	"\abalance\x18\x01 \x01(\x04R\abalance\x12&\n" +
+	"\x0eportfolioValue\x18\x02 \x01(\x04R\x0eportfolioValue\x129\n" +
+	"\vcommodities\x18\x03 \x03(\v2\x17.game.v1.OwnedCommodityR\vcommodities\x12<\n" +
+	"\x0eactive_effects\x18\x04 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffectsB4Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1b\x06proto3"
 
 var (
 	file_game_v1_player_proto_rawDescOnce sync.Once

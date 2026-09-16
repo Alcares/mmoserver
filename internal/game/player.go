@@ -1,6 +1,14 @@
 package game
 
-import pb "github.com/alcares/mmoserver/gen/go/game/v1"
+import (
+	"fmt"
+
+	pb "github.com/alcares/mmoserver/gen/go/game/v1"
+)
+
+const (
+	StartingBalance = 100
+)
 
 type Player struct {
 	ID        uint32
@@ -9,13 +17,28 @@ type Player struct {
 	TargetDir Vec2f // Current intended movement heading (-1 to 1)
 	Speed     float64
 	// private
-	balance     uint64
-	commodities []OwnedCommodity
+	balance        uint64
+	portfolioValue uint64
+	commodities    map[pb.CommodityType]uint32
 }
 
-type OwnedCommodity struct {
-	cType  pb.CommodityType
-	amount uint32
+func NewPlayer(id uint32, pos Vec2f) *Player {
+	commodityTypes := GetCommodityTypes()
+
+	ownedCommodities := make(map[pb.CommodityType]uint32, len(commodityTypes))
+	for _, v := range commodityTypes {
+		ownedCommodities[v] = uint32(0)
+	}
+
+	return &Player{
+		ID:             id,
+		Name:           fmt.Sprintf("Player %d", id),
+		Pos:            pos,
+		Speed:          MoveSpeed,
+		balance:        StartingBalance,
+		portfolioValue: 0,
+		commodities:    ownedCommodities,
+	}
 }
 
 // ToProtoState maps internal domain state to wire DTO
@@ -28,11 +51,29 @@ func (p *Player) ToProtoState() *pb.PlayerState {
 	}
 }
 
-func (p *Player) ToProtoInventory() *pb.PlayerInventory {
+func (p *Player) CalculatePortfolioValue(world *World) uint64 {
+	totalValue := uint64(0)
+	for cType, amount := range p.commodities {
+		totalValue += uint64(amount) * world.Commodities[cType].price
+	}
+	return totalValue
+}
+
+func (p *Player) ToProtoInventory(portfolioValue uint64) *pb.PlayerInventory {
+	commodities := make([]*pb.OwnedCommodity, 0, len(p.commodities))
+
+	for cType, amount := range p.commodities {
+		commodities = append(commodities, &pb.OwnedCommodity{
+			Type:   cType,
+			Amount: amount,
+		})
+	}
+
 	return &pb.PlayerInventory{
-		Balance:       p.balance,
-		ActiveEffects: make([]*pb.ActiveEffect, 0),
-		Commodities:   make([]*pb.OwnedCommodity, 0),
+		Balance:        p.balance,
+		PortfolioValue: portfolioValue,
+		ActiveEffects:  make([]*pb.ActiveEffect, 0),
+		Commodities:    commodities,
 	}
 }
 

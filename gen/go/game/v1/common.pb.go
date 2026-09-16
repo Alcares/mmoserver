@@ -75,6 +75,8 @@ const (
 	CommodityType_COMMODITY_COFFEE      CommodityType = 2
 	CommodityType_COMMODITY_LITHIUM     CommodityType = 3
 	CommodityType_COMMODITY_GOLD        CommodityType = 5
+	CommodityType_COMMODITY_OIL         CommodityType = 6
+	CommodityType_COMMODITY_SILVER      CommodityType = 7
 )
 
 // Enum value maps for CommodityType.
@@ -85,6 +87,8 @@ var (
 		2: "COMMODITY_COFFEE",
 		3: "COMMODITY_LITHIUM",
 		5: "COMMODITY_GOLD",
+		6: "COMMODITY_OIL",
+		7: "COMMODITY_SILVER",
 	}
 	CommodityType_value = map[string]int32{
 		"COMMODITY_UNSPECIFIED": 0,
@@ -92,6 +96,8 @@ var (
 		"COMMODITY_COFFEE":      2,
 		"COMMODITY_LITHIUM":     3,
 		"COMMODITY_GOLD":        5,
+		"COMMODITY_OIL":         6,
+		"COMMODITY_SILVER":      7,
 	}
 )
 
@@ -184,13 +190,15 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x14game/v1/common.proto\x12\agame.v1*K\n" +
 	"\vPowerUpType\x12\x1d\n" +
 	"\x19POWER_UP_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
-	"\x19POWER_UP_TYPE_FULL_VISION\x10\x01*\x80\x01\n" +
+	"\x19POWER_UP_TYPE_FULL_VISION\x10\x01*\xa9\x01\n" +
 	"\rCommodityType\x12\x19\n" +
 	"\x15COMMODITY_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fCOMMODITY_WHEAT\x10\x01\x12\x14\n" +
 	"\x10COMMODITY_COFFEE\x10\x02\x12\x15\n" +
 	"\x11COMMODITY_LITHIUM\x10\x03\x12\x12\n" +
-	"\x0eCOMMODITY_GOLD\x10\x05*\x87\x01\n" +
+	"\x0eCOMMODITY_GOLD\x10\x05\x12\x11\n" +
+	"\rCOMMODITY_OIL\x10\x06\x12\x14\n" +
+	"\x10COMMODITY_SILVER\x10\a*\x87\x01\n" +
 	"\vOrderIntent\x12\x16\n" +
 	"\x12INTENT_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15INTENT_ALLOCATE_FIXED\x10\x01\x12\x19\n" +

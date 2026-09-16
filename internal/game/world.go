@@ -20,7 +20,6 @@ const (
 	WorldMinY        = 0.0
 	WorldMaxY        = 500.0
 	TickDuration     = 0.05 // 50ms = 20Hz
-	StartingBalance  = 100
 )
 
 // World represents the central authoritative game state
@@ -28,10 +27,11 @@ type World struct {
 	Mu sync.RWMutex
 
 	// Game state
-	tick     uint64
-	players  map[uint32]*Player
-	clients  map[uint32]*Client
-	Stations []*TradingStation
+	tick        uint64
+	players     map[uint32]*Player
+	clients     map[uint32]*Client
+	Stations    []*TradingStation
+	Commodities map[pb.CommodityType]*CommodityState
 
 	// Communication channels
 	movementQueue chan PlayerMovementInput
@@ -60,6 +60,7 @@ func NewWorld() *World {
 		players:         make(map[uint32]*Player),
 		clients:         make(map[uint32]*Client),
 		Stations:        NewTradingStations(),
+		Commodities:     NewCommodities(),
 		movementQueue:   make(chan PlayerMovementInput, 1024), // Buffered to handle bursts
 		tradeQueue:      make(chan TradeOrder, 64),
 		availableSpawns: initialSpawns,
@@ -77,14 +78,7 @@ func (w *World) AddPlayer(client *Client) (*Player, error) {
 
 	playerID := w.nextPlayerID
 	w.nextPlayerID++
-
-	player := &Player{
-		ID:      playerID,
-		Name:    fmt.Sprintf("Player %d", playerID),
-		Pos:     spawnPos,
-		Speed:   MoveSpeed,
-		balance: StartingBalance,
-	}
+	player := NewPlayer(playerID, spawnPos)
 
 	client.ID = playerID
 	w.players[playerID] = player
@@ -160,14 +154,26 @@ func (w *World) Run() {
 				}
 
 				// 2. Find out if player has enough cash for the transaction
-				if trade.CashAmount > 0 {
+				switch trade.Intent {
+				case pb.OrderIntent_INTENT_ALLOCATE_FIXED:
+					if trade.CashAmount < 0 {
+						continue
+					}
 					if player.balance < trade.CashAmount {
 						// TODO: return an invalid trade to the client
 						continue
 					}
 					player.balance -= trade.CashAmount
-				} else {
-					// TOOD: implement basis point handling
+					player.commodities[targetStation.Commodity]++
+					w.Commodities[targetStation.Commodity].amount--
+					// TODO: updateCommodityPrice()
+				case pb.OrderIntent_INTENT_ALLOCATE_RATIO:
+					continue
+				case pb.OrderIntent_INTENT_SELL_RATIO:
+					continue
+				case pb.OrderIntent_INTENT_DUMP_ALL:
+					continue
+				case pb.OrderIntent_INTENT_UNSPECIFIED:
 					continue
 				}
 
@@ -178,7 +184,7 @@ func (w *World) Run() {
 
 				msg := &pb.ServerMessage{
 					Msg: &pb.ServerMessage_PlayerInventory{
-						PlayerInventory: player.ToProtoInventory(),
+						PlayerInventory: player.ToProtoInventory(player.CalculatePortfolioValue(w)),
 					},
 				}
 

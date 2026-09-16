@@ -57,6 +57,17 @@ func handleWS(world *game.World, initialState *pb.ServerMessage_InitialState, w 
 		// while holding the same lock, so FIFO ordering guarantees the
 		// initial state hits the wire before any snapshot for this player.
 		client.Send <- payload
+
+		// The starting balance only exists once AddPlayer assigns it, so this
+		// has to be built per-connection rather than reused like initialState.
+		inventoryPayload, err := proto.Marshal(&pb.ServerMessage{
+			Msg: &pb.ServerMessage_PlayerInventory{PlayerInventory: player.ToProtoInventory(0)},
+		})
+		if err != nil {
+			log.Printf("Marshal initial inventory: %v", err)
+		} else {
+			client.Send <- inventoryPayload
+		}
 	}
 	world.Mu.Unlock()
 
