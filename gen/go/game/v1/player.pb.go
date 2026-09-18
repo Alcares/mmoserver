@@ -276,7 +276,7 @@ const file_game_v1_player_proto_rawDesc = "" +
 	"\x0fPlayerInventory\x12\x18\n" +
 	"\abalance\x18\x01 \x01(\x04R\abalance\x129\n" +
 	"\vcommodities\x18\x02 \x03(\v2\x17.game.v1.OwnedCommodityR\vcommodities\x12<\n" +
-	"\x0eactive_effects\x18\x03 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffectsB4Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1b\x06proto3"
+	"\x0eactive_effects\x18\x03 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffectsB>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
 	file_game_v1_player_proto_rawDescOnce sync.Once

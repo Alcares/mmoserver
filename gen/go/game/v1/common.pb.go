@@ -204,7 +204,7 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x15INTENT_ALLOCATE_FIXED\x10\x01\x12\x19\n" +
 	"\x15INTENT_ALLOCATE_RATIO\x10\x02\x12\x15\n" +
 	"\x11INTENT_SELL_RATIO\x10\x03\x12\x13\n" +
-	"\x0fINTENT_DUMP_ALL\x10\x04B4Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1b\x06proto3"
+	"\x0fINTENT_DUMP_ALL\x10\x04B>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
 	file_game_v1_common_proto_rawDescOnce sync.Once

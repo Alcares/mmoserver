@@ -275,7 +275,7 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\rClientMessage\x120\n" +
 	"\x05input\x18\x01 \x01(\v2\x18.game.v1.MovementCommandH\x00R\x05input\x12-\n" +
 	"\x05trade\x18\x02 \x01(\v2\x15.game.v1.TradeRequestH\x00R\x05tradeB\x05\n" +
-	"\x03cmdB4Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1b\x06proto3"
+	"\x03cmdB>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
 	file_game_v1_client_message_proto_rawDescOnce sync.Once

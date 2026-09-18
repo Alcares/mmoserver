@@ -796,7 +796,7 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\rinitial_state\x18\x05 \x01(\v2\x19.game.v1.InitialGameStateH\x00R\finitialState\x12-\n" +
 	"\x05trade\x18\x06 \x01(\v2\x15.game.v1.TradeReceiptH\x00R\x05trade\x12E\n" +
 	"\x10player_inventory\x18\a \x01(\v2\x18.game.v1.PlayerInventoryH\x00R\x0fplayerInventoryB\x05\n" +
-	"\x03msgB4Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1b\x06proto3"
+	"\x03msgB>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
 	file_game_v1_server_message_proto_rawDescOnce sync.Once
