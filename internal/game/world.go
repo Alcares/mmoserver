@@ -160,13 +160,13 @@ func (w *World) Run() {
 						// TODO: return an invalid trade to the client
 						continue
 					}
-					if w.Commodities[targetStation.Commodity].amount == 0 {
+					unitsBought := w.Commodities[targetStation.Commodity].buy(trade.CashAmount)
+					if unitsBought == 0 {
+						// TODO: return an invalid trade to the client (cash amount too small to move the market)
 						continue
 					}
 					player.balance -= trade.CashAmount
-					player.commodities[targetStation.Commodity]++
-					w.Commodities[targetStation.Commodity].amount--
-					// TODO: updateCommodityPrice()
+					player.commodities[targetStation.Commodity] += uint32(unitsBought)
 				case pb.OrderIntent_INTENT_ALLOCATE_RATIO:
 					continue
 				case pb.OrderIntent_INTENT_SELL_RATIO:
@@ -291,10 +291,19 @@ func (w *World) Run() {
 		// 5. Broadcast market state: identical for every client, so marshal once
 		quotes := make([]*pb.PriceQuote, 0, len(w.Commodities))
 		for cType, state := range w.Commodities {
+			price := state.spotPrice()
+
+			var deltaBasisPoints int32
+			if state.lastPrice > 0 {
+				deltaBasisPoints = int32((price - state.lastPrice) / state.lastPrice * 10000)
+			}
+			state.lastPrice = price
+
 			quotes = append(quotes, &pb.PriceQuote{
 				Commodity:          cType,
-				SpotPriceCents:     uint32(state.price),
-				AvailablePoolUnits: state.amount,
+				SpotPriceCents:     uint32(price),
+				DeltaBasisPoints:   deltaBasisPoints,
+				AvailablePoolUnits: uint32(state.unitReserve),
 			})
 		}
 
