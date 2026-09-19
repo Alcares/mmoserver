@@ -59,12 +59,14 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 		Send: make(chan []byte, game.SendBufferSize),
 	}
 	e.observer = bot.Observer{}
+
 	_, err := e.world.Join(e.client)
 	if err != nil {
 		return nil, err
 	}
 
 	e.world.Tick(e.grid)
+
 	err = e.drain()
 	if err != nil {
 		return nil, err
@@ -73,10 +75,12 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	obs, err := e.observer.Encode(e.goal)
 	if err != nil {
 		return nil, err
 	}
+
 	e.prevDist = obs.GoalDist
 	e.steps = 0
 	e.done = false
