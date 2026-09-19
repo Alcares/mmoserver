@@ -27,7 +27,7 @@ func handleWS(world *game.World, w http.ResponseWriter, r *http.Request) {
 
 	client := &game.Client{
 		Conn: conn,
-		Send: make(chan []byte, 32),
+		Send: make(chan []byte, game.SendBufferSize),
 	}
 
 	player, err := world.Join(client)

@@ -28,7 +28,7 @@ func drain(t *testing.T, c *Client) []*pb.ServerMessage {
 
 func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 	w := NewWorld(rand.New(rand.NewSource(1)))
-	c := &Client{Send: make(chan []byte, 32)}
+	c := &Client{Send: make(chan []byte, SendBufferSize)}
 
 	if _, err := w.Join(c); err != nil {
 		t.Fatal(err)
@@ -58,7 +58,7 @@ func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 func TestJoinSpawnsAtCentre(t *testing.T) {
 	w := NewWorld(rand.New(rand.NewSource(1)))
 	for range 3 {
-		player, err := w.Join(&Client{Send: make(chan []byte, 32)})
+		player, err := w.Join(&Client{Send: make(chan []byte, SendBufferSize)})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -71,12 +71,12 @@ func TestJoinSpawnsAtCentre(t *testing.T) {
 func TestJoinRejectsWhenFull(t *testing.T) {
 	w := NewWorld(rand.New(rand.NewSource(1)))
 	for range MaxPlayers {
-		if _, err := w.Join(&Client{Send: make(chan []byte, 32)}); err != nil {
+		if _, err := w.Join(&Client{Send: make(chan []byte, SendBufferSize)}); err != nil {
 			t.Fatal(err)
 		}
 	}
 
-	c := &Client{Send: make(chan []byte, 32)}
+	c := &Client{Send: make(chan []byte, SendBufferSize)}
 	if _, err := w.Join(c); err == nil {
 		t.Fatal("Join with MaxPlayers already in: want error")
 	}

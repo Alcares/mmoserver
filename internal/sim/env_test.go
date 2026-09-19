@@ -39,11 +39,11 @@ func TestEnvReachesGoal(t *testing.T) {
 			t.Fatal(err)
 		}
 		// Full speed covers MoveSpeed*TickDuration per tick; the bot must be within TradeRange
-		optimal := int(math.Ceil(float64(start.GoalDist()-game.TradeRange) / (game.MoveSpeed * game.TickDuration)))
+		optimal := int(math.Ceil(float64(start.GoalDist-game.TradeRange) / (game.MoveSpeed * game.TickDuration)))
 
 		res, steps := walkToGoal(t, e, seed)
 		if !res.Terminated {
-			t.Fatalf("seed %d: goal %v not reached in %d steps", seed, e.Goal(), steps)
+			t.Fatalf("seed %d: goal %v not reached in %d steps", seed, e.goal, steps)
 		}
 		if steps > optimal+1 {
 			t.Errorf("seed %d: took %d steps, optimal is %d", seed, steps, optimal)

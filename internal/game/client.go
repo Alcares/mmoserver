@@ -6,6 +6,9 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// SendBufferSize is how many outgoing messages a client can have queued before new ones are dropped
+const SendBufferSize = 32
+
 // Client represents an active WebSocket connection
 type Client struct {
 	ID   uint32

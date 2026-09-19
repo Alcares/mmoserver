@@ -14,8 +14,8 @@ const ObsSize = 5
 
 // Observer is the contract between the game and the bot, and everything else (sim, training, spectator) depends on it.
 type Observer struct {
-	stations []*pb.TradingStation
-	world    *pb.WorldSnapshot
+	Stations []*pb.TradingStation
+	World    *pb.WorldSnapshot
 	// for later
 	//inventory *pb.PlayerInventory
 	//market    *pb.MarketState
@@ -27,7 +27,7 @@ type Observation struct {
 	botY     float32
 	goalDX   float32 // Signed offset from the bot to the goal station
 	goalDY   float32
-	goalDist float32
+	GoalDist float32
 }
 
 // Vectorise returns [x, y, dx, dy, dist], all ÷ worldSize. Changing the order or length
@@ -38,33 +38,33 @@ func (o *Observation) Vectorise() [ObsSize]float32 {
 		normalize(o.botY, worldSize),
 		normalize(o.goalDX, worldSize),
 		normalize(o.goalDY, worldSize),
-		normalize(o.goalDist, worldSize),
+		normalize(o.GoalDist, worldSize),
 	}
 }
 
 func (o *Observer) Consume(msg *pb.ServerMessage) { // fed from Client.Send, nothing else
 	switch msg.Msg.(type) {
 	case *pb.ServerMessage_InitialState:
-		o.stations = msg.GetInitialState().StationLayout
+		o.Stations = msg.GetInitialState().StationLayout
 	case *pb.ServerMessage_WorldSnapshot:
-		o.world = msg.GetWorldSnapshot()
+		o.World = msg.GetWorldSnapshot()
 	}
 }
 
 func (o *Observer) Encode(goal pb.CommodityType) (*Observation, error) {
-	if o.stations == nil || o.world == nil {
+	if o.Stations == nil || o.World == nil {
 		return nil, fmt.Errorf("observer: no stations or world found - cannot encode goal")
 	}
-	if len(o.world.Players) == 0 {
+	if len(o.World.Players) == 0 {
 		return nil, fmt.Errorf("observer: no players found - cannot encode goal")
 	}
 
 	observation := &Observation{}
-	observation.botX = o.world.Players[0].X
-	observation.botY = o.world.Players[0].Y
+	observation.botX = o.World.Players[0].X
+	observation.botY = o.World.Players[0].Y
 
 	found := false
-	for _, station := range o.stations {
+	for _, station := range o.Stations {
 		if station.Commodity == goal {
 			observation.goalDX = station.X - observation.botX
 			observation.goalDY = station.Y - observation.botY
@@ -76,7 +76,7 @@ func (o *Observer) Encode(goal pb.CommodityType) (*Observation, error) {
 		return nil, fmt.Errorf("observer: no station trades %v - cannot encode goal", goal)
 	}
 
-	observation.goalDist = distance(observation.goalDX, observation.goalDY)
+	observation.GoalDist = distance(observation.goalDX, observation.goalDY)
 
 	return observation, nil
 }
