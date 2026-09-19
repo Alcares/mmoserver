@@ -21,7 +21,11 @@ const (
 	WorldMaxY        = 500.0
 	TickDuration     = 0.05 // 50ms = 20Hz
 	TradeRange       = 5.0  // Max distance to a station a player can trade from
+	MaxPlayers       = 50
 )
+
+// SpawnPos is where every player joins: the centre of the map
+var SpawnPos = Vec2f{X: (WorldMinX + WorldMaxX) / 2, Y: (WorldMinY + WorldMaxY) / 2}
 
 // World represents the central authoritative game state
 type World struct {
@@ -39,47 +43,38 @@ type World struct {
 	tradeQueue    chan TradeOrder
 
 	// ID generator counter
-	availableSpawns []Vec2f
-	nextPlayerID    uint32
+	nextPlayerID uint32
 }
 
 func NewWorld(rand *rand.Rand) *World {
-	// Predefined fixed spawn positions
-	// Generates 50 spawns scattered in a radius around the central town (250, 250)
-	initialSpawns := make([]Vec2f, 0, 50)
-	for i := 0; i < 50; i++ {
-		ring := float64((i%5 + 1) * 8)
-		angle := float64(i) * 0.7
-		initialSpawns = append(initialSpawns, Vec2f{
-			X: 250.0 + ring*math.Cos(angle),
-			Y: 250.0 + ring*math.Sin(angle),
-		})
-	}
-
 	return &World{
-		tick:            0,
-		players:         make(map[uint32]*Player),
-		clients:         make(map[uint32]*Client),
-		Stations:        NewTradingStations(rand),
-		Commodities:     NewCommodities(),
-		movementQueue:   make(chan PlayerMovementInput, 1024), // Buffered to handle bursts
-		tradeQueue:      make(chan TradeOrder, 64),
-		availableSpawns: initialSpawns,
-		nextPlayerID:    1,
+		tick:          0,
+		players:       make(map[uint32]*Player),
+		clients:       make(map[uint32]*Client),
+		Stations:      NewTradingStations(rand),
+		Commodities:   NewCommodities(),
+		movementQueue: make(chan PlayerMovementInput, 1024), // Buffered to handle bursts
+		tradeQueue:    make(chan TradeOrder, 64),
+		nextPlayerID:  1,
+	}
+}
+
+func (w *World) EnqueueMovement(mov PlayerMovementInput) {
+	select {
+	case w.movementQueue <- mov:
+	default:
+		// Buffer full
 	}
 }
 
 func (w *World) addPlayer(client *Client) (*Player, error) {
-	if len(w.availableSpawns) == 0 {
-		return nil, fmt.Errorf("server full: no spawn points available")
+	if len(w.players) >= MaxPlayers {
+		return nil, fmt.Errorf("server full: %d players", MaxPlayers)
 	}
-
-	spawnPos := w.availableSpawns[0]
-	w.availableSpawns = w.availableSpawns[1:]
 
 	playerID := w.nextPlayerID
 	w.nextPlayerID++
-	player := NewPlayer(playerID, spawnPos)
+	player := NewPlayer(playerID, SpawnPos)
 
 	client.ID = playerID
 	w.players[playerID] = player
@@ -118,12 +113,6 @@ func (w *World) initialState() *pb.InitialGameState {
 }
 
 func (w *World) removePlayer(playerID uint32) {
-	player, exists := w.players[playerID]
-	if !exists {
-		return
-	}
-
-	w.availableSpawns = append(w.availableSpawns, player.Pos)
 	delete(w.players, playerID)
 	delete(w.clients, playerID)
 }

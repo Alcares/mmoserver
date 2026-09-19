@@ -55,15 +55,32 @@ func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 	}
 }
 
+func TestJoinSpawnsAtCentre(t *testing.T) {
+	w := NewWorld(rand.New(rand.NewSource(1)))
+	for range 3 {
+		player, err := w.Join(&Client{Send: make(chan []byte, 32)})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if player.Pos != SpawnPos {
+			t.Errorf("player %d spawned at %v, want %v", player.ID, player.Pos, SpawnPos)
+		}
+	}
+}
+
 func TestJoinRejectsWhenFull(t *testing.T) {
 	w := NewWorld(rand.New(rand.NewSource(1)))
-	w.availableSpawns = nil
-	c := &Client{Send: make(chan []byte, 32)}
-
-	if _, err := w.Join(c); err == nil {
-		t.Fatal("Join with no spawn points: want error")
+	for range MaxPlayers {
+		if _, err := w.Join(&Client{Send: make(chan []byte, 32)}); err != nil {
+			t.Fatal(err)
+		}
 	}
-	if len(w.players) != 0 || len(c.Send) != 0 {
-		t.Errorf("rejected join left %d players and %d queued messages, want none", len(w.players), len(c.Send))
+
+	c := &Client{Send: make(chan []byte, 32)}
+	if _, err := w.Join(c); err == nil {
+		t.Fatal("Join with MaxPlayers already in: want error")
+	}
+	if len(w.players) != MaxPlayers || len(c.Send) != 0 {
+		t.Errorf("rejected join left %d players and %d queued messages, want %d and none", len(w.players), len(c.Send), MaxPlayers)
 	}
 }

@@ -52,15 +52,11 @@ func (c *Client) ReadPump(w *World) {
 
 		switch cmd := msg.Cmd.(type) {
 		case *pb.ClientMessage_Input:
-			select {
-			case w.movementQueue <- PlayerMovementInput{
+			w.EnqueueMovement(PlayerMovementInput{
 				PlayerID: c.ID,
 				Vx:       float64(cmd.Input.GetVx()),
 				Vy:       float64(cmd.Input.GetVy()),
-			}:
-			default:
-				// Buffer full
-			}
+			})
 		case *pb.ClientMessage_Trade:
 			o := TradeOrder{
 				PlayerID:   c.ID,
