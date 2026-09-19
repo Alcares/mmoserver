@@ -23,7 +23,7 @@ func (t *TradingStation) ToProto() *pb.TradingStation {
 	}
 }
 
-func NewTradingStations() []*TradingStation {
+func NewTradingStations(rand *rand.Rand) []*TradingStation {
 	types := GetCommodityTypes()
 
 	positions := ellipsePoints(WorldMaxX/2.0, WorldMaxY/2.0, 25, 16, len(types))

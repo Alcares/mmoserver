@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	pb "github.com/alcares/mmoserver/gen/go/game/v1"
 	"github.com/alcares/mmoserver/internal/game"
@@ -89,7 +91,7 @@ func handleWS(world *game.World, initialState *pb.ServerMessage_InitialState, w 
 }
 
 func main() {
-	world := game.NewWorld()
+	world := game.NewWorld(rand.New(rand.NewSource(time.Now().Unix())))
 	initialState := buildInitialState(world)
 
 	go world.Run()

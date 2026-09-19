@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package sim.v1;
+option go_package = "github.com/alcares/mmoserver/gen/go/sim/v1;simv1";
+
+
+
+// Client -> Server: Discriminated wrapper for all client commands.
+message ClientMessage {
+  oneof cmd {
+  }
+}
