@@ -132,10 +132,11 @@ type OrderIntent int32
 
 const (
 	OrderIntent_INTENT_UNSPECIFIED    OrderIntent = 0
-	OrderIntent_INTENT_ALLOCATE_FIXED OrderIntent = 1 // Spend exact micro-dollar amount
+	OrderIntent_INTENT_ALLOCATE_FIXED OrderIntent = 1 // Buy: spend an exact amount of cash (cents)
 	OrderIntent_INTENT_ALLOCATE_RATIO OrderIntent = 2 // Spend e.g. 10%, 25%, 50%, 100% of wallet
 	OrderIntent_INTENT_SELL_RATIO     OrderIntent = 3 // Sell e.g. 25%, 50%, 100% of holdings
 	OrderIntent_INTENT_DUMP_ALL       OrderIntent = 4 // Complete liquidation
+	OrderIntent_INTENT_SELL_FIXED     OrderIntent = 5 // Sell an exact quantity of units (micro-units)
 )
 
 // Enum value maps for OrderIntent.
@@ -146,6 +147,7 @@ var (
 		2: "INTENT_ALLOCATE_RATIO",
 		3: "INTENT_SELL_RATIO",
 		4: "INTENT_DUMP_ALL",
+		5: "INTENT_SELL_FIXED",
 	}
 	OrderIntent_value = map[string]int32{
 		"INTENT_UNSPECIFIED":    0,
@@ -153,6 +155,7 @@ var (
 		"INTENT_ALLOCATE_RATIO": 2,
 		"INTENT_SELL_RATIO":     3,
 		"INTENT_DUMP_ALL":       4,
+		"INTENT_SELL_FIXED":     5,
 	}
 )
 
@@ -198,13 +201,14 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x11COMMODITY_LITHIUM\x10\x03\x12\x12\n" +
 	"\x0eCOMMODITY_GOLD\x10\x05\x12\x11\n" +
 	"\rCOMMODITY_OIL\x10\x06\x12\x14\n" +
-	"\x10COMMODITY_SILVER\x10\a*\x87\x01\n" +
+	"\x10COMMODITY_SILVER\x10\a*\x9e\x01\n" +
 	"\vOrderIntent\x12\x16\n" +
 	"\x12INTENT_UNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15INTENT_ALLOCATE_FIXED\x10\x01\x12\x19\n" +
 	"\x15INTENT_ALLOCATE_RATIO\x10\x02\x12\x15\n" +
 	"\x11INTENT_SELL_RATIO\x10\x03\x12\x13\n" +
-	"\x0fINTENT_DUMP_ALL\x10\x04B>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
+	"\x0fINTENT_DUMP_ALL\x10\x04\x12\x15\n" +
+	"\x11INTENT_SELL_FIXED\x10\x05B>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
 	file_game_v1_common_proto_rawDescOnce sync.Once

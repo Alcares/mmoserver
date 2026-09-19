@@ -31,16 +31,26 @@ Uniswap and similar decentralized exchanges use, minus the parts that don't appl
 here (no LP tokens, no external liquidity providers — the "pool" is just an internal
 bookkeeping device, not real deposited funds).
 
-**Spot price** is simply the ratio of the two reserves:
-
-```
-price = cashReserve / unitReserve
-```
+The **marginal price** is the ratio of the two reserves, `cashReserve / unitReserve`.
+It is only the price of an infinitesimal sliver, so it is not what players are shown
+(see "The price" below), but it explains why the pool behaves as it does.
 
 There's no separate "update the price" step. Price is never stored as its own
 number that something has to remember to change — it's a computed read of whatever
 the reserves currently are. This means it's structurally impossible for price and
 reserves to drift out of sync with each other.
+
+## Cash is cents, quantities are micro-units
+
+Cash is whole **cents** everywhere: balances, prices, order amounts and the pool's
+cash reserve (`$10.11` is `1011`). Commodity quantities are fixed-point
+**micro-units** (`UnitScale` = 1,000,000 per unit) in the pool and in inventories, so
+holdings are fractional (1.0009, 14.55 units).
+
+The smallest order the pool fills is **one whole unit** (`MinBuyUnits`). Any order
+worth less than that is rejected with no charge and the pool untouched. Orders above
+the minimum are filled at whatever the pool's price is *when the order executes*, not
+when it was placed.
 
 ## Buying
 
@@ -49,34 +59,53 @@ and removes enough from `unitReserve` to keep `k` constant:
 
 ```
 newCashReserve = cashReserve + cashIn
-newUnitReserve = k / newCashReserve
-unitsOut       = unitReserve - newUnitReserve
+newUnitReserve = ceil(k / newCashReserve)
+unitsOut       = unitReserve - newUnitReserve        (micro-units)
 ```
 
-Because `k` is fixed, `newUnitReserve` is always smaller than `unitReserve` for any
-positive `cashIn` — you always get a positive number of units, and the pool never
-needs a manual "are we out of stock" check the way a flat-price model does. If a
-station's reserve is small, the same `cashIn` yields more units per dollar than a
-deep, heavily-bought pool would — but because `newUnitReserve` shrinks in the
-denominator, taking a large share of a shallow pool moves price sharply. This
-"slippage" curve is what makes buying more of something progressively more
-expensive within a single trade, on top of raising the *next* trade's starting
-price.
+`newUnitReserve` rounds **up**, so `unitsOut` rounds down: rounding always stays in
+the pool's favour. Rounding the other way lets a trader buy a fractional unit as a
+whole one and then hold it at full market value. `k` may grow slightly from rounding
+but must never shrink. If `unitsOut` is under the one-unit minimum, the order is
+rejected.
 
-If `cashIn` is too small to move `unitsOut` above zero (i.e., it rounds down to
-nothing at the current price), `buy()` returns `0` and leaves the pool completely
-untouched — no partial trade, no cash silently vanishing into the pool for
-nothing.
+Because `k` is fixed, buying more of something is progressively more expensive within
+a single trade ("slippage"), on top of raising the *next* trade's starting price.
+
+## The price
+
+There is one price per commodity, `price_cents`: **the exact cost of one whole unit
+right now**, rounded up to the cent.
+
+```
+price = ceil(k / (unitReserve - MinBuyUnits)) - cashReserve
+```
+
+It is slightly above the marginal price because taking a unit out of the pool moves
+the price while you buy it. This is the number on the station label, the amount the
+client sends when you press E, and the price holdings are valued at, so the price you
+see is the price you pay.
+
+Sending exactly `price_cents` fills a hair over one unit (the cent rounding, about
+1.0009 units at $10). If another trade pushed the price up before the order arrived,
+the same cash no longer buys a whole unit and the order is rejected with no charge; if
+the price fell, the same cash fills more.
+
+The client only offers one-unit buys. The server accepts any larger order too; it
+fills at the pool's average price for that size, so bulk costs more per unit than the
+displayed price.
 
 ## Selling
 
-Selling `unitsIn` back into the pool is the mirror image:
+Selling `unitsIn` micro-units back into the pool is the mirror image:
 
 ```
 newUnitReserve = unitReserve + unitsIn
-newCashReserve = k / newUnitReserve
+newCashReserve = ceil(k / newUnitReserve)
 cashOut        = cashReserve - newCashReserve
 ```
+
+Same rule as buying: the pool keeps the rounding, so `cashOut` is rounded down.
 
 The math is implemented (`CommodityState.sell`) but not yet wired into any trade
 intent — `INTENT_SELL_RATIO` and `INTENT_DUMP_ALL` are still TODOs in
@@ -84,23 +113,27 @@ intent — `INTENT_SELL_RATIO` and `INTENT_DUMP_ALL` are still TODOs in
 
 ## Worked example
 
-Starting state for a fresh commodity: `unitReserve = 100`, `cashReserve = 1000`
-(so `k = 100,000`, initial price = `1000 / 100 = 10`).
+Starting state for a fresh commodity: `unitReserve` = 100 units, `cashReserve` =
+`100000` cents ($1000.00), so the marginal price is $10.00.
 
-A player buys with `cashIn = 50`:
+The price (cost of one unit):
 
 ```
-newCashReserve = 1000 + 50 = 1050
-newUnitReserve = 100,000 / 1050 = 95 (floored)
-unitsOut       = 100 - 95 = 5 units
-new price      = 1050 / 95 ≈ 11.05
+price = ceil(100000 * 100 / 99) - 100000 = ceil(101010.10) - 100000 = 1011 cents
 ```
 
-Confirmed against the running server: this exact trade produced `price: 10 → 11`
-(rounded for the wire), `delta_basis_points: +1052` (`(11.05 - 10) / 10 * 10000`),
-and pool depth `100 → 95`. A second identical trade pushed price to `12` and depth
-to `90` — each successive buy costs more than the last, exactly as the curve
-predicts.
+A player sends exactly that, `cashIn = 1011`:
+
+```
+newUnitReserve = 100000 * 100 / 101011 = 98.999119 units (rounded up at micro-unit precision)
+unitsOut       = 1.000881 units
+new price      = $10.31
+```
+
+One cent less (`cashIn = 1010`) buys under one unit and is rejected. A bigger order,
+`cashIn = 10000` ($100.00), buys 9.09 units. These cases are pinned by tests in
+`internal/game/commodity_test.go`, alongside a randomized check that no buy, or buy
+followed by sell, is ever worth more than it cost.
 
 ## What gets broadcast
 
@@ -108,15 +141,15 @@ Every tick, `World.Run` builds one `PriceQuote` per commodity and broadcasts the
 same `MarketState` message to every connected client (not just whoever just
 traded — price is global, so everyone needs to see it move):
 
-- `spot_price_cents` — `cashReserve / unitReserve`, truncated to an integer for now
-- `delta_basis_points` — the percent change vs. the price at the end of the
+- `price_cents` — the cost of one whole unit right now, in cents (see "The price")
+- `delta_basis_points` — the percent change of that price vs. the end of the
   *previous* tick (`CommodityState.lastPrice`), in basis points (1% = 100)
-- `available_pool_units` — the current `unitReserve`, i.e. how much liquidity is
+- `available_pool_units` — the current `unitReserve` in whole units, i.e. how much liquidity is
   left before buying gets punishingly expensive
 
 ## The one tuning knob: pool depth
 
-`initialUnitReserve` (currently `100`) is the only number that controls game feel.
+`initialUnits` (currently `100` whole units) is the only number that controls game feel.
 It's not something to derive analytically — it's a balance decision:
 
 - **Shallow pools** (small reserve) mean a single trade swings price a lot. Feels

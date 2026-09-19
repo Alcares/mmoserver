@@ -15,7 +15,7 @@ message ActiveEffect {
 // Server -> Client: What commodities in what quantities is the player holding
 message OwnedCommodity {
     CommodityType type = 1;
-    uint32 amount = 2;
+    uint64 amount = 2; // Micro-units: 1,000,000 = one whole unit
 }
 
 // Server -> Client: Represents an individual player's state (position only, sent every tick)
@@ -28,7 +28,7 @@ message PlayerState {
 
 // Server -> Client: Private inventory sent only to the owning player (on connect and on change)
 message PlayerInventory {
-  uint64 balance = 1;
+  uint64 balance = 1; // Cash in cents: 10000 = $100.00
   repeated OwnedCommodity commodities = 2;
   repeated ActiveEffect active_effects = 3;
 }

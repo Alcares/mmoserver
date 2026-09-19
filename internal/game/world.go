@@ -12,14 +12,14 @@ import (
 )
 
 const (
-	MoveSpeed        = 8.0  // World units per second
-	PlayerRadius     = 0.5  // Collision boundary size
-	DefaultFOVRadius = 15.0 // Float-based vision circle
+	MoveSpeed        = 12.0 // World units per second
+	DefaultFOVRadius = 25.0 // Float-based vision circle
 	WorldMinX        = 0.0
 	WorldMaxX        = 500.0
 	WorldMinY        = 0.0
 	WorldMaxY        = 500.0
 	TickDuration     = 0.05 // 50ms = 20Hz
+	TradeRange       = 5.0  // Max distance to a station a player can trade from
 )
 
 // World represents the central authoritative game state
@@ -139,11 +139,12 @@ func (w *World) Run() {
 					continue
 				}
 
+				// 1. Find the nearest trading station within range
 				var targetStation *TradingStation
-
-				// 1. Find out if player is near a trading station
+				nearest := TradeRange
 				for _, station := range w.Stations {
-					if EuclideanDistance(player.Pos, station.Pos) <= 5 {
+					if d := EuclideanDistance(player.Pos, station.Pos); d <= nearest {
+						nearest = d
 						targetStation = station
 					}
 				}
@@ -162,11 +163,24 @@ func (w *World) Run() {
 					}
 					unitsBought := w.Commodities[targetStation.Commodity].buy(trade.CashAmount)
 					if unitsBought == 0 {
-						// TODO: return an invalid trade to the client (cash amount too small to move the market)
+						// TODO: return an invalid trade to the client (order would buy less than one unit, e.g. the price rose)
 						continue
 					}
 					player.balance -= trade.CashAmount
-					player.commodities[targetStation.Commodity] += uint32(unitsBought)
+					player.commodities[targetStation.Commodity] += unitsBought
+				case pb.OrderIntent_INTENT_SELL_FIXED:
+					held := player.commodities[targetStation.Commodity]
+					if trade.UnitAmount == 0 || held < trade.UnitAmount {
+						// TODO: return an invalid trade to the client
+						continue
+					}
+					cashOut := w.Commodities[targetStation.Commodity].sell(trade.UnitAmount)
+					if cashOut == 0 {
+						// TODO: return an invalid trade to the client (units worth less than a cent)
+						continue
+					}
+					player.commodities[targetStation.Commodity] = held - trade.UnitAmount
+					player.balance += cashOut
 				case pb.OrderIntent_INTENT_ALLOCATE_RATIO:
 					continue
 				case pb.OrderIntent_INTENT_SELL_RATIO:
@@ -291,7 +305,7 @@ func (w *World) Run() {
 		// 5. Broadcast market state: identical for every client, so marshal once
 		quotes := make([]*pb.PriceQuote, 0, len(w.Commodities))
 		for cType, state := range w.Commodities {
-			price := state.spotPrice()
+			price := float64(state.unitPrice())
 
 			var deltaBasisPoints int32
 			if state.lastPrice > 0 {
@@ -301,9 +315,10 @@ func (w *World) Run() {
 
 			quotes = append(quotes, &pb.PriceQuote{
 				Commodity:          cType,
-				SpotPriceCents:     uint32(price),
+				BuyPriceCents:      uint32(price),
+				SellPriceCents:     uint32(state.sellPrice()),
 				DeltaBasisPoints:   deltaBasisPoints,
-				AvailablePoolUnits: uint32(state.unitReserve),
+				AvailablePoolUnits: uint32(state.unitReserve / UnitScale),
 			})
 		}
 

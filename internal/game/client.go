@@ -72,6 +72,8 @@ func (c *Client) ReadPump(w *World) {
 				o.CashAmount = v.CashAmount
 			case *pb.TradeRequest_BasisPoints:
 				o.BasisPoints = v.BasisPoints
+			case *pb.TradeRequest_UnitAmount:
+				o.UnitAmount = v.UnitAmount
 			}
 
 			select {

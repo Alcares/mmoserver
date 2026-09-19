@@ -20,6 +20,7 @@ message TradeRequest {
   oneof value {
     uint64 cash_amount = 3;       // Flat cash (e.g. $10.00 = 1000)
     uint32 basis_points = 4;      // Percentage of wallet (10000 = 100%, 2500 = 25%)
+    uint64 unit_amount = 5;       // Units to sell, in micro-units (1000000 = one whole unit)
   }
 }
 

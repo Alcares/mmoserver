@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	StartingBalance = 100
+	StartingBalance = 1000_00 // cents, i.e. $1000.00
 )
 
 type Player struct {
@@ -18,15 +18,15 @@ type Player struct {
 	Speed     float64
 	// private
 	balance     uint64
-	commodities map[pb.CommodityType]uint32
+	commodities map[pb.CommodityType]uint64 // micro-units, see UnitScale
 }
 
 func NewPlayer(id uint32, pos Vec2f) *Player {
 	commodityTypes := GetCommodityTypes()
 
-	ownedCommodities := make(map[pb.CommodityType]uint32, len(commodityTypes))
+	ownedCommodities := make(map[pb.CommodityType]uint64, len(commodityTypes))
 	for _, v := range commodityTypes {
-		ownedCommodities[v] = uint32(0)
+		ownedCommodities[v] = 0
 	}
 
 	return &Player{

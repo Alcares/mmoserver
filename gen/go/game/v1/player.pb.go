@@ -78,7 +78,7 @@ func (x *ActiveEffect) GetDurationTicksLeft() uint32 {
 type OwnedCommodity struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          CommodityType          `protobuf:"varint,1,opt,name=type,proto3,enum=game.v1.CommodityType" json:"type,omitempty"`
-	Amount        uint32                 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	Amount        uint64                 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"` // Micro-units: 1,000,000 = one whole unit
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -120,7 +120,7 @@ func (x *OwnedCommodity) GetType() CommodityType {
 	return CommodityType_COMMODITY_UNSPECIFIED
 }
 
-func (x *OwnedCommodity) GetAmount() uint32 {
+func (x *OwnedCommodity) GetAmount() uint64 {
 	if x != nil {
 		return x.Amount
 	}
@@ -199,7 +199,7 @@ func (x *PlayerState) GetY() float32 {
 // Server -> Client: Private inventory sent only to the owning player (on connect and on change)
 type PlayerInventory struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Balance       uint64                 `protobuf:"varint,1,opt,name=balance,proto3" json:"balance,omitempty"`
+	Balance       uint64                 `protobuf:"varint,1,opt,name=balance,proto3" json:"balance,omitempty"` // Cash in cents: 10000 = $100.00
 	Commodities   []*OwnedCommodity      `protobuf:"bytes,2,rep,name=commodities,proto3" json:"commodities,omitempty"`
 	ActiveEffects []*ActiveEffect        `protobuf:"bytes,3,rep,name=active_effects,json=activeEffects,proto3" json:"active_effects,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -267,7 +267,7 @@ const file_game_v1_player_proto_rawDesc = "" +
 	"\x13duration_ticks_left\x18\x02 \x01(\rR\x11durationTicksLeft\"T\n" +
 	"\x0eOwnedCommodity\x12*\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\x04type\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\rR\x06amount\"M\n" +
+	"\x06amount\x18\x02 \x01(\x04R\x06amount\"M\n" +
 	"\vPlayerState\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\f\n" +

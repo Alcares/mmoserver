@@ -83,6 +83,7 @@ type TradeRequest struct {
 	//
 	//	*TradeRequest_CashAmount
 	//	*TradeRequest_BasisPoints
+	//	*TradeRequest_UnitAmount
 	Value         isTradeRequest_Value `protobuf_oneof:"value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -157,6 +158,15 @@ func (x *TradeRequest) GetBasisPoints() uint32 {
 	return 0
 }
 
+func (x *TradeRequest) GetUnitAmount() uint64 {
+	if x != nil {
+		if x, ok := x.Value.(*TradeRequest_UnitAmount); ok {
+			return x.UnitAmount
+		}
+	}
+	return 0
+}
+
 type isTradeRequest_Value interface {
 	isTradeRequest_Value()
 }
@@ -169,9 +179,15 @@ type TradeRequest_BasisPoints struct {
 	BasisPoints uint32 `protobuf:"varint,4,opt,name=basis_points,json=basisPoints,proto3,oneof"` // Percentage of wallet (10000 = 100%, 2500 = 25%)
 }
 
+type TradeRequest_UnitAmount struct {
+	UnitAmount uint64 `protobuf:"varint,5,opt,name=unit_amount,json=unitAmount,proto3,oneof"` // Units to sell, in micro-units (1000000 = one whole unit)
+}
+
 func (*TradeRequest_CashAmount) isTradeRequest_Value() {}
 
 func (*TradeRequest_BasisPoints) isTradeRequest_Value() {}
+
+func (*TradeRequest_UnitAmount) isTradeRequest_Value() {}
 
 // Client -> Server: Discriminated wrapper for all client commands.
 type ClientMessage struct {
@@ -263,14 +279,16 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\x1cgame/v1/client_message.proto\x12\agame.v1\x1a\x14game/v1/common.proto\"1\n" +
 	"\x0fMovementCommand\x12\x0e\n" +
 	"\x02vx\x18\x01 \x01(\x02R\x02vx\x12\x0e\n" +
-	"\x02vy\x18\x02 \x01(\x02R\x02vy\"\xae\x01\n" +
+	"\x02vy\x18\x02 \x01(\x02R\x02vy\"\xd1\x01\n" +
 	"\fTradeRequest\x12\x1f\n" +
 	"\vsequence_id\x18\x01 \x01(\rR\n" +
 	"sequenceId\x12,\n" +
 	"\x06intent\x18\x02 \x01(\x0e2\x14.game.v1.OrderIntentR\x06intent\x12!\n" +
 	"\vcash_amount\x18\x03 \x01(\x04H\x00R\n" +
 	"cashAmount\x12#\n" +
-	"\fbasis_points\x18\x04 \x01(\rH\x00R\vbasisPointsB\a\n" +
+	"\fbasis_points\x18\x04 \x01(\rH\x00R\vbasisPoints\x12!\n" +
+	"\vunit_amount\x18\x05 \x01(\x04H\x00R\n" +
+	"unitAmountB\a\n" +
 	"\x05value\"w\n" +
 	"\rClientMessage\x120\n" +
 	"\x05input\x18\x01 \x01(\v2\x18.game.v1.MovementCommandH\x00R\x05input\x12-\n" +
@@ -316,6 +334,7 @@ func file_game_v1_client_message_proto_init() {
 	file_game_v1_client_message_proto_msgTypes[1].OneofWrappers = []any{
 		(*TradeRequest_CashAmount)(nil),
 		(*TradeRequest_BasisPoints)(nil),
+		(*TradeRequest_UnitAmount)(nil),
 	}
 	file_game_v1_client_message_proto_msgTypes[2].OneofWrappers = []any{
 		(*ClientMessage_Input)(nil),

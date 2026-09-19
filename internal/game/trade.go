@@ -9,4 +9,5 @@ type TradeOrder struct {
 	Intent      pb.OrderIntent
 	CashAmount  uint64
 	BasisPoints uint32
+	UnitAmount  uint64 // micro-units, for sell orders
 }

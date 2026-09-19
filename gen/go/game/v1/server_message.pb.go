@@ -294,16 +294,22 @@ func (x *MarketState) GetQuotes() []*PriceQuote {
 }
 
 type PriceQuote struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Commodity        CommodityType          `protobuf:"varint,1,opt,name=commodity,proto3,enum=game.v1.CommodityType" json:"commodity,omitempty"`
-	SpotPriceCents   uint32                 `protobuf:"varint,2,opt,name=spot_price_cents,json=spotPriceCents,proto3" json:"spot_price_cents,omitempty"`       // e.g., $14.50 = 1450
-	DeltaBasisPoints int32                  `protobuf:"varint,3,opt,name=delta_basis_points,json=deltaBasisPoints,proto3" json:"delta_basis_points,omitempty"` // Shift since last tick (+350 = +3.5%)
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Commodity CommodityType          `protobuf:"varint,1,opt,name=commodity,proto3,enum=game.v1.CommodityType" json:"commodity,omitempty"`
+	// Buy price: cash (in cents) for exactly one whole unit right now, rounded up to the cent.
+	// Clients show it and send exactly it as the order; the minimum buy is one unit.
+	// 0 means the pool can't sell a whole unit.
+	BuyPriceCents    uint32 `protobuf:"varint,2,opt,name=buy_price_cents,json=buyPriceCents,proto3" json:"buy_price_cents,omitempty"`          // e.g., $14.50 = 1450
+	DeltaBasisPoints int32  `protobuf:"varint,3,opt,name=delta_basis_points,json=deltaBasisPoints,proto3" json:"delta_basis_points,omitempty"` // Shift since last tick (+350 = +3.5%)
 	// Total units left in the AMM pool (or total circulating units held by players)
 	AvailablePoolUnits uint32 `protobuf:"varint,4,opt,name=available_pool_units,json=availablePoolUnits,proto3" json:"available_pool_units,omitempty"`
 	// Optional: ID of the biggest bagholder in this pit for client visuals
 	DominantWhaleId uint32 `protobuf:"varint,5,opt,name=dominant_whale_id,json=dominantWhaleId,proto3" json:"dominant_whale_id,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Sell price: cash (in cents) received for selling exactly one whole unit right now, rounded
+	// down to the cent. It is always a little below the buy price: the pool keeps the spread.
+	SellPriceCents uint32 `protobuf:"varint,7,opt,name=sell_price_cents,json=sellPriceCents,proto3" json:"sell_price_cents,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *PriceQuote) Reset() {
@@ -343,9 +349,9 @@ func (x *PriceQuote) GetCommodity() CommodityType {
 	return CommodityType_COMMODITY_UNSPECIFIED
 }
 
-func (x *PriceQuote) GetSpotPriceCents() uint32 {
+func (x *PriceQuote) GetBuyPriceCents() uint32 {
 	if x != nil {
-		return x.SpotPriceCents
+		return x.BuyPriceCents
 	}
 	return 0
 }
@@ -371,6 +377,13 @@ func (x *PriceQuote) GetDominantWhaleId() uint32 {
 	return 0
 }
 
+func (x *PriceQuote) GetSellPriceCents() uint32 {
+	if x != nil {
+		return x.SellPriceCents
+	}
+	return 0
+}
+
 // Server -> Client: After successfully executing a trade
 type TradeReceipt struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
@@ -378,7 +391,7 @@ type TradeReceipt struct {
 	Success             bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
 	TotalBalanceChange  uint64                 `protobuf:"varint,3,opt,name=total_balance_change,json=totalBalanceChange,proto3" json:"total_balance_change,omitempty"` // Actual cash spent or gained
 	UnitsTransacted     uint64                 `protobuf:"varint,4,opt,name=units_transacted,json=unitsTransacted,proto3" json:"units_transacted,omitempty"`            // Micro-units added/removed (scaled by 1e6)
-	SpotPriceCents      uint64                 `protobuf:"varint,5,opt,name=spot_price_cents,json=spotPriceCents,proto3" json:"spot_price_cents,omitempty"`             // Execution price per unit
+	PriceCents          uint64                 `protobuf:"varint,5,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`                           // Execution price per unit
 	NewCashBalanceCents uint64                 `protobuf:"varint,6,opt,name=new_cash_balance_cents,json=newCashBalanceCents,proto3" json:"new_cash_balance_cents,omitempty"`
 	NewHoldingUnits     uint64                 `protobuf:"varint,7,opt,name=new_holding_units,json=newHoldingUnits,proto3" json:"new_holding_units,omitempty"`
 	unknownFields       protoimpl.UnknownFields
@@ -443,9 +456,9 @@ func (x *TradeReceipt) GetUnitsTransacted() uint64 {
 	return 0
 }
 
-func (x *TradeReceipt) GetSpotPriceCents() uint64 {
+func (x *TradeReceipt) GetPriceCents() uint64 {
 	if x != nil {
-		return x.SpotPriceCents
+		return x.PriceCents
 	}
 	return 0
 }
@@ -764,21 +777,23 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\aplayers\x18\x02 \x03(\v2\x14.game.v1.PlayerStateR\aplayers\"N\n" +
 	"\vMarketState\x12\x12\n" +
 	"\x04tick\x18\x01 \x01(\x04R\x04tick\x12+\n" +
-	"\x06quotes\x18\x02 \x03(\v2\x13.game.v1.PriceQuoteR\x06quotes\"\xf8\x01\n" +
+	"\x06quotes\x18\x02 \x03(\v2\x13.game.v1.PriceQuoteR\x06quotes\"\xb6\x02\n" +
 	"\n" +
 	"PriceQuote\x124\n" +
-	"\tcommodity\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x12(\n" +
-	"\x10spot_price_cents\x18\x02 \x01(\rR\x0espotPriceCents\x12,\n" +
+	"\tcommodity\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x12&\n" +
+	"\x0fbuy_price_cents\x18\x02 \x01(\rR\rbuyPriceCents\x12,\n" +
 	"\x12delta_basis_points\x18\x03 \x01(\x05R\x10deltaBasisPoints\x120\n" +
 	"\x14available_pool_units\x18\x04 \x01(\rR\x12availablePoolUnits\x12*\n" +
-	"\x11dominant_whale_id\x18\x05 \x01(\rR\x0fdominantWhaleId\"\xb1\x02\n" +
+	"\x11dominant_whale_id\x18\x05 \x01(\rR\x0fdominantWhaleId\x12(\n" +
+	"\x10sell_price_cents\x18\a \x01(\rR\x0esellPriceCentsJ\x04\b\x06\x10\aR\x0ebuy_cost_cents\"\xa8\x02\n" +
 	"\fTradeReceipt\x12\x1f\n" +
 	"\vsequence_id\x18\x01 \x01(\rR\n" +
 	"sequenceId\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x120\n" +
 	"\x14total_balance_change\x18\x03 \x01(\x04R\x12totalBalanceChange\x12)\n" +
-	"\x10units_transacted\x18\x04 \x01(\x04R\x0funitsTransacted\x12(\n" +
-	"\x10spot_price_cents\x18\x05 \x01(\x04R\x0espotPriceCents\x123\n" +
+	"\x10units_transacted\x18\x04 \x01(\x04R\x0funitsTransacted\x12\x1f\n" +
+	"\vprice_cents\x18\x05 \x01(\x04R\n" +
+	"priceCents\x123\n" +
 	"\x16new_cash_balance_cents\x18\x06 \x01(\x04R\x13newCashBalanceCents\x12*\n" +
 	"\x11new_holding_units\x18\a \x01(\x04R\x0fnewHoldingUnits\"x\n" +
 	"\x0eTradingStation\x124\n" +
