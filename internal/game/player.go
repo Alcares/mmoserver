@@ -18,7 +18,7 @@ type Player struct {
 	Speed     float64
 	// private
 	balance     uint64
-	commodities map[pb.CommodityType]uint64 // micro-units, see UnitScale
+	commodities map[pb.CommodityType]uint64 // whole units
 }
 
 func NewPlayer(id uint32, pos Vec2f) *Player {

@@ -74,9 +74,9 @@ const (
 	CommodityType_COMMODITY_WHEAT       CommodityType = 1
 	CommodityType_COMMODITY_COFFEE      CommodityType = 2
 	CommodityType_COMMODITY_LITHIUM     CommodityType = 3
-	CommodityType_COMMODITY_GOLD        CommodityType = 5
-	CommodityType_COMMODITY_OIL         CommodityType = 6
-	CommodityType_COMMODITY_SILVER      CommodityType = 7
+	CommodityType_COMMODITY_GOLD        CommodityType = 4
+	CommodityType_COMMODITY_OIL         CommodityType = 5
+	CommodityType_COMMODITY_SILVER      CommodityType = 6
 )
 
 // Enum value maps for CommodityType.
@@ -86,18 +86,18 @@ var (
 		1: "COMMODITY_WHEAT",
 		2: "COMMODITY_COFFEE",
 		3: "COMMODITY_LITHIUM",
-		5: "COMMODITY_GOLD",
-		6: "COMMODITY_OIL",
-		7: "COMMODITY_SILVER",
+		4: "COMMODITY_GOLD",
+		5: "COMMODITY_OIL",
+		6: "COMMODITY_SILVER",
 	}
 	CommodityType_value = map[string]int32{
 		"COMMODITY_UNSPECIFIED": 0,
 		"COMMODITY_WHEAT":       1,
 		"COMMODITY_COFFEE":      2,
 		"COMMODITY_LITHIUM":     3,
-		"COMMODITY_GOLD":        5,
-		"COMMODITY_OIL":         6,
-		"COMMODITY_SILVER":      7,
+		"COMMODITY_GOLD":        4,
+		"COMMODITY_OIL":         5,
+		"COMMODITY_SILVER":      6,
 	}
 )
 
@@ -131,31 +131,22 @@ func (CommodityType) EnumDescriptor() ([]byte, []int) {
 type OrderIntent int32
 
 const (
-	OrderIntent_INTENT_UNSPECIFIED    OrderIntent = 0
-	OrderIntent_INTENT_ALLOCATE_FIXED OrderIntent = 1 // Buy: spend an exact amount of cash (cents)
-	OrderIntent_INTENT_ALLOCATE_RATIO OrderIntent = 2 // Spend e.g. 10%, 25%, 50%, 100% of wallet
-	OrderIntent_INTENT_SELL_RATIO     OrderIntent = 3 // Sell e.g. 25%, 50%, 100% of holdings
-	OrderIntent_INTENT_DUMP_ALL       OrderIntent = 4 // Complete liquidation
-	OrderIntent_INTENT_SELL_FIXED     OrderIntent = 5 // Sell an exact quantity of units (micro-units)
+	OrderIntent_INTENT_UNSPECIFIED OrderIntent = 0
+	OrderIntent_INTENT_BUY         OrderIntent = 1 // Buy a whole number of units
+	OrderIntent_INTENT_SELL        OrderIntent = 2 // Sell a whole number of units
 )
 
 // Enum value maps for OrderIntent.
 var (
 	OrderIntent_name = map[int32]string{
 		0: "INTENT_UNSPECIFIED",
-		1: "INTENT_ALLOCATE_FIXED",
-		2: "INTENT_ALLOCATE_RATIO",
-		3: "INTENT_SELL_RATIO",
-		4: "INTENT_DUMP_ALL",
-		5: "INTENT_SELL_FIXED",
+		1: "INTENT_BUY",
+		2: "INTENT_SELL",
 	}
 	OrderIntent_value = map[string]int32{
-		"INTENT_UNSPECIFIED":    0,
-		"INTENT_ALLOCATE_FIXED": 1,
-		"INTENT_ALLOCATE_RATIO": 2,
-		"INTENT_SELL_RATIO":     3,
-		"INTENT_DUMP_ALL":       4,
-		"INTENT_SELL_FIXED":     5,
+		"INTENT_UNSPECIFIED": 0,
+		"INTENT_BUY":         1,
+		"INTENT_SELL":        2,
 	}
 )
 
@@ -186,6 +177,68 @@ func (OrderIntent) EnumDescriptor() ([]byte, []int) {
 	return file_game_v1_common_proto_rawDescGZIP(), []int{2}
 }
 
+// Why the server refused a trade, carried in TradeReceipt
+type TradeRejection int32
+
+const (
+	TradeRejection_TRADE_REJECTION_UNSPECIFIED        TradeRejection = 0 // Not rejected: the trade executed
+	TradeRejection_TRADE_REJECTION_NOT_AT_STATION     TradeRejection = 1 // No trading station within TradeRange
+	TradeRejection_TRADE_REJECTION_INVALID_ORDER      TradeRejection = 2 // Unknown intent or zero units
+	TradeRejection_TRADE_REJECTION_PRICE_MOVED        TradeRejection = 3 // The price moved against the price the client sent
+	TradeRejection_TRADE_REJECTION_INSUFFICIENT_CASH  TradeRejection = 4 // Can't afford units * price
+	TradeRejection_TRADE_REJECTION_INSUFFICIENT_UNITS TradeRejection = 5 // Holds fewer units than the order sells
+	TradeRejection_TRADE_REJECTION_POOL_EXHAUSTED     TradeRejection = 6 // The pool can't fill it: buying its last unit, or units worth under a cent
+)
+
+// Enum value maps for TradeRejection.
+var (
+	TradeRejection_name = map[int32]string{
+		0: "TRADE_REJECTION_UNSPECIFIED",
+		1: "TRADE_REJECTION_NOT_AT_STATION",
+		2: "TRADE_REJECTION_INVALID_ORDER",
+		3: "TRADE_REJECTION_PRICE_MOVED",
+		4: "TRADE_REJECTION_INSUFFICIENT_CASH",
+		5: "TRADE_REJECTION_INSUFFICIENT_UNITS",
+		6: "TRADE_REJECTION_POOL_EXHAUSTED",
+	}
+	TradeRejection_value = map[string]int32{
+		"TRADE_REJECTION_UNSPECIFIED":        0,
+		"TRADE_REJECTION_NOT_AT_STATION":     1,
+		"TRADE_REJECTION_INVALID_ORDER":      2,
+		"TRADE_REJECTION_PRICE_MOVED":        3,
+		"TRADE_REJECTION_INSUFFICIENT_CASH":  4,
+		"TRADE_REJECTION_INSUFFICIENT_UNITS": 5,
+		"TRADE_REJECTION_POOL_EXHAUSTED":     6,
+	}
+)
+
+func (x TradeRejection) Enum() *TradeRejection {
+	p := new(TradeRejection)
+	*p = x
+	return p
+}
+
+func (x TradeRejection) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TradeRejection) Descriptor() protoreflect.EnumDescriptor {
+	return file_game_v1_common_proto_enumTypes[3].Descriptor()
+}
+
+func (TradeRejection) Type() protoreflect.EnumType {
+	return &file_game_v1_common_proto_enumTypes[3]
+}
+
+func (x TradeRejection) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TradeRejection.Descriptor instead.
+func (TradeRejection) EnumDescriptor() ([]byte, []int) {
+	return file_game_v1_common_proto_rawDescGZIP(), []int{3}
+}
+
 var File_game_v1_common_proto protoreflect.FileDescriptor
 
 const file_game_v1_common_proto_rawDesc = "" +
@@ -199,16 +252,22 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x0fCOMMODITY_WHEAT\x10\x01\x12\x14\n" +
 	"\x10COMMODITY_COFFEE\x10\x02\x12\x15\n" +
 	"\x11COMMODITY_LITHIUM\x10\x03\x12\x12\n" +
-	"\x0eCOMMODITY_GOLD\x10\x05\x12\x11\n" +
-	"\rCOMMODITY_OIL\x10\x06\x12\x14\n" +
-	"\x10COMMODITY_SILVER\x10\a*\x9e\x01\n" +
+	"\x0eCOMMODITY_GOLD\x10\x04\x12\x11\n" +
+	"\rCOMMODITY_OIL\x10\x05\x12\x14\n" +
+	"\x10COMMODITY_SILVER\x10\x06*F\n" +
 	"\vOrderIntent\x12\x16\n" +
-	"\x12INTENT_UNSPECIFIED\x10\x00\x12\x19\n" +
-	"\x15INTENT_ALLOCATE_FIXED\x10\x01\x12\x19\n" +
-	"\x15INTENT_ALLOCATE_RATIO\x10\x02\x12\x15\n" +
-	"\x11INTENT_SELL_RATIO\x10\x03\x12\x13\n" +
-	"\x0fINTENT_DUMP_ALL\x10\x04\x12\x15\n" +
-	"\x11INTENT_SELL_FIXED\x10\x05B>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
+	"\x12INTENT_UNSPECIFIED\x10\x00\x12\x0e\n" +
+	"\n" +
+	"INTENT_BUY\x10\x01\x12\x0f\n" +
+	"\vINTENT_SELL\x10\x02*\x8c\x02\n" +
+	"\x0eTradeRejection\x12\x1f\n" +
+	"\x1bTRADE_REJECTION_UNSPECIFIED\x10\x00\x12\"\n" +
+	"\x1eTRADE_REJECTION_NOT_AT_STATION\x10\x01\x12!\n" +
+	"\x1dTRADE_REJECTION_INVALID_ORDER\x10\x02\x12\x1f\n" +
+	"\x1bTRADE_REJECTION_PRICE_MOVED\x10\x03\x12%\n" +
+	"!TRADE_REJECTION_INSUFFICIENT_CASH\x10\x04\x12&\n" +
+	"\"TRADE_REJECTION_INSUFFICIENT_UNITS\x10\x05\x12\"\n" +
+	"\x1eTRADE_REJECTION_POOL_EXHAUSTED\x10\x06B>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
 	file_game_v1_common_proto_rawDescOnce sync.Once
@@ -222,11 +281,12 @@ func file_game_v1_common_proto_rawDescGZIP() []byte {
 	return file_game_v1_common_proto_rawDescData
 }
 
-var file_game_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_game_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
 var file_game_v1_common_proto_goTypes = []any{
-	(PowerUpType)(0),   // 0: game.v1.PowerUpType
-	(CommodityType)(0), // 1: game.v1.CommodityType
-	(OrderIntent)(0),   // 2: game.v1.OrderIntent
+	(PowerUpType)(0),    // 0: game.v1.PowerUpType
+	(CommodityType)(0),  // 1: game.v1.CommodityType
+	(OrderIntent)(0),    // 2: game.v1.OrderIntent
+	(TradeRejection)(0), // 3: game.v1.TradeRejection
 }
 var file_game_v1_common_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -246,7 +306,7 @@ func file_game_v1_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_common_proto_rawDesc), len(file_game_v1_common_proto_rawDesc)),
-			NumEnums:      3,
+			NumEnums:      4,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,

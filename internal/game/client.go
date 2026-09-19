@@ -64,16 +64,10 @@ func (c *Client) ReadPump(w *World) {
 		case *pb.ClientMessage_Trade:
 			o := TradeOrder{
 				PlayerID:   c.ID,
-				SequenceID: cmd.Trade.SequenceId,
-				Intent:     cmd.Trade.Intent,
-			}
-			switch v := cmd.Trade.GetValue().(type) {
-			case *pb.TradeRequest_CashAmount:
-				o.CashAmount = v.CashAmount
-			case *pb.TradeRequest_BasisPoints:
-				o.BasisPoints = v.BasisPoints
-			case *pb.TradeRequest_UnitAmount:
-				o.UnitAmount = v.UnitAmount
+				SequenceID: cmd.Trade.GetSequenceId(),
+				Intent:     cmd.Trade.GetIntent(),
+				Units:      uint64(cmd.Trade.GetUnits()),
+				PriceCents: cmd.Trade.GetPriceCents(),
 			}
 
 			select {

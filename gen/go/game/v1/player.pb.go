@@ -78,7 +78,7 @@ func (x *ActiveEffect) GetDurationTicksLeft() uint32 {
 type OwnedCommodity struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          CommodityType          `protobuf:"varint,1,opt,name=type,proto3,enum=game.v1.CommodityType" json:"type,omitempty"`
-	Amount        uint64                 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"` // Micro-units: 1,000,000 = one whole unit
+	Amount        uint64                 `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"` // Whole units
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

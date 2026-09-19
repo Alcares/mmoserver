@@ -14,17 +14,24 @@ enum CommodityType {
   COMMODITY_WHEAT = 1;
   COMMODITY_COFFEE = 2;
   COMMODITY_LITHIUM = 3;
-  COMMODITY_GOLD = 5;
-  COMMODITY_OIL = 6;
-  COMMODITY_SILVER = 7;
+  COMMODITY_GOLD = 4;
+  COMMODITY_OIL = 5;
+  COMMODITY_SILVER = 6;
 }
 
 enum OrderIntent {
   INTENT_UNSPECIFIED = 0;
-  INTENT_ALLOCATE_FIXED = 1; // Buy: spend an exact amount of cash (cents)
-  INTENT_ALLOCATE_RATIO = 2; // Spend e.g. 10%, 25%, 50%, 100% of wallet
-  INTENT_SELL_RATIO     = 3; // Sell e.g. 25%, 50%, 100% of holdings
-  INTENT_DUMP_ALL       = 4; // Complete liquidation
-  INTENT_SELL_FIXED     = 5; // Sell an exact quantity of units (micro-units)
+  INTENT_BUY  = 1; // Buy a whole number of units
+  INTENT_SELL = 2; // Sell a whole number of units
 }
 
+// Why the server refused a trade, carried in TradeReceipt
+enum TradeRejection {
+  TRADE_REJECTION_UNSPECIFIED        = 0; // Not rejected: the trade executed
+  TRADE_REJECTION_NOT_AT_STATION     = 1; // No trading station within TradeRange
+  TRADE_REJECTION_INVALID_ORDER      = 2; // Unknown intent or zero units
+  TRADE_REJECTION_PRICE_MOVED        = 3; // The price moved against the price the client sent
+  TRADE_REJECTION_INSUFFICIENT_CASH  = 4; // Can't afford units * price
+  TRADE_REJECTION_INSUFFICIENT_UNITS = 5; // Holds fewer units than the order sells
+  TRADE_REJECTION_POOL_EXHAUSTED     = 6; // The pool can't fill it: buying its last unit, or units worth under a cent
+}

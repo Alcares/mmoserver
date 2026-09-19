@@ -132,93 +132,20 @@ func (w *World) Run() {
 				player.TargetDir.X = dirX
 				player.TargetDir.Y = dirY
 
-			// TODO: execute trade
-			case trade := <-w.tradeQueue:
-				player, exists := w.players[trade.PlayerID]
+			case order := <-w.tradeQueue:
+				player, exists := w.players[order.PlayerID]
 				if !exists {
 					continue
 				}
 
-				// 1. Find the nearest trading station within range
-				var targetStation *TradingStation
-				nearest := TradeRange
-				for _, station := range w.Stations {
-					if d := EuclideanDistance(player.Pos, station.Pos); d <= nearest {
-						nearest = d
-						targetStation = station
-					}
+				receipt := w.executeTrade(player, order)
+				w.sendTo(order.PlayerID, &pb.ServerMessage{Msg: &pb.ServerMessage_Trade{Trade: receipt}})
+				if receipt.Success {
+					w.sendTo(order.PlayerID, &pb.ServerMessage{
+						Msg: &pb.ServerMessage_PlayerInventory{PlayerInventory: player.ToProtoInventory()},
+					})
 				}
 
-				if targetStation == nil {
-					// TODO: return an invalid trade to the client
-					continue
-				}
-
-				// 2. Find out if player has enough cash for the transaction
-				switch trade.Intent {
-				case pb.OrderIntent_INTENT_ALLOCATE_FIXED:
-					if player.balance < trade.CashAmount {
-						// TODO: return an invalid trade to the client
-						continue
-					}
-					unitsBought := w.Commodities[targetStation.Commodity].buy(trade.CashAmount)
-					if unitsBought == 0 {
-						// TODO: return an invalid trade to the client (order would buy less than one unit, e.g. the price rose)
-						continue
-					}
-					player.balance -= trade.CashAmount
-					player.commodities[targetStation.Commodity] += unitsBought
-				case pb.OrderIntent_INTENT_SELL_FIXED:
-					held := player.commodities[targetStation.Commodity]
-					if trade.UnitAmount == 0 || held < trade.UnitAmount {
-						// TODO: return an invalid trade to the client
-						continue
-					}
-					cashOut := w.Commodities[targetStation.Commodity].sell(trade.UnitAmount)
-					if cashOut == 0 {
-						// TODO: return an invalid trade to the client (units worth less than a cent)
-						continue
-					}
-					player.commodities[targetStation.Commodity] = held - trade.UnitAmount
-					player.balance += cashOut
-				case pb.OrderIntent_INTENT_ALLOCATE_RATIO:
-					continue
-				case pb.OrderIntent_INTENT_SELL_RATIO:
-					continue
-				case pb.OrderIntent_INTENT_DUMP_ALL:
-					continue
-				case pb.OrderIntent_INTENT_UNSPECIFIED:
-					continue
-				default:
-					continue
-				}
-
-				client, exists := w.clients[trade.PlayerID]
-				if !exists {
-					continue
-				}
-
-				msg := &pb.ServerMessage{
-					Msg: &pb.ServerMessage_PlayerInventory{
-						PlayerInventory: player.ToProtoInventory(),
-					},
-				}
-
-				payload, err := proto.Marshal(msg)
-				if err != nil {
-					log.Printf("Marshal error: %v", err)
-					continue
-				}
-
-				select {
-				case client.Send <- payload:
-				default:
-					// Client buffer is full; drop this frame to keep tick rate steady
-				}
-
-			// 3. Commit transaction
-			// 4. Update balances
-			// 5. Broadcast changes
 			default:
 				break drainInputs
 			}
@@ -305,21 +232,15 @@ func (w *World) Run() {
 		// 5. Broadcast market state: identical for every client, so marshal once
 		quotes := make([]*pb.PriceQuote, 0, len(w.Commodities))
 		for cType, state := range w.Commodities {
-			price := float64(state.unitPrice())
+			price := state.buyPrice(1)
 
 			var deltaBasisPoints int32
 			if state.lastPrice > 0 {
-				deltaBasisPoints = int32((price - state.lastPrice) / state.lastPrice * 10000)
+				deltaBasisPoints = int32((int64(price) - int64(state.lastPrice)) * 10000 / int64(state.lastPrice))
 			}
 			state.lastPrice = price
 
-			quotes = append(quotes, &pb.PriceQuote{
-				Commodity:          cType,
-				BuyPriceCents:      uint32(price),
-				SellPriceCents:     uint32(state.sellPrice()),
-				DeltaBasisPoints:   deltaBasisPoints,
-				AvailablePoolUnits: uint32(state.unitReserve / UnitScale),
-			})
+			quotes = append(quotes, state.toProtoQuote(cType, deltaBasisPoints))
 		}
 
 		marketPayload, err := proto.Marshal(&pb.ServerMessage{
@@ -343,6 +264,26 @@ func (w *World) Run() {
 		}
 
 		w.Mu.Unlock()
+	}
+}
+
+// sendTo queues msg for one player's client without blocking; dropped if its buffer is full
+func (w *World) sendTo(playerID uint32, msg *pb.ServerMessage) {
+	client, exists := w.clients[playerID]
+	if !exists {
+		return
+	}
+
+	payload, err := proto.Marshal(msg)
+	if err != nil {
+		log.Printf("Marshal error: %v", err)
+		return
+	}
+
+	select {
+	case client.Send <- payload:
+	default:
+		// Client buffer is full; drop this frame to keep tick rate steady
 	}
 }
 

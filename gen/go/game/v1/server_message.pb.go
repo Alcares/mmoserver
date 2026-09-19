@@ -294,22 +294,18 @@ func (x *MarketState) GetQuotes() []*PriceQuote {
 }
 
 type PriceQuote struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	Commodity CommodityType          `protobuf:"varint,1,opt,name=commodity,proto3,enum=game.v1.CommodityType" json:"commodity,omitempty"`
-	// Buy price: cash (in cents) for exactly one whole unit right now, rounded up to the cent.
-	// Clients show it and send exactly it as the order; the minimum buy is one unit.
-	// 0 means the pool can't sell a whole unit.
-	BuyPriceCents    uint32 `protobuf:"varint,2,opt,name=buy_price_cents,json=buyPriceCents,proto3" json:"buy_price_cents,omitempty"`          // e.g., $14.50 = 1450
-	DeltaBasisPoints int32  `protobuf:"varint,3,opt,name=delta_basis_points,json=deltaBasisPoints,proto3" json:"delta_basis_points,omitempty"` // Shift since last tick (+350 = +3.5%)
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Commodity        CommodityType          `protobuf:"varint,1,opt,name=commodity,proto3,enum=game.v1.CommodityType" json:"commodity,omitempty"`
+	DeltaBasisPoints int32                  `protobuf:"varint,2,opt,name=delta_basis_points,json=deltaBasisPoints,proto3" json:"delta_basis_points,omitempty"` // Shift of the one-unit buy price since last tick (+350 = +3.5%)
 	// Total units left in the AMM pool (or total circulating units held by players)
-	AvailablePoolUnits uint32 `protobuf:"varint,4,opt,name=available_pool_units,json=availablePoolUnits,proto3" json:"available_pool_units,omitempty"`
+	AvailablePoolUnits uint32 `protobuf:"varint,3,opt,name=available_pool_units,json=availablePoolUnits,proto3" json:"available_pool_units,omitempty"`
 	// Optional: ID of the biggest bagholder in this pit for client visuals
-	DominantWhaleId uint32 `protobuf:"varint,5,opt,name=dominant_whale_id,json=dominantWhaleId,proto3" json:"dominant_whale_id,omitempty"`
-	// Sell price: cash (in cents) received for selling exactly one whole unit right now, rounded
-	// down to the cent. It is always a little below the buy price: the pool keeps the spread.
-	SellPriceCents uint32 `protobuf:"varint,7,opt,name=sell_price_cents,json=sellPriceCents,proto3" json:"sell_price_cents,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	DominantWhaleId uint32 `protobuf:"varint,4,opt,name=dominant_whale_id,json=dominantWhaleId,proto3" json:"dominant_whale_id,omitempty"`
+	// One quote per order size the server offers (1, 2, 5, 10 units), smallest first.
+	// Clients offer exactly these sizes as their multipliers.
+	Orders        []*OrderQuote `protobuf:"bytes,5,rep,name=orders,proto3" json:"orders,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PriceQuote) Reset() {
@@ -349,13 +345,6 @@ func (x *PriceQuote) GetCommodity() CommodityType {
 	return CommodityType_COMMODITY_UNSPECIFIED
 }
 
-func (x *PriceQuote) GetBuyPriceCents() uint32 {
-	if x != nil {
-		return x.BuyPriceCents
-	}
-	return 0
-}
-
 func (x *PriceQuote) GetDeltaBasisPoints() int32 {
 	if x != nil {
 		return x.DeltaBasisPoints
@@ -377,30 +366,98 @@ func (x *PriceQuote) GetDominantWhaleId() uint32 {
 	return 0
 }
 
-func (x *PriceQuote) GetSellPriceCents() uint32 {
+func (x *PriceQuote) GetOrders() []*OrderQuote {
+	if x != nil {
+		return x.Orders
+	}
+	return nil
+}
+
+// Per-unit prices for an order of a given size. Every unit in an order trades at the same
+// price, so the order's total is exactly units * price. Bigger orders move the pool further,
+// so they buy higher and sell lower per unit.
+type OrderQuote struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Units uint32                 `protobuf:"varint,1,opt,name=units,proto3" json:"units,omitempty"`
+	// Cents per unit to buy this many, rounded up; 0 if the pool can't sell this many
+	BuyPriceCents uint64 `protobuf:"varint,2,opt,name=buy_price_cents,json=buyPriceCents,proto3" json:"buy_price_cents,omitempty"`
+	// Cents per unit received for selling this many, rounded down; 0 if worth under a cent each
+	SellPriceCents uint64 `protobuf:"varint,3,opt,name=sell_price_cents,json=sellPriceCents,proto3" json:"sell_price_cents,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *OrderQuote) Reset() {
+	*x = OrderQuote{}
+	mi := &file_game_v1_server_message_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrderQuote) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrderQuote) ProtoMessage() {}
+
+func (x *OrderQuote) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_server_message_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OrderQuote.ProtoReflect.Descriptor instead.
+func (*OrderQuote) Descriptor() ([]byte, []int) {
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *OrderQuote) GetUnits() uint32 {
+	if x != nil {
+		return x.Units
+	}
+	return 0
+}
+
+func (x *OrderQuote) GetBuyPriceCents() uint64 {
+	if x != nil {
+		return x.BuyPriceCents
+	}
+	return 0
+}
+
+func (x *OrderQuote) GetSellPriceCents() uint64 {
 	if x != nil {
 		return x.SellPriceCents
 	}
 	return 0
 }
 
-// Server -> Client: After successfully executing a trade
+// Server -> Client: Answer to every TradeRequest, sent only to the trader
 type TradeReceipt struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	SequenceId          uint32                 `protobuf:"varint,1,opt,name=sequence_id,json=sequenceId,proto3" json:"sequence_id,omitempty"` // Matches incoming TradeRequest sequence_id
 	Success             bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
-	TotalBalanceChange  uint64                 `protobuf:"varint,3,opt,name=total_balance_change,json=totalBalanceChange,proto3" json:"total_balance_change,omitempty"` // Actual cash spent or gained
-	UnitsTransacted     uint64                 `protobuf:"varint,4,opt,name=units_transacted,json=unitsTransacted,proto3" json:"units_transacted,omitempty"`            // Micro-units added/removed (scaled by 1e6)
-	PriceCents          uint64                 `protobuf:"varint,5,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`                           // Execution price per unit
-	NewCashBalanceCents uint64                 `protobuf:"varint,6,opt,name=new_cash_balance_cents,json=newCashBalanceCents,proto3" json:"new_cash_balance_cents,omitempty"`
-	NewHoldingUnits     uint64                 `protobuf:"varint,7,opt,name=new_holding_units,json=newHoldingUnits,proto3" json:"new_holding_units,omitempty"`
+	Rejection           TradeRejection         `protobuf:"varint,3,opt,name=rejection,proto3,enum=game.v1.TradeRejection" json:"rejection,omitempty"` // Why it failed; UNSPECIFIED on success
+	Intent              OrderIntent            `protobuf:"varint,4,opt,name=intent,proto3,enum=game.v1.OrderIntent" json:"intent,omitempty"`
+	Commodity           CommodityType          `protobuf:"varint,5,opt,name=commodity,proto3,enum=game.v1.CommodityType" json:"commodity,omitempty"`                    // Unspecified if the player wasn't at a station
+	TotalBalanceChange  uint64                 `protobuf:"varint,6,opt,name=total_balance_change,json=totalBalanceChange,proto3" json:"total_balance_change,omitempty"` // Cash spent or gained (cents): units_transacted * price_cents
+	UnitsTransacted     uint64                 `protobuf:"varint,7,opt,name=units_transacted,json=unitsTransacted,proto3" json:"units_transacted,omitempty"`            // Whole units bought or sold
+	PriceCents          uint64                 `protobuf:"varint,8,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`                           // Execution price per unit
+	NewCashBalanceCents uint64                 `protobuf:"varint,9,opt,name=new_cash_balance_cents,json=newCashBalanceCents,proto3" json:"new_cash_balance_cents,omitempty"`
+	NewHoldingUnits     uint64                 `protobuf:"varint,10,opt,name=new_holding_units,json=newHoldingUnits,proto3" json:"new_holding_units,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
 
 func (x *TradeReceipt) Reset() {
 	*x = TradeReceipt{}
-	mi := &file_game_v1_server_message_proto_msgTypes[6]
+	mi := &file_game_v1_server_message_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -412,7 +469,7 @@ func (x *TradeReceipt) String() string {
 func (*TradeReceipt) ProtoMessage() {}
 
 func (x *TradeReceipt) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_server_message_proto_msgTypes[6]
+	mi := &file_game_v1_server_message_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -425,7 +482,7 @@ func (x *TradeReceipt) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TradeReceipt.ProtoReflect.Descriptor instead.
 func (*TradeReceipt) Descriptor() ([]byte, []int) {
-	return file_game_v1_server_message_proto_rawDescGZIP(), []int{6}
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *TradeReceipt) GetSequenceId() uint32 {
@@ -440,6 +497,27 @@ func (x *TradeReceipt) GetSuccess() bool {
 		return x.Success
 	}
 	return false
+}
+
+func (x *TradeReceipt) GetRejection() TradeRejection {
+	if x != nil {
+		return x.Rejection
+	}
+	return TradeRejection_TRADE_REJECTION_UNSPECIFIED
+}
+
+func (x *TradeReceipt) GetIntent() OrderIntent {
+	if x != nil {
+		return x.Intent
+	}
+	return OrderIntent_INTENT_UNSPECIFIED
+}
+
+func (x *TradeReceipt) GetCommodity() CommodityType {
+	if x != nil {
+		return x.Commodity
+	}
+	return CommodityType_COMMODITY_UNSPECIFIED
 }
 
 func (x *TradeReceipt) GetTotalBalanceChange() uint64 {
@@ -489,7 +567,7 @@ type TradingStation struct {
 
 func (x *TradingStation) Reset() {
 	*x = TradingStation{}
-	mi := &file_game_v1_server_message_proto_msgTypes[7]
+	mi := &file_game_v1_server_message_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -501,7 +579,7 @@ func (x *TradingStation) String() string {
 func (*TradingStation) ProtoMessage() {}
 
 func (x *TradingStation) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_server_message_proto_msgTypes[7]
+	mi := &file_game_v1_server_message_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -514,7 +592,7 @@ func (x *TradingStation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TradingStation.ProtoReflect.Descriptor instead.
 func (*TradingStation) Descriptor() ([]byte, []int) {
-	return file_game_v1_server_message_proto_rawDescGZIP(), []int{7}
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *TradingStation) GetCommodity() CommodityType {
@@ -554,7 +632,7 @@ type InitialGameState struct {
 
 func (x *InitialGameState) Reset() {
 	*x = InitialGameState{}
-	mi := &file_game_v1_server_message_proto_msgTypes[8]
+	mi := &file_game_v1_server_message_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -566,7 +644,7 @@ func (x *InitialGameState) String() string {
 func (*InitialGameState) ProtoMessage() {}
 
 func (x *InitialGameState) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_server_message_proto_msgTypes[8]
+	mi := &file_game_v1_server_message_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -579,7 +657,7 @@ func (x *InitialGameState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InitialGameState.ProtoReflect.Descriptor instead.
 func (*InitialGameState) Descriptor() ([]byte, []int) {
-	return file_game_v1_server_message_proto_rawDescGZIP(), []int{8}
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *InitialGameState) GetStationLayout() []*TradingStation {
@@ -609,7 +687,7 @@ type ServerMessage struct {
 
 func (x *ServerMessage) Reset() {
 	*x = ServerMessage{}
-	mi := &file_game_v1_server_message_proto_msgTypes[9]
+	mi := &file_game_v1_server_message_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -621,7 +699,7 @@ func (x *ServerMessage) String() string {
 func (*ServerMessage) ProtoMessage() {}
 
 func (x *ServerMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_server_message_proto_msgTypes[9]
+	mi := &file_game_v1_server_message_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -634,7 +712,7 @@ func (x *ServerMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerMessage.ProtoReflect.Descriptor instead.
 func (*ServerMessage) Descriptor() ([]byte, []int) {
-	return file_game_v1_server_message_proto_rawDescGZIP(), []int{9}
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ServerMessage) GetMsg() isServerMessage_Msg {
@@ -777,25 +855,33 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\aplayers\x18\x02 \x03(\v2\x14.game.v1.PlayerStateR\aplayers\"N\n" +
 	"\vMarketState\x12\x12\n" +
 	"\x04tick\x18\x01 \x01(\x04R\x04tick\x12+\n" +
-	"\x06quotes\x18\x02 \x03(\v2\x13.game.v1.PriceQuoteR\x06quotes\"\xb6\x02\n" +
+	"\x06quotes\x18\x02 \x03(\v2\x13.game.v1.PriceQuoteR\x06quotes\"\xfb\x01\n" +
 	"\n" +
 	"PriceQuote\x124\n" +
-	"\tcommodity\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x12&\n" +
-	"\x0fbuy_price_cents\x18\x02 \x01(\rR\rbuyPriceCents\x12,\n" +
-	"\x12delta_basis_points\x18\x03 \x01(\x05R\x10deltaBasisPoints\x120\n" +
-	"\x14available_pool_units\x18\x04 \x01(\rR\x12availablePoolUnits\x12*\n" +
-	"\x11dominant_whale_id\x18\x05 \x01(\rR\x0fdominantWhaleId\x12(\n" +
-	"\x10sell_price_cents\x18\a \x01(\rR\x0esellPriceCentsJ\x04\b\x06\x10\aR\x0ebuy_cost_cents\"\xa8\x02\n" +
+	"\tcommodity\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x12,\n" +
+	"\x12delta_basis_points\x18\x02 \x01(\x05R\x10deltaBasisPoints\x120\n" +
+	"\x14available_pool_units\x18\x03 \x01(\rR\x12availablePoolUnits\x12*\n" +
+	"\x11dominant_whale_id\x18\x04 \x01(\rR\x0fdominantWhaleId\x12+\n" +
+	"\x06orders\x18\x05 \x03(\v2\x13.game.v1.OrderQuoteR\x06orders\"t\n" +
+	"\n" +
+	"OrderQuote\x12\x14\n" +
+	"\x05units\x18\x01 \x01(\rR\x05units\x12&\n" +
+	"\x0fbuy_price_cents\x18\x02 \x01(\x04R\rbuyPriceCents\x12(\n" +
+	"\x10sell_price_cents\x18\x03 \x01(\x04R\x0esellPriceCents\"\xc3\x03\n" +
 	"\fTradeReceipt\x12\x1f\n" +
 	"\vsequence_id\x18\x01 \x01(\rR\n" +
 	"sequenceId\x12\x18\n" +
-	"\asuccess\x18\x02 \x01(\bR\asuccess\x120\n" +
-	"\x14total_balance_change\x18\x03 \x01(\x04R\x12totalBalanceChange\x12)\n" +
-	"\x10units_transacted\x18\x04 \x01(\x04R\x0funitsTransacted\x12\x1f\n" +
-	"\vprice_cents\x18\x05 \x01(\x04R\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x125\n" +
+	"\trejection\x18\x03 \x01(\x0e2\x17.game.v1.TradeRejectionR\trejection\x12,\n" +
+	"\x06intent\x18\x04 \x01(\x0e2\x14.game.v1.OrderIntentR\x06intent\x124\n" +
+	"\tcommodity\x18\x05 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x120\n" +
+	"\x14total_balance_change\x18\x06 \x01(\x04R\x12totalBalanceChange\x12)\n" +
+	"\x10units_transacted\x18\a \x01(\x04R\x0funitsTransacted\x12\x1f\n" +
+	"\vprice_cents\x18\b \x01(\x04R\n" +
 	"priceCents\x123\n" +
-	"\x16new_cash_balance_cents\x18\x06 \x01(\x04R\x13newCashBalanceCents\x12*\n" +
-	"\x11new_holding_units\x18\a \x01(\x04R\x0fnewHoldingUnits\"x\n" +
+	"\x16new_cash_balance_cents\x18\t \x01(\x04R\x13newCashBalanceCents\x12*\n" +
+	"\x11new_holding_units\x18\n" +
+	" \x01(\x04R\x0fnewHoldingUnits\"x\n" +
 	"\x0eTradingStation\x124\n" +
 	"\tcommodity\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x12\f\n" +
 	"\x01x\x18\x02 \x01(\x02R\x01x\x12\f\n" +
@@ -825,7 +911,7 @@ func file_game_v1_server_message_proto_rawDescGZIP() []byte {
 	return file_game_v1_server_message_proto_rawDescData
 }
 
-var file_game_v1_server_message_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_game_v1_server_message_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_game_v1_server_message_proto_goTypes = []any{
 	(*PowerUp)(nil),          // 0: game.v1.PowerUp
 	(*PowerUpSpawned)(nil),   // 1: game.v1.PowerUpSpawned
@@ -833,35 +919,42 @@ var file_game_v1_server_message_proto_goTypes = []any{
 	(*WorldSnapshot)(nil),    // 3: game.v1.WorldSnapshot
 	(*MarketState)(nil),      // 4: game.v1.MarketState
 	(*PriceQuote)(nil),       // 5: game.v1.PriceQuote
-	(*TradeReceipt)(nil),     // 6: game.v1.TradeReceipt
-	(*TradingStation)(nil),   // 7: game.v1.TradingStation
-	(*InitialGameState)(nil), // 8: game.v1.InitialGameState
-	(*ServerMessage)(nil),    // 9: game.v1.ServerMessage
-	(PowerUpType)(0),         // 10: game.v1.PowerUpType
-	(*PlayerState)(nil),      // 11: game.v1.PlayerState
-	(CommodityType)(0),       // 12: game.v1.CommodityType
-	(*PlayerInventory)(nil),  // 13: game.v1.PlayerInventory
+	(*OrderQuote)(nil),       // 6: game.v1.OrderQuote
+	(*TradeReceipt)(nil),     // 7: game.v1.TradeReceipt
+	(*TradingStation)(nil),   // 8: game.v1.TradingStation
+	(*InitialGameState)(nil), // 9: game.v1.InitialGameState
+	(*ServerMessage)(nil),    // 10: game.v1.ServerMessage
+	(PowerUpType)(0),         // 11: game.v1.PowerUpType
+	(*PlayerState)(nil),      // 12: game.v1.PlayerState
+	(CommodityType)(0),       // 13: game.v1.CommodityType
+	(TradeRejection)(0),      // 14: game.v1.TradeRejection
+	(OrderIntent)(0),         // 15: game.v1.OrderIntent
+	(*PlayerInventory)(nil),  // 16: game.v1.PlayerInventory
 }
 var file_game_v1_server_message_proto_depIdxs = []int32{
-	10, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
+	11, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
 	0,  // 1: game.v1.PowerUpSpawned.power_up:type_name -> game.v1.PowerUp
-	11, // 2: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
+	12, // 2: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
 	5,  // 3: game.v1.MarketState.quotes:type_name -> game.v1.PriceQuote
-	12, // 4: game.v1.PriceQuote.commodity:type_name -> game.v1.CommodityType
-	12, // 5: game.v1.TradingStation.commodity:type_name -> game.v1.CommodityType
-	7,  // 6: game.v1.InitialGameState.station_layout:type_name -> game.v1.TradingStation
-	3,  // 7: game.v1.ServerMessage.world_snapshot:type_name -> game.v1.WorldSnapshot
-	4,  // 8: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
-	1,  // 9: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
-	2,  // 10: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
-	8,  // 11: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
-	6,  // 12: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
-	13, // 13: game.v1.ServerMessage.player_inventory:type_name -> game.v1.PlayerInventory
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	13, // 4: game.v1.PriceQuote.commodity:type_name -> game.v1.CommodityType
+	6,  // 5: game.v1.PriceQuote.orders:type_name -> game.v1.OrderQuote
+	14, // 6: game.v1.TradeReceipt.rejection:type_name -> game.v1.TradeRejection
+	15, // 7: game.v1.TradeReceipt.intent:type_name -> game.v1.OrderIntent
+	13, // 8: game.v1.TradeReceipt.commodity:type_name -> game.v1.CommodityType
+	13, // 9: game.v1.TradingStation.commodity:type_name -> game.v1.CommodityType
+	8,  // 10: game.v1.InitialGameState.station_layout:type_name -> game.v1.TradingStation
+	3,  // 11: game.v1.ServerMessage.world_snapshot:type_name -> game.v1.WorldSnapshot
+	4,  // 12: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
+	1,  // 13: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
+	2,  // 14: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
+	9,  // 15: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
+	7,  // 16: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
+	16, // 17: game.v1.ServerMessage.player_inventory:type_name -> game.v1.PlayerInventory
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_server_message_proto_init() }
@@ -871,7 +964,7 @@ func file_game_v1_server_message_proto_init() {
 	}
 	file_game_v1_common_proto_init()
 	file_game_v1_player_proto_init()
-	file_game_v1_server_message_proto_msgTypes[9].OneofWrappers = []any{
+	file_game_v1_server_message_proto_msgTypes[10].OneofWrappers = []any{
 		(*ServerMessage_WorldSnapshot)(nil),
 		(*ServerMessage_MarketState)(nil),
 		(*ServerMessage_PowerUpSpawned)(nil),
@@ -886,7 +979,7 @@ func file_game_v1_server_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_server_message_proto_rawDesc), len(file_game_v1_server_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

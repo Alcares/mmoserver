@@ -2,89 +2,116 @@ package game
 
 import pb "github.com/alcares/mmoserver/gen/go/game/v1"
 
+// Cash is whole cents everywhere: balances, prices and the pool's cash reserve.
+// Commodity quantities are whole units everywhere: pools, inventories and orders.
 const (
-	// Cash is whole cents everywhere: balances, prices, order amounts and the pool's cash reserve.
-	//
-	// UnitScale is the fixed-point scale of commodity quantities: 1 unit is
-	// 1,000,000 micro-units. Pools and inventories both hold micro-units, so a
-	// trade can buy a fraction of a unit.
-	UnitScale = 1_000_000
-
-	// MinBuyUnits is the smallest order the pool fills (micro-units). Bigger orders
-	// can be fractional (1.2, 14.55 units), but never less than one whole unit.
-	MinBuyUnits = 1 * UnitScale
-
-	initialUnits      = 100
 	initialPriceCents = 10_00 // cash per whole unit, used only to seed cashReserve
+	defaultPoolUnits  = 200   // pool depth for a commodity missing from poolUnits
 )
+
+// OrderSizes are the order sizes (whole units) every MarketState quotes, smallest first.
+// Clients offer exactly these as their multipliers; the server fills any size.
+var OrderSizes = []uint64{1, 2, 5, 10}
+
+// poolUnits is each commodity's starting pool depth in whole units, the one knob for how
+// hard its price is to move: deep pools barely move per trade, shallow ones swing hard.
+var poolUnits = map[pb.CommodityType]uint64{
+	pb.CommodityType_COMMODITY_OIL:     2000,
+	pb.CommodityType_COMMODITY_WHEAT:   1000,
+	pb.CommodityType_COMMODITY_COFFEE:  500,
+	pb.CommodityType_COMMODITY_GOLD:    400,
+	pb.CommodityType_COMMODITY_SILVER:  250,
+	pb.CommodityType_COMMODITY_LITHIUM: 60,
+}
 
 // CommodityState is one commodity's constant-product AMM pool
 type CommodityState struct {
-	cashReserve uint64  // cents
-	unitReserve uint64  // micro-units
-	lastPrice   float64 // unitPrice as of the last tick's broadcast for calculating price delta
+	cashReserve uint64 // cents
+	unitReserve uint64 // whole units
+	lastPrice   uint64 // one-unit buy price as of the last tick's broadcast, for the price delta
+}
+
+func newCommodityState(units, priceCents uint64) *CommodityState {
+	c := &CommodityState{unitReserve: units, cashReserve: units * priceCents}
+	c.lastPrice = c.buyPrice(1)
+	return c
 }
 
 // ceilDiv rounds up. Every reserve is rounded up so that rounding error always
-// stays in the pool: k = cashReserve*unitReserve can grow but never shrink,
-// otherwise a trader could buy fractional units for free.
+// stays in the pool: k = cashReserve*unitReserve can grow but never shrink.
 func ceilDiv(a, b uint64) uint64 {
 	return (a + b - 1) / b
 }
 
-// unitPrice is the price of the commodity: the cash (cents) that buys exactly one
-// whole unit right now, rounded up to the cent. This is the price shown to players and
-// the order they send; sending exactly it fills the minimum order, a hair over one unit.
-// Returns 0 if the pool holds no more than one unit and can't sell one.
-func (c *CommodityState) unitPrice() uint64 {
-	if c.unitReserve <= MinBuyUnits {
+// buyPrice is the per-unit price (cents) of buying units whole units right now: the pool's
+// cost for the whole order spread evenly over it and rounded up to the cent, so every unit
+// costs the same, the order costs exactly units*price, and the pool keeps the rounding.
+// Returns 0 if the pool can't sell that many; it always keeps at least one unit.
+func (c *CommodityState) buyPrice(units uint64) uint64 {
+	if units == 0 || units >= c.unitReserve {
 		return 0
 	}
 	k := c.cashReserve * c.unitReserve
-	return ceilDiv(k, c.unitReserve-MinBuyUnits) - c.cashReserve
+	cost := ceilDiv(k, c.unitReserve-units) - c.cashReserve
+	return ceilDiv(cost, units)
 }
 
-// buy spends cashIn against the pool and returns the micro-units bought, which
-// is whatever the pool's price is at the moment the trade executes, not when it
-// was requested. Returns 0 and leaves the pool untouched if cashIn wouldn't buy
-// MinBuyUnits, e.g. because the price rose after the order was placed.
-func (c *CommodityState) buy(cashIn uint64) uint64 {
-	k := c.cashReserve * c.unitReserve
-
-	// Round the pool's remaining units up, so units bought round down.
-	newUnitReserve := ceilDiv(k, c.cashReserve+cashIn)
-	unitsOut := c.unitReserve - newUnitReserve
-	if unitsOut < MinBuyUnits {
+// sellPrice is the per-unit price (cents) received for selling units whole units right now:
+// the pool's payout spread evenly over the order and rounded down to the cent. It is below
+// buyPrice for the same size; the spread is what the pool keeps. Returns 0 if each unit is
+// worth under a cent.
+func (c *CommodityState) sellPrice(units uint64) uint64 {
+	if units == 0 {
 		return 0
 	}
-
-	c.cashReserve += cashIn
-	c.unitReserve = newUnitReserve
-	return unitsOut
+	k := c.cashReserve * c.unitReserve
+	payout := c.cashReserve - ceilDiv(k, c.unitReserve+units)
+	return payout / units
 }
 
-// sellPrice is the cash (cents) received for selling exactly one whole unit right now,
-// rounded down to the cent. It is below unitPrice: the spread is what the pool keeps.
-func (c *CommodityState) sellPrice() uint64 {
-	k := c.cashReserve * c.unitReserve
-	return c.cashReserve - ceilDiv(k, c.unitReserve+UnitScale)
-}
-
-// sell returns unitsIn micro-units to the pool and returns how much cash (cents) it pays,
-// rounded down so selling can never pay out more than the pool gives up. Returns 0 and
-// leaves the pool untouched if the units are worth less than a cent.
-func (c *CommodityState) sell(unitsIn uint64) uint64 {
-	k := c.cashReserve * c.unitReserve
-	newUnitReserve := c.unitReserve + unitsIn
-	newCashReserve := ceilDiv(k, newUnitReserve)
-	cashOut := c.cashReserve - newCashReserve
-	if cashOut == 0 {
+// buy takes units out of the pool at buyPrice(units) each and returns the total cost in
+// cents, which is whatever the pool's price is when the trade executes. Returns 0 and leaves
+// the pool untouched if the pool can't sell that many.
+func (c *CommodityState) buy(units uint64) uint64 {
+	price := c.buyPrice(units)
+	if price == 0 {
 		return 0
 	}
+	total := units * price
+	c.cashReserve += total
+	c.unitReserve -= units
+	return total
+}
 
-	c.cashReserve = newCashReserve
-	c.unitReserve = newUnitReserve
-	return cashOut
+// sell returns units to the pool at sellPrice(units) each and returns the total payout in
+// cents. Returns 0 and leaves the pool untouched if the units are worth under a cent each.
+func (c *CommodityState) sell(units uint64) uint64 {
+	price := c.sellPrice(units)
+	if price == 0 {
+		return 0
+	}
+	total := units * price
+	c.cashReserve -= total
+	c.unitReserve += units
+	return total
+}
+
+// toProtoQuote prices every OrderSizes order against the pool's current reserves
+func (c *CommodityState) toProtoQuote(cType pb.CommodityType, deltaBasisPoints int32) *pb.PriceQuote {
+	orders := make([]*pb.OrderQuote, len(OrderSizes))
+	for i, units := range OrderSizes {
+		orders[i] = &pb.OrderQuote{
+			Units:          uint32(units),
+			BuyPriceCents:  c.buyPrice(units),
+			SellPriceCents: c.sellPrice(units),
+		}
+	}
+	return &pb.PriceQuote{
+		Commodity:          cType,
+		DeltaBasisPoints:   deltaBasisPoints,
+		AvailablePoolUnits: uint32(c.unitReserve),
+		Orders:             orders,
+	}
 }
 
 func GetCommodityTypes() []pb.CommodityType {
@@ -105,12 +132,11 @@ func NewCommodities() map[pb.CommodityType]*CommodityState {
 
 	commodities := make(map[pb.CommodityType]*CommodityState, len(commodityTypes))
 	for _, v := range commodityTypes {
-		state := &CommodityState{
-			unitReserve: initialUnits * UnitScale,
-			cashReserve: initialUnits * initialPriceCents,
+		units, ok := poolUnits[v]
+		if !ok {
+			units = defaultPoolUnits
 		}
-		state.lastPrice = float64(state.unitPrice())
-		commodities[v] = state
+		commodities[v] = newCommodityState(units, initialPriceCents)
 	}
 
 	return commodities

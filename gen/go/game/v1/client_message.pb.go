@@ -74,17 +74,16 @@ func (x *MovementCommand) GetVy() float32 {
 	return 0
 }
 
-// Client -> Server: Sent when the player taps/holds the sell/buy button
+// Client -> Server: Sent when the player presses buy/sell at a station. The server trades
+// against the station the player is standing at, for the whole order or nothing.
 type TradeRequest struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
-	SequenceId uint32                 `protobuf:"varint,1,opt,name=sequence_id,json=sequenceId,proto3" json:"sequence_id,omitempty"` // Client sequence counter for reconciliation
+	SequenceId uint32                 `protobuf:"varint,1,opt,name=sequence_id,json=sequenceId,proto3" json:"sequence_id,omitempty"` // Client sequence counter, echoed in TradeReceipt
 	Intent     OrderIntent            `protobuf:"varint,2,opt,name=intent,proto3,enum=game.v1.OrderIntent" json:"intent,omitempty"`
-	// Types that are valid to be assigned to Value:
-	//
-	//	*TradeRequest_CashAmount
-	//	*TradeRequest_BasisPoints
-	//	*TradeRequest_UnitAmount
-	Value         isTradeRequest_Value `protobuf_oneof:"value"`
+	Units      uint32                 `protobuf:"varint,3,opt,name=units,proto3" json:"units,omitempty"` // Whole units to buy or sell, at least 1
+	// Per-unit price (cents) the client saw for this order size (OrderQuote). A buy is rejected
+	// if the price rose above it, a sell if it fell below it; a better price fills.
+	PriceCents    uint64 `protobuf:"varint,4,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -133,61 +132,19 @@ func (x *TradeRequest) GetIntent() OrderIntent {
 	return OrderIntent_INTENT_UNSPECIFIED
 }
 
-func (x *TradeRequest) GetValue() isTradeRequest_Value {
+func (x *TradeRequest) GetUnits() uint32 {
 	if x != nil {
-		return x.Value
-	}
-	return nil
-}
-
-func (x *TradeRequest) GetCashAmount() uint64 {
-	if x != nil {
-		if x, ok := x.Value.(*TradeRequest_CashAmount); ok {
-			return x.CashAmount
-		}
+		return x.Units
 	}
 	return 0
 }
 
-func (x *TradeRequest) GetBasisPoints() uint32 {
+func (x *TradeRequest) GetPriceCents() uint64 {
 	if x != nil {
-		if x, ok := x.Value.(*TradeRequest_BasisPoints); ok {
-			return x.BasisPoints
-		}
+		return x.PriceCents
 	}
 	return 0
 }
-
-func (x *TradeRequest) GetUnitAmount() uint64 {
-	if x != nil {
-		if x, ok := x.Value.(*TradeRequest_UnitAmount); ok {
-			return x.UnitAmount
-		}
-	}
-	return 0
-}
-
-type isTradeRequest_Value interface {
-	isTradeRequest_Value()
-}
-
-type TradeRequest_CashAmount struct {
-	CashAmount uint64 `protobuf:"varint,3,opt,name=cash_amount,json=cashAmount,proto3,oneof"` // Flat cash (e.g. $10.00 = 1000)
-}
-
-type TradeRequest_BasisPoints struct {
-	BasisPoints uint32 `protobuf:"varint,4,opt,name=basis_points,json=basisPoints,proto3,oneof"` // Percentage of wallet (10000 = 100%, 2500 = 25%)
-}
-
-type TradeRequest_UnitAmount struct {
-	UnitAmount uint64 `protobuf:"varint,5,opt,name=unit_amount,json=unitAmount,proto3,oneof"` // Units to sell, in micro-units (1000000 = one whole unit)
-}
-
-func (*TradeRequest_CashAmount) isTradeRequest_Value() {}
-
-func (*TradeRequest_BasisPoints) isTradeRequest_Value() {}
-
-func (*TradeRequest_UnitAmount) isTradeRequest_Value() {}
 
 // Client -> Server: Discriminated wrapper for all client commands.
 type ClientMessage struct {
@@ -279,17 +236,14 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\x1cgame/v1/client_message.proto\x12\agame.v1\x1a\x14game/v1/common.proto\"1\n" +
 	"\x0fMovementCommand\x12\x0e\n" +
 	"\x02vx\x18\x01 \x01(\x02R\x02vx\x12\x0e\n" +
-	"\x02vy\x18\x02 \x01(\x02R\x02vy\"\xd1\x01\n" +
+	"\x02vy\x18\x02 \x01(\x02R\x02vy\"\x94\x01\n" +
 	"\fTradeRequest\x12\x1f\n" +
 	"\vsequence_id\x18\x01 \x01(\rR\n" +
 	"sequenceId\x12,\n" +
-	"\x06intent\x18\x02 \x01(\x0e2\x14.game.v1.OrderIntentR\x06intent\x12!\n" +
-	"\vcash_amount\x18\x03 \x01(\x04H\x00R\n" +
-	"cashAmount\x12#\n" +
-	"\fbasis_points\x18\x04 \x01(\rH\x00R\vbasisPoints\x12!\n" +
-	"\vunit_amount\x18\x05 \x01(\x04H\x00R\n" +
-	"unitAmountB\a\n" +
-	"\x05value\"w\n" +
+	"\x06intent\x18\x02 \x01(\x0e2\x14.game.v1.OrderIntentR\x06intent\x12\x14\n" +
+	"\x05units\x18\x03 \x01(\rR\x05units\x12\x1f\n" +
+	"\vprice_cents\x18\x04 \x01(\x04R\n" +
+	"priceCents\"w\n" +
 	"\rClientMessage\x120\n" +
 	"\x05input\x18\x01 \x01(\v2\x18.game.v1.MovementCommandH\x00R\x05input\x12-\n" +
 	"\x05trade\x18\x02 \x01(\v2\x15.game.v1.TradeRequestH\x00R\x05tradeB\x05\n" +
@@ -331,11 +285,6 @@ func file_game_v1_client_message_proto_init() {
 		return
 	}
 	file_game_v1_common_proto_init()
-	file_game_v1_client_message_proto_msgTypes[1].OneofWrappers = []any{
-		(*TradeRequest_CashAmount)(nil),
-		(*TradeRequest_BasisPoints)(nil),
-		(*TradeRequest_UnitAmount)(nil),
-	}
 	file_game_v1_client_message_proto_msgTypes[2].OneofWrappers = []any{
 		(*ClientMessage_Input)(nil),
 		(*ClientMessage_Trade)(nil),

@@ -12,16 +12,15 @@ message MovementCommand {
   float vy = 2;
 }
 
-// Client -> Server: Sent when the player taps/holds the sell/buy button
+// Client -> Server: Sent when the player presses buy/sell at a station. The server trades
+// against the station the player is standing at, for the whole order or nothing.
 message TradeRequest {
-  uint32 sequence_id = 1;         // Client sequence counter for reconciliation
+  uint32 sequence_id = 1;         // Client sequence counter, echoed in TradeReceipt
   OrderIntent intent = 2;
-
-  oneof value {
-    uint64 cash_amount = 3;       // Flat cash (e.g. $10.00 = 1000)
-    uint32 basis_points = 4;      // Percentage of wallet (10000 = 100%, 2500 = 25%)
-    uint64 unit_amount = 5;       // Units to sell, in micro-units (1000000 = one whole unit)
-  }
+  uint32 units = 3;               // Whole units to buy or sell, at least 1
+  // Per-unit price (cents) the client saw for this order size (OrderQuote). A buy is rejected
+  // if the price rose above it, a sell if it fell below it; a better price fills.
+  uint64 price_cents = 4;
 }
 
 // Client -> Server: Discriminated wrapper for all client commands.
