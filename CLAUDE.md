@@ -1,10 +1,7 @@
 # Project conventions
 
 ## Commands
-- Run: `make run` (server on :8080, serves `web/` as static files)
-- Regenerate protobuf: `make proto` (regenerates both Go and C# output)
-- Clean generated code: `make clean`
-- Tests: `make test`
+- See `Makefile`
 
 ## Stack
 - Go 1.26, gorilla/websocket, google.golang.org/protobuf
