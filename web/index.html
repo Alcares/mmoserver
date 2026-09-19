@@ -70,6 +70,11 @@
   const facingDirections = new Map();
   const lastPositions = new Map();
 
+  // Cash is whole cents on the wire: 1011 -> "$10.11"
+  function money(cents) {
+    return "$" + (cents / 100).toFixed(2);
+  }
+
   // "COMMODITY_WHEAT" -> "WHEAT", matching the label stations already render
   function commodityLabel(typeName) {
     return typeName.split("_")[1] || typeName;
@@ -179,21 +184,57 @@
     socket.send(payload);
   }
 
-  // Fixed test trade: buy $10.00 of whatever station the player is standing
-  // on. The server silently drops this if no station is in range (TODO on
-  // its end to report that back), so nothing renders differently on failure.
-  const TRADE_TEST_CASH_AMOUNT = 10; // players start with a balance of 100 (world.go StartingBalance)
+  // Buy one unit at the station the player is standing at, offering exactly the price
+  // shown on its label (cents). The server fills it at its price when the order arrives:
+  // a hair over one unit if the price held, nothing (no charge) if it rose too far.
+  const TRADE_RANGE = 5; // world.go TradeRange
+  const UNIT_SCALE = 1e6; // holdings are micro-units: 1,000,000 = one whole unit
   const INTENT_ALLOCATE_FIXED = 1;
+  const INTENT_SELL_FIXED = 5;
 
-  function sendTrade() {
+  function nearbyStation(me) {
+    let best = null, nearest = TRADE_RANGE;
+    for (const s of stations) {
+      const d = Math.hypot(s.x - me.x, s.y - me.y);
+      if (d <= nearest) { nearest = d; best = s; }
+    }
+    return best;
+  }
+
+  function sendBuy() {
     if (!socket || socket.readyState !== WebSocket.OPEN || !ClientMessage) return;
+    const me = players.find(p => p.id === myPlayerId);
+    if (!me) return;
+    const station = nearbyStation(me);
+    if (!station) return;
+    const quote = commodityPrices[station.commodity];
+    const cash = quote ? quote.buyPriceCents : 0;
+    if (!cash || myBalance === null || myBalance < cash) return;
+
     tradeSequenceId += 1;
     const payload = ClientMessage.encode({
-      trade: {
-        sequenceId: tradeSequenceId,
-        intent: INTENT_ALLOCATE_FIXED,
-        cashAmount: TRADE_TEST_CASH_AMOUNT,
-      },
+      trade: { sequenceId: tradeSequenceId, intent: INTENT_ALLOCATE_FIXED, cashAmount: cash },
+    }).finish();
+    socket.send(payload);
+  }
+
+  // Sell one whole unit at the price shown on the station label (the cash it fetches), or
+  // whatever is left if less than a unit is held so small remainders can be cleared.
+  function sendSell() {
+    if (!socket || socket.readyState !== WebSocket.OPEN || !ClientMessage) return;
+    const me = players.find(p => p.id === myPlayerId);
+    if (!me) return;
+    const station = nearbyStation(me);
+    if (!station) return;
+    const quote = commodityPrices[station.commodity];
+    if (!quote || !quote.sellPriceCents) return;
+    const holding = myCommodities.find(c => c.type === station.commodity);
+    const held = holding ? holding.amount : 0;
+    if (!held) return;
+
+    tradeSequenceId += 1;
+    const payload = ClientMessage.encode({
+      trade: { sequenceId: tradeSequenceId, intent: INTENT_SELL_FIXED, unitAmount: Math.min(held, UNIT_SCALE) },
     }).finish();
     socket.send(payload);
   }
@@ -201,7 +242,12 @@
   window.addEventListener("keydown", (e) => {
     if (e.key === "e" || e.key === "E") {
       e.preventDefault();
-      sendTrade();
+      sendBuy();
+      return;
+    }
+    if (e.key === "q" || e.key === "Q") {
+      e.preventDefault();
+      sendSell();
       return;
     }
     if (!CONTROL_KEYS.includes(e.key)) return;
@@ -274,7 +320,9 @@
         ctx.fill();
 
         const price = commodityPrices[s.commodity];
-        const stationLabel = price ? `${s.label} ($${price.spotPriceCents})` : s.label;
+        const stationLabel = price && price.buyPriceCents
+          ? `${s.label} (E ${money(price.buyPriceCents)} / Q ${money(price.sellPriceCents)})`
+          : s.label;
 
         ctx.font = "bold 10px monospace";
         ctx.textAlign = "center";
@@ -334,16 +382,17 @@
       // Value is computed here from the latest MarketState quotes rather
       // than sent by the server, so there's one live source of truth for
       // price instead of a snapshot that could go stale as the market moves.
+      // Value at the sell price: what selling the holding would fetch, in cents.
       function commodityValue(c) {
         const price = commodityPrices[c.type];
-        return price ? c.amount * price.spotPriceCents : 0;
+        return price ? (c.amount / UNIT_SCALE) * price.sellPriceCents : 0;
       }
       const portfolioValue = myCommodities.reduce((sum, c) => sum + commodityValue(c), 0);
       const hudLines = [
         `Pos: [${me.x.toFixed(1)}, ${me.y.toFixed(1)}]`,
-        `Balance: ${myBalance === null ? "..." : myBalance}`,
-        `Portfolio: ${portfolioValue}`,
-        ...myCommodities.map(c => `${commodityLabel(c.type)}: ${c.amount} ($${commodityValue(c)})`),
+        `Balance: ${myBalance === null ? "..." : money(myBalance)}`,
+        `Portfolio: ${money(portfolioValue)}`,
+        ...myCommodities.map(c => `${commodityLabel(c.type)}: ${(c.amount / UNIT_SCALE).toFixed(3)} (${money(commodityValue(c))})`),
       ];
       const hudLineHeight = 18;
       const hudWidth = 190;
