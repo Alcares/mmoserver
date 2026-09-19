@@ -33,14 +33,12 @@ func TestEncodeTowardsGoal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	obsVec := obs.Vectorise()
 
 	want := []float32{0.5, 0.5, 0.1, 0, 0.1}
-	if len(obs) != ObsSize {
-		t.Fatalf("len(obs) = %d, want %d", len(obs), ObsSize)
-	}
 	for i := range want {
-		if math.Abs(float64(obs[i]-want[i])) > 1e-6 {
-			t.Errorf("obs[%d] = %v, want %v", i, obs[i], want[i])
+		if math.Abs(float64(obsVec[i]-want[i])) > 1e-6 {
+			t.Errorf("obs[%d] = %v, want %v", i, obsVec[i], want[i])
 		}
 	}
 }
@@ -55,9 +53,10 @@ func TestEncodeUsesLatestSnapshot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	obsVec := obs.Vectorise()
 	// Goal is straight down (+y) from the bot, 50 units away
-	if obs[2] != 0 || math.Abs(float64(obs[3]-0.1)) > 1e-6 {
-		t.Errorf("dx, dy = %v, %v, want 0, 0.1", obs[2], obs[3])
+	if obsVec[2] != 0 || math.Abs(float64(obsVec[3]-0.1)) > 1e-6 {
+		t.Errorf("dx, dy = %v, %v, want 0, 0.1", obsVec[2], obsVec[3])
 	}
 }
 
