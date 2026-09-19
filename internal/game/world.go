@@ -69,7 +69,7 @@ func NewWorld(rand *rand.Rand) *World {
 	}
 }
 
-func (w *World) AddPlayer(client *Client) (*Player, error) {
+func (w *World) addPlayer(client *Client) (*Player, error) {
 	if len(w.availableSpawns) == 0 {
 		return nil, fmt.Errorf("server full: no spawn points available")
 	}
@@ -86,6 +86,35 @@ func (w *World) AddPlayer(client *Client) (*Player, error) {
 	w.clients[playerID] = client
 
 	return player, nil
+}
+
+// Join adds a player for c and queues its InitialGameState and PlayerInventory ahead of any WorldSnapshot
+func (w *World) Join(c *Client) (*Player, error) {
+	w.Mu.Lock()
+	defer w.Mu.Unlock()
+
+	player, err := w.addPlayer(c)
+	if err != nil {
+		return nil, err
+	}
+
+	w.sendTo(player.ID, &pb.ServerMessage{
+		Msg: &pb.ServerMessage_InitialState{InitialState: w.initialState()},
+	})
+	w.sendTo(player.ID, &pb.ServerMessage{
+		Msg: &pb.ServerMessage_PlayerInventory{PlayerInventory: player.ToProtoInventory()},
+	})
+
+	return player, nil
+}
+
+// initialState describes the current station layout; built per join so it never goes stale
+func (w *World) initialState() *pb.InitialGameState {
+	stations := make([]*pb.TradingStation, 0, len(w.Stations))
+	for _, s := range w.Stations {
+		stations = append(stations, s.ToProto())
+	}
+	return &pb.InitialGameState{StationLayout: stations}
 }
 
 func (w *World) removePlayer(playerID uint32) {
