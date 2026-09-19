@@ -2,7 +2,7 @@ MODULE := github.com/alcares/mmoserver
 PROTO_DIR := api/proto
 CSHARP_OUT := unity-client/Assets/Scripts/Generated
 
-.PHONY: proto clean run
+.PHONY: proto clean run test hooks
 
 proto:
 	protoc \
@@ -25,3 +25,6 @@ run:
 
 test:
 	go test ./...
+
+hooks:
+	git config core.hooksPath .githooks

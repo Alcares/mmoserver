@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Git pre-commit hook: block the commit if any staged Go file is not gofmt'd or if
+# `go test ./...` fails. Enable with `make hooks`; bypass once with `git commit --no-verify`.
+set -uo pipefail
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+# Check the staged content (not the working tree), so what gets committed is what gets checked.
+unformatted=()
+while IFS= read -r -d '' file; do
+  if [[ -n "$(git show ":$file" | gofmt -l 2>&1)" ]]; then
+    unformatted+=("$file")
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACMR -z -- '*.go')
+
+if (( ${#unformatted[@]} )); then
+  echo "pre-commit: these staged files are not gofmt'd (run \`go fmt ./...\` and re-stage):" >&2
+  printf '  %s\n' "${unformatted[@]}" >&2
+  exit 1
+fi
+
+if ! out=$(go test ./... 2>&1); then
+  echo "pre-commit: go test ./... failed:" >&2
+  echo "$out" | tail -n 40 >&2
+  exit 1
+fi
