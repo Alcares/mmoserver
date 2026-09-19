@@ -18,13 +18,11 @@ namespace Game.Client
         /// <summary>Mirrors internal/game/world.go TradeRange; the server is authoritative.</summary>
         public const float TradeRange = 5f;
 
-        /// <summary>Micro-units per whole commodity unit (internal/game/commodity.go UnitScale).</summary>
-        public const double UnitScale = 1_000_000d;
-
         private GameClient _client;
         private readonly Dictionary<CommodityType, PriceQuote> _prices = new();
         private readonly List<OwnedCommodity> _holdings = new();
         private readonly List<TradingStation> _stations = new();
+        private readonly List<uint> _orderSizes = new();
 
         /// <summary>Local player position in server coordinates (tiles, +y down); null before the first snapshot.</summary>
         public Vector2? Position { get; private set; }
@@ -32,6 +30,8 @@ namespace Game.Client
         public ulong? Balance { get; private set; }
         public IReadOnlyList<OwnedCommodity> Holdings => _holdings;
         public IReadOnlyDictionary<CommodityType, PriceQuote> Prices => _prices;
+        /// <summary>Order sizes (whole units) the server quotes, smallest first; empty before the first MarketState.</summary>
+        public IReadOnlyList<uint> OrderSizes => _orderSizes;
 
         public event Action PricesChanged;
 
@@ -73,6 +73,13 @@ namespace Game.Client
         private void OnMarket(MarketState m)
         {
             foreach (var q in m.Quotes) _prices[q.Commodity] = q;
+
+            // Every quote carries the same sizes; the server owns the list.
+            if (m.Quotes.Count > 0 && !SameSizes(m.Quotes[0]))
+            {
+                _orderSizes.Clear();
+                foreach (var o in m.Quotes[0].Orders) _orderSizes.Add(o.Units);
+            }
             PricesChanged?.Invoke();
         }
 
@@ -80,6 +87,32 @@ namespace Game.Client
         {
             _stations.Clear();
             _stations.AddRange(s.StationLayout);
+        }
+
+        private bool SameSizes(PriceQuote q)
+        {
+            if (q.Orders.Count != _orderSizes.Count) return false;
+            for (int i = 0; i < q.Orders.Count; i++)
+            {
+                if (q.Orders[i].Units != _orderSizes[i]) return false;
+            }
+            return true;
+        }
+
+        /// <summary>The per-unit buy/sell prices for an order of this many units of a commodity.</summary>
+        public bool TryGetOrderQuote(CommodityType type, uint units, out OrderQuote quote)
+        {
+            quote = null;
+            if (!_prices.TryGetValue(type, out var q)) return false;
+            foreach (var o in q.Orders)
+            {
+                if (o.Units == units)
+                {
+                    quote = o;
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>The nearest station within trading range of the local player, as the server will see it.</summary>
@@ -101,10 +134,7 @@ namespace Game.Client
             return station != null;
         }
 
-        /// <summary>Quantity in whole units (holdings are stored as micro-units).</summary>
-        public static double Units(OwnedCommodity c) => c.Amount / UnitScale;
-
-        /// <summary>Held quantity of a commodity in micro-units, 0 if none.</summary>
+        /// <summary>Held whole units of a commodity, 0 if none.</summary>
         public ulong AmountOf(CommodityType type)
         {
             foreach (var c in _holdings)
@@ -114,10 +144,10 @@ namespace Game.Client
             return 0;
         }
 
-        /// <summary>Value of a holding in dollars at its sell price, i.e. what selling it would fetch.</summary>
+        /// <summary>Value of a holding in dollars at the one-unit sell price.</summary>
         public double ValueOf(OwnedCommodity c)
         {
-            return _prices.TryGetValue(c.Type, out var q) ? Units(c) * q.SellPriceCents / 100d : 0d;
+            return TryGetOrderQuote(c.Type, 1, out var q) ? c.Amount * q.SellPriceCents / 100d : 0d;
         }
 
         public static string Money(double dollars) => "$" + dollars.ToString("F2", CultureInfo.InvariantCulture);

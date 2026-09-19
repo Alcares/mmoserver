@@ -211,11 +211,12 @@ namespace Game.Client
 
         private void RefreshStationLabels()
         {
+            uint units = _input.OrderUnits;
             foreach (var s in _stations)
             {
-                // The label shows what E pays for one whole unit and what Q gets for selling one.
-                s.Label.Text = _state.Prices.TryGetValue(s.Commodity, out var q) && q.BuyPriceCents > 0
-                    ? $"{s.Name} (E {GameState.MoneyCents(q.BuyPriceCents)} / Q {GameState.MoneyCents(q.SellPriceCents)})"
+                // Per-unit prices for the selected order size: E buys that many, Q sells that many.
+                s.Label.Text = _state.TryGetOrderQuote(s.Commodity, units, out var q) && q.BuyPriceCents > 0
+                    ? $"{s.Name} x{units} (E {GameState.MoneyCents(q.BuyPriceCents)} / Q {GameState.MoneyCents(q.SellPriceCents)})"
                     : s.Name;
             }
         }

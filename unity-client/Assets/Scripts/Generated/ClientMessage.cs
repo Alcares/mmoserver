@@ -26,19 +26,18 @@ namespace Game.V1 {
           string.Concat(
             "ChxnYW1lL3YxL2NsaWVudF9tZXNzYWdlLnByb3RvEgdnYW1lLnYxGhRnYW1l",
             "L3YxL2NvbW1vbi5wcm90byIpCg9Nb3ZlbWVudENvbW1hbmQSCgoCdngYASAB",
-            "KAISCgoCdnkYAiABKAIimAEKDFRyYWRlUmVxdWVzdBITCgtzZXF1ZW5jZV9p",
-            "ZBgBIAEoDRIkCgZpbnRlbnQYAiABKA4yFC5nYW1lLnYxLk9yZGVySW50ZW50",
-            "EhUKC2Nhc2hfYW1vdW50GAMgASgESAASFgoMYmFzaXNfcG9pbnRzGAQgASgN",
-            "SAASFQoLdW5pdF9hbW91bnQYBSABKARIAEIHCgV2YWx1ZSJpCg1DbGllbnRN",
-            "ZXNzYWdlEikKBWlucHV0GAEgASgLMhguZ2FtZS52MS5Nb3ZlbWVudENvbW1h",
-            "bmRIABImCgV0cmFkZRgCIAEoCzIVLmdhbWUudjEuVHJhZGVSZXF1ZXN0SABC",
-            "BQoDY21kQj5aMmdpdGh1Yi5jb20vYWxjYXJlcy9tbW9zZXJ2ZXIvZ2VuL2dv",
-            "L2dhbWUvdjE7Z2FtZXYxqgIHR2FtZS5WMWIGcHJvdG8z"));
+            "KAISCgoCdnkYAiABKAIibQoMVHJhZGVSZXF1ZXN0EhMKC3NlcXVlbmNlX2lk",
+            "GAEgASgNEiQKBmludGVudBgCIAEoDjIULmdhbWUudjEuT3JkZXJJbnRlbnQS",
+            "DQoFdW5pdHMYAyABKA0SEwoLcHJpY2VfY2VudHMYBCABKAQiaQoNQ2xpZW50",
+            "TWVzc2FnZRIpCgVpbnB1dBgBIAEoCzIYLmdhbWUudjEuTW92ZW1lbnRDb21t",
+            "YW5kSAASJgoFdHJhZGUYAiABKAsyFS5nYW1lLnYxLlRyYWRlUmVxdWVzdEgA",
+            "QgUKA2NtZEI+WjJnaXRodWIuY29tL2FsY2FyZXMvbW1vc2VydmVyL2dlbi9n",
+            "by9nYW1lL3YxO2dhbWV2MaoCB0dhbWUuVjFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.MovementCommand), global::Game.V1.MovementCommand.Parser, new[]{ "Vx", "Vy" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeRequest), global::Game.V1.TradeRequest.Parser, new[]{ "SequenceId", "Intent", "CashAmount", "BasisPoints", "UnitAmount" }, new[]{ "Value" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeRequest), global::Game.V1.TradeRequest.Parser, new[]{ "SequenceId", "Intent", "Units", "PriceCents" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ClientMessage), global::Game.V1.ClientMessage.Parser, new[]{ "Input", "Trade" }, new[]{ "Cmd" }, null, null, null)
           }));
     }
@@ -285,7 +284,8 @@ namespace Game.V1 {
   }
 
   /// <summary>
-  /// Client -> Server: Sent when the player taps/holds the sell/buy button
+  /// Client -> Server: Sent when the player presses buy/sell at a station. The server trades
+  /// against the station the player is standing at, for the whole order or nothing.
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class TradeRequest : pb::IMessage<TradeRequest>
@@ -324,18 +324,8 @@ namespace Game.V1 {
     public TradeRequest(TradeRequest other) : this() {
       sequenceId_ = other.sequenceId_;
       intent_ = other.intent_;
-      switch (other.ValueCase) {
-        case ValueOneofCase.CashAmount:
-          CashAmount = other.CashAmount;
-          break;
-        case ValueOneofCase.BasisPoints:
-          BasisPoints = other.BasisPoints;
-          break;
-        case ValueOneofCase.UnitAmount:
-          UnitAmount = other.UnitAmount;
-          break;
-      }
-
+      units_ = other.units_;
+      priceCents_ = other.priceCents_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -349,7 +339,7 @@ namespace Game.V1 {
     public const int SequenceIdFieldNumber = 1;
     private uint sequenceId_;
     /// <summary>
-    /// Client sequence counter for reconciliation
+    /// Client sequence counter, echoed in TradeReceipt
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -372,113 +362,35 @@ namespace Game.V1 {
       }
     }
 
-    /// <summary>Field number for the "cash_amount" field.</summary>
-    public const int CashAmountFieldNumber = 3;
+    /// <summary>Field number for the "units" field.</summary>
+    public const int UnitsFieldNumber = 3;
+    private uint units_;
     /// <summary>
-    /// Flat cash (e.g. $10.00 = 1000)
+    /// Whole units to buy or sell, at least 1
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong CashAmount {
-      get { return HasCashAmount ? (ulong) value_ : 0UL; }
+    public uint Units {
+      get { return units_; }
       set {
-        value_ = value;
-        valueCase_ = ValueOneofCase.CashAmount;
-      }
-    }
-    /// <summary>Gets whether the "cash_amount" field is set</summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool HasCashAmount {
-      get { return valueCase_ == ValueOneofCase.CashAmount; }
-    }
-    /// <summary> Clears the value of the oneof if it's currently set to "cash_amount" </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearCashAmount() {
-      if (HasCashAmount) {
-        ClearValue();
+        units_ = value;
       }
     }
 
-    /// <summary>Field number for the "basis_points" field.</summary>
-    public const int BasisPointsFieldNumber = 4;
+    /// <summary>Field number for the "price_cents" field.</summary>
+    public const int PriceCentsFieldNumber = 4;
+    private ulong priceCents_;
     /// <summary>
-    /// Percentage of wallet (10000 = 100%, 2500 = 25%)
+    /// Per-unit price (cents) the client saw for this order size (OrderQuote). A buy is rejected
+    /// if the price rose above it, a sell if it fell below it; a better price fills.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public uint BasisPoints {
-      get { return HasBasisPoints ? (uint) value_ : 0; }
+    public ulong PriceCents {
+      get { return priceCents_; }
       set {
-        value_ = value;
-        valueCase_ = ValueOneofCase.BasisPoints;
+        priceCents_ = value;
       }
-    }
-    /// <summary>Gets whether the "basis_points" field is set</summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool HasBasisPoints {
-      get { return valueCase_ == ValueOneofCase.BasisPoints; }
-    }
-    /// <summary> Clears the value of the oneof if it's currently set to "basis_points" </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearBasisPoints() {
-      if (HasBasisPoints) {
-        ClearValue();
-      }
-    }
-
-    /// <summary>Field number for the "unit_amount" field.</summary>
-    public const int UnitAmountFieldNumber = 5;
-    /// <summary>
-    /// Units to sell, in micro-units (1000000 = one whole unit)
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong UnitAmount {
-      get { return HasUnitAmount ? (ulong) value_ : 0UL; }
-      set {
-        value_ = value;
-        valueCase_ = ValueOneofCase.UnitAmount;
-      }
-    }
-    /// <summary>Gets whether the "unit_amount" field is set</summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool HasUnitAmount {
-      get { return valueCase_ == ValueOneofCase.UnitAmount; }
-    }
-    /// <summary> Clears the value of the oneof if it's currently set to "unit_amount" </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearUnitAmount() {
-      if (HasUnitAmount) {
-        ClearValue();
-      }
-    }
-
-    private object value_;
-    /// <summary>Enum of possible cases for the "value" oneof.</summary>
-    public enum ValueOneofCase {
-      None = 0,
-      CashAmount = 3,
-      BasisPoints = 4,
-      UnitAmount = 5,
-    }
-    private ValueOneofCase valueCase_ = ValueOneofCase.None;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ValueOneofCase ValueCase {
-      get { return valueCase_; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearValue() {
-      valueCase_ = ValueOneofCase.None;
-      value_ = null;
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -498,10 +410,8 @@ namespace Game.V1 {
       }
       if (SequenceId != other.SequenceId) return false;
       if (Intent != other.Intent) return false;
-      if (CashAmount != other.CashAmount) return false;
-      if (BasisPoints != other.BasisPoints) return false;
-      if (UnitAmount != other.UnitAmount) return false;
-      if (ValueCase != other.ValueCase) return false;
+      if (Units != other.Units) return false;
+      if (PriceCents != other.PriceCents) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -511,10 +421,8 @@ namespace Game.V1 {
       int hash = 1;
       if (SequenceId != 0) hash ^= SequenceId.GetHashCode();
       if (Intent != global::Game.V1.OrderIntent.IntentUnspecified) hash ^= Intent.GetHashCode();
-      if (HasCashAmount) hash ^= CashAmount.GetHashCode();
-      if (HasBasisPoints) hash ^= BasisPoints.GetHashCode();
-      if (HasUnitAmount) hash ^= UnitAmount.GetHashCode();
-      hash ^= (int) valueCase_;
+      if (Units != 0) hash ^= Units.GetHashCode();
+      if (PriceCents != 0UL) hash ^= PriceCents.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -541,17 +449,13 @@ namespace Game.V1 {
         output.WriteRawTag(16);
         output.WriteEnum((int) Intent);
       }
-      if (HasCashAmount) {
+      if (Units != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt64(CashAmount);
+        output.WriteUInt32(Units);
       }
-      if (HasBasisPoints) {
+      if (PriceCents != 0UL) {
         output.WriteRawTag(32);
-        output.WriteUInt32(BasisPoints);
-      }
-      if (HasUnitAmount) {
-        output.WriteRawTag(40);
-        output.WriteUInt64(UnitAmount);
+        output.WriteUInt64(PriceCents);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -571,17 +475,13 @@ namespace Game.V1 {
         output.WriteRawTag(16);
         output.WriteEnum((int) Intent);
       }
-      if (HasCashAmount) {
+      if (Units != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt64(CashAmount);
+        output.WriteUInt32(Units);
       }
-      if (HasBasisPoints) {
+      if (PriceCents != 0UL) {
         output.WriteRawTag(32);
-        output.WriteUInt32(BasisPoints);
-      }
-      if (HasUnitAmount) {
-        output.WriteRawTag(40);
-        output.WriteUInt64(UnitAmount);
+        output.WriteUInt64(PriceCents);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -599,14 +499,11 @@ namespace Game.V1 {
       if (Intent != global::Game.V1.OrderIntent.IntentUnspecified) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Intent);
       }
-      if (HasCashAmount) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(CashAmount);
+      if (Units != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Units);
       }
-      if (HasBasisPoints) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(BasisPoints);
-      }
-      if (HasUnitAmount) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(UnitAmount);
+      if (PriceCents != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(PriceCents);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -626,18 +523,12 @@ namespace Game.V1 {
       if (other.Intent != global::Game.V1.OrderIntent.IntentUnspecified) {
         Intent = other.Intent;
       }
-      switch (other.ValueCase) {
-        case ValueOneofCase.CashAmount:
-          CashAmount = other.CashAmount;
-          break;
-        case ValueOneofCase.BasisPoints:
-          BasisPoints = other.BasisPoints;
-          break;
-        case ValueOneofCase.UnitAmount:
-          UnitAmount = other.UnitAmount;
-          break;
+      if (other.Units != 0) {
+        Units = other.Units;
       }
-
+      if (other.PriceCents != 0UL) {
+        PriceCents = other.PriceCents;
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -666,15 +557,11 @@ namespace Game.V1 {
             break;
           }
           case 24: {
-            CashAmount = input.ReadUInt64();
+            Units = input.ReadUInt32();
             break;
           }
           case 32: {
-            BasisPoints = input.ReadUInt32();
-            break;
-          }
-          case 40: {
-            UnitAmount = input.ReadUInt64();
+            PriceCents = input.ReadUInt64();
             break;
           }
         }
@@ -705,15 +592,11 @@ namespace Game.V1 {
             break;
           }
           case 24: {
-            CashAmount = input.ReadUInt64();
+            Units = input.ReadUInt32();
             break;
           }
           case 32: {
-            BasisPoints = input.ReadUInt32();
-            break;
-          }
-          case 40: {
-            UnitAmount = input.ReadUInt64();
+            PriceCents = input.ReadUInt64();
             break;
           }
         }

@@ -62,6 +62,9 @@
   let myBalance = null;
   let myCommodities = [];
   let commodityPrices = {}; // type string -> PriceQuote, from the latest MarketState
+  let orderSizes = []; // units per order the server quotes (1, 2, 5, 10); T cycles through them
+  let orderSizeIndex = 0;
+  let lastReceipt = null; // { text, ok, until } for the latest TradeReceipt
   let tradeSequenceId = 0;
   let ClientMessage = null;
   let ServerMessage = null;
@@ -128,9 +131,13 @@
             .slice()
             .sort((a, b) => a.type.localeCompare(b.type));
         } else if (message.msg === "marketState") {
-          for (const q of message.marketState.quotes || []) {
+          const quotes = message.marketState.quotes || [];
+          for (const q of quotes) {
             commodityPrices[q.commodity] = q;
           }
+          if (quotes.length > 0) orderSizes = (quotes[0].orders || []).map(o => o.units);
+        } else if (message.msg === "trade") {
+          handleTradeReceipt(message.trade);
         }
       } catch (e) {
         console.error("Failed to decode message:", e);
@@ -184,13 +191,30 @@
     socket.send(payload);
   }
 
-  // Buy one unit at the station the player is standing at, offering exactly the price
-  // shown on its label (cents). The server fills it at its price when the order arrives:
-  // a hair over one unit if the price held, nothing (no charge) if it rose too far.
+  // Trading: E buys and Q sells exactly the selected order size at the nearby station, sending
+  // the per-unit price shown on its label. The server fills the whole order at one price or
+  // rejects it (not enough cash or units, or the price moved against us) with a TradeReceipt.
   const TRADE_RANGE = 5; // world.go TradeRange
-  const UNIT_SCALE = 1e6; // holdings are micro-units: 1,000,000 = one whole unit
-  const INTENT_ALLOCATE_FIXED = 1;
-  const INTENT_SELL_FIXED = 5;
+  const INTENT_BUY = 1;
+  const INTENT_SELL = 2;
+  const RECEIPT_MS = 2500;
+  const REJECTION_TEXT = {
+    TRADE_REJECTION_NOT_AT_STATION: "Not at a trading station",
+    TRADE_REJECTION_PRICE_MOVED: "Price moved, trade cancelled",
+    TRADE_REJECTION_INSUFFICIENT_CASH: "Not enough cash",
+    TRADE_REJECTION_INSUFFICIENT_UNITS: "Not enough units to sell",
+    TRADE_REJECTION_POOL_EXHAUSTED: "Market can't fill that order",
+  };
+
+  function selectedUnits() {
+    return orderSizes.length ? orderSizes[Math.min(orderSizeIndex, orderSizes.length - 1)] : 0;
+  }
+
+  // Per-unit buy/sell prices (cents) for an order of `units` of a commodity, or null
+  function orderQuote(commodity, units) {
+    const quote = commodityPrices[commodity];
+    return quote ? (quote.orders || []).find(o => o.units === units) || null : null;
+  }
 
   function nearbyStation(me) {
     let best = null, nearest = TRADE_RANGE;
@@ -201,53 +225,45 @@
     return best;
   }
 
-  function sendBuy() {
+  function sendTrade(intent) {
     if (!socket || socket.readyState !== WebSocket.OPEN || !ClientMessage) return;
     const me = players.find(p => p.id === myPlayerId);
     if (!me) return;
     const station = nearbyStation(me);
     if (!station) return;
-    const quote = commodityPrices[station.commodity];
-    const cash = quote ? quote.buyPriceCents : 0;
-    if (!cash || myBalance === null || myBalance < cash) return;
+    const units = selectedUnits();
+    const quote = orderQuote(station.commodity, units);
+    const priceCents = quote ? (intent === INTENT_BUY ? quote.buyPriceCents : quote.sellPriceCents) : 0;
+    if (!priceCents) return;
 
     tradeSequenceId += 1;
     const payload = ClientMessage.encode({
-      trade: { sequenceId: tradeSequenceId, intent: INTENT_ALLOCATE_FIXED, cashAmount: cash },
+      trade: { sequenceId: tradeSequenceId, intent, units, priceCents },
     }).finish();
     socket.send(payload);
   }
 
-  // Sell one whole unit at the price shown on the station label (the cash it fetches), or
-  // whatever is left if less than a unit is held so small remainders can be cleared.
-  function sendSell() {
-    if (!socket || socket.readyState !== WebSocket.OPEN || !ClientMessage) return;
-    const me = players.find(p => p.id === myPlayerId);
-    if (!me) return;
-    const station = nearbyStation(me);
-    if (!station) return;
-    const quote = commodityPrices[station.commodity];
-    if (!quote || !quote.sellPriceCents) return;
-    const holding = myCommodities.find(c => c.type === station.commodity);
-    const held = holding ? holding.amount : 0;
-    if (!held) return;
-
-    tradeSequenceId += 1;
-    const payload = ClientMessage.encode({
-      trade: { sequenceId: tradeSequenceId, intent: INTENT_SELL_FIXED, unitAmount: Math.min(held, UNIT_SCALE) },
-    }).finish();
-    socket.send(payload);
+  function handleTradeReceipt(r) {
+    const text = r.success
+      ? `${r.intent === "INTENT_BUY" ? "Bought" : "Sold"} ${r.unitsTransacted} ${commodityLabel(r.commodity)} @ ${money(r.priceCents)} = ${money(r.totalBalanceChange)}`
+      : REJECTION_TEXT[r.rejection] || "Trade rejected";
+    lastReceipt = { text, ok: r.success, until: performance.now() + RECEIPT_MS };
   }
 
   window.addEventListener("keydown", (e) => {
     if (e.key === "e" || e.key === "E") {
       e.preventDefault();
-      sendBuy();
+      sendTrade(INTENT_BUY);
       return;
     }
     if (e.key === "q" || e.key === "Q") {
       e.preventDefault();
-      sendSell();
+      sendTrade(INTENT_SELL);
+      return;
+    }
+    if (e.key === "t" || e.key === "T") {
+      e.preventDefault();
+      if (orderSizes.length) orderSizeIndex = (orderSizeIndex + 1) % orderSizes.length;
       return;
     }
     if (!CONTROL_KEYS.includes(e.key)) return;
@@ -319,9 +335,11 @@
         ctx.arc(sx, sy, TILE_SIZE * 0.9, 0, Math.PI * 2);
         ctx.fill();
 
-        const price = commodityPrices[s.commodity];
-        const stationLabel = price && price.buyPriceCents
-          ? `${s.label} (E ${money(price.buyPriceCents)} / Q ${money(price.sellPriceCents)})`
+        // Per-unit prices for the selected order size: E buys that many, Q sells that many
+        const units = selectedUnits();
+        const quote = orderQuote(s.commodity, units);
+        const stationLabel = quote && quote.buyPriceCents
+          ? `${s.label} x${units} (E ${money(quote.buyPriceCents)} / Q ${money(quote.sellPriceCents)})`
           : s.label;
 
         ctx.font = "bold 10px monospace";
@@ -382,20 +400,22 @@
       // Value is computed here from the latest MarketState quotes rather
       // than sent by the server, so there's one live source of truth for
       // price instead of a snapshot that could go stale as the market moves.
-      // Value at the sell price: what selling the holding would fetch, in cents.
+      // Value at the one-unit sell price, in cents.
       function commodityValue(c) {
-        const price = commodityPrices[c.type];
-        return price ? (c.amount / UNIT_SCALE) * price.sellPriceCents : 0;
+        const quote = orderQuote(c.type, 1);
+        return quote ? c.amount * quote.sellPriceCents : 0;
       }
       const portfolioValue = myCommodities.reduce((sum, c) => sum + commodityValue(c), 0);
       const hudLines = [
         `Pos: [${me.x.toFixed(1)}, ${me.y.toFixed(1)}]`,
         `Balance: ${myBalance === null ? "..." : money(myBalance)}`,
         `Portfolio: ${money(portfolioValue)}`,
-        ...myCommodities.map(c => `${commodityLabel(c.type)}: ${(c.amount / UNIT_SCALE).toFixed(3)} (${money(commodityValue(c))})`),
+        ...myCommodities.map(c => `${commodityLabel(c.type)}: ${c.amount} (${money(commodityValue(c))})`),
+        "",
+        `Order [T]: ${orderSizes.map((n, i) => i === orderSizeIndex ? `[${n}x]` : `${n}x`).join(" ")}`,
       ];
       const hudLineHeight = 18;
-      const hudWidth = 190;
+      const hudWidth = 230;
       const hudHeight = 12 + hudLines.length * hudLineHeight;
 
       ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
@@ -408,6 +428,17 @@
       hudLines.forEach((line, i) => {
         ctx.fillText(line, 26, 35 + i * hudLineHeight);
       });
+
+      // Latest trade result, centered near the bottom until it expires
+      if (lastReceipt && performance.now() < lastReceipt.until) {
+        ctx.font = "bold 14px monospace";
+        ctx.textAlign = "center";
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "rgba(15, 23, 42, 0.9)";
+        ctx.strokeText(lastReceipt.text, canvas.width / 2, canvas.height - 40);
+        ctx.fillStyle = lastReceipt.ok ? "#86efac" : "#f87171";
+        ctx.fillText(lastReceipt.text, canvas.width / 2, canvas.height - 40);
+      }
     }
 
     requestAnimationFrame(render);

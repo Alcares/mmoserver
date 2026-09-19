@@ -29,16 +29,20 @@ namespace Game.V1 {
             "VFlQRV9GVUxMX1ZJU0lPThABKqkBCg1Db21tb2RpdHlUeXBlEhkKFUNPTU1P",
             "RElUWV9VTlNQRUNJRklFRBAAEhMKD0NPTU1PRElUWV9XSEVBVBABEhQKEENP",
             "TU1PRElUWV9DT0ZGRUUQAhIVChFDT01NT0RJVFlfTElUSElVTRADEhIKDkNP",
-            "TU1PRElUWV9HT0xEEAUSEQoNQ09NTU9ESVRZX09JTBAGEhQKEENPTU1PRElU",
-            "WV9TSUxWRVIQByqeAQoLT3JkZXJJbnRlbnQSFgoSSU5URU5UX1VOU1BFQ0lG",
-            "SUVEEAASGQoVSU5URU5UX0FMTE9DQVRFX0ZJWEVEEAESGQoVSU5URU5UX0FM",
-            "TE9DQVRFX1JBVElPEAISFQoRSU5URU5UX1NFTExfUkFUSU8QAxITCg9JTlRF",
-            "TlRfRFVNUF9BTEwQBBIVChFJTlRFTlRfU0VMTF9GSVhFRBAFQj5aMmdpdGh1",
-            "Yi5jb20vYWxjYXJlcy9tbW9zZXJ2ZXIvZ2VuL2dvL2dhbWUvdjE7Z2FtZXYx",
-            "qgIHR2FtZS5WMWIGcHJvdG8z"));
+            "TU1PRElUWV9HT0xEEAQSEQoNQ09NTU9ESVRZX09JTBAFEhQKEENPTU1PRElU",
+            "WV9TSUxWRVIQBipGCgtPcmRlckludGVudBIWChJJTlRFTlRfVU5TUEVDSUZJ",
+            "RUQQABIOCgpJTlRFTlRfQlVZEAESDwoLSU5URU5UX1NFTEwQAiqMAgoOVHJh",
+            "ZGVSZWplY3Rpb24SHwobVFJBREVfUkVKRUNUSU9OX1VOU1BFQ0lGSUVEEAAS",
+            "IgoeVFJBREVfUkVKRUNUSU9OX05PVF9BVF9TVEFUSU9OEAESIQodVFJBREVf",
+            "UkVKRUNUSU9OX0lOVkFMSURfT1JERVIQAhIfChtUUkFERV9SRUpFQ1RJT05f",
+            "UFJJQ0VfTU9WRUQQAxIlCiFUUkFERV9SRUpFQ1RJT05fSU5TVUZGSUNJRU5U",
+            "X0NBU0gQBBImCiJUUkFERV9SRUpFQ1RJT05fSU5TVUZGSUNJRU5UX1VOSVRT",
+            "EAUSIgoeVFJBREVfUkVKRUNUSU9OX1BPT0xfRVhIQVVTVEVEEAZCPloyZ2l0",
+            "aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9nZW4vZ28vZ2FtZS92MTtnYW1l",
+            "djGqAgdHYW1lLlYxYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Game.V1.PowerUpType), typeof(global::Game.V1.CommodityType), typeof(global::Game.V1.OrderIntent), }, null, null));
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Game.V1.PowerUpType), typeof(global::Game.V1.CommodityType), typeof(global::Game.V1.OrderIntent), typeof(global::Game.V1.TradeRejection), }, null, null));
     }
     #endregion
 
@@ -54,33 +58,55 @@ namespace Game.V1 {
     [pbr::OriginalName("COMMODITY_WHEAT")] CommodityWheat = 1,
     [pbr::OriginalName("COMMODITY_COFFEE")] CommodityCoffee = 2,
     [pbr::OriginalName("COMMODITY_LITHIUM")] CommodityLithium = 3,
-    [pbr::OriginalName("COMMODITY_GOLD")] CommodityGold = 5,
-    [pbr::OriginalName("COMMODITY_OIL")] CommodityOil = 6,
-    [pbr::OriginalName("COMMODITY_SILVER")] CommoditySilver = 7,
+    [pbr::OriginalName("COMMODITY_GOLD")] CommodityGold = 4,
+    [pbr::OriginalName("COMMODITY_OIL")] CommodityOil = 5,
+    [pbr::OriginalName("COMMODITY_SILVER")] CommoditySilver = 6,
   }
 
   public enum OrderIntent {
     [pbr::OriginalName("INTENT_UNSPECIFIED")] IntentUnspecified = 0,
     /// <summary>
-    /// Buy: spend an exact amount of cash (cents)
+    /// Buy a whole number of units
     /// </summary>
-    [pbr::OriginalName("INTENT_ALLOCATE_FIXED")] IntentAllocateFixed = 1,
+    [pbr::OriginalName("INTENT_BUY")] IntentBuy = 1,
     /// <summary>
-    /// Spend e.g. 10%, 25%, 50%, 100% of wallet
+    /// Sell a whole number of units
     /// </summary>
-    [pbr::OriginalName("INTENT_ALLOCATE_RATIO")] IntentAllocateRatio = 2,
+    [pbr::OriginalName("INTENT_SELL")] IntentSell = 2,
+  }
+
+  /// <summary>
+  /// Why the server refused a trade, carried in TradeReceipt
+  /// </summary>
+  public enum TradeRejection {
     /// <summary>
-    /// Sell e.g. 25%, 50%, 100% of holdings
+    /// Not rejected: the trade executed
     /// </summary>
-    [pbr::OriginalName("INTENT_SELL_RATIO")] IntentSellRatio = 3,
+    [pbr::OriginalName("TRADE_REJECTION_UNSPECIFIED")] Unspecified = 0,
     /// <summary>
-    /// Complete liquidation
+    /// No trading station within TradeRange
     /// </summary>
-    [pbr::OriginalName("INTENT_DUMP_ALL")] IntentDumpAll = 4,
+    [pbr::OriginalName("TRADE_REJECTION_NOT_AT_STATION")] NotAtStation = 1,
     /// <summary>
-    /// Sell an exact quantity of units (micro-units)
+    /// Unknown intent or zero units
     /// </summary>
-    [pbr::OriginalName("INTENT_SELL_FIXED")] IntentSellFixed = 5,
+    [pbr::OriginalName("TRADE_REJECTION_INVALID_ORDER")] InvalidOrder = 2,
+    /// <summary>
+    /// The price moved against the price the client sent
+    /// </summary>
+    [pbr::OriginalName("TRADE_REJECTION_PRICE_MOVED")] PriceMoved = 3,
+    /// <summary>
+    /// Can't afford units * price
+    /// </summary>
+    [pbr::OriginalName("TRADE_REJECTION_INSUFFICIENT_CASH")] InsufficientCash = 4,
+    /// <summary>
+    /// Holds fewer units than the order sells
+    /// </summary>
+    [pbr::OriginalName("TRADE_REJECTION_INSUFFICIENT_UNITS")] InsufficientUnits = 5,
+    /// <summary>
+    /// The pool can't fill it: buying its last unit, or units worth under a cent
+    /// </summary>
+    [pbr::OriginalName("TRADE_REJECTION_POOL_EXHAUSTED")] PoolExhausted = 6,
   }
 
   #endregion

@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: CommodityIcons
   m_EditorClassIdentifier: Assembly-CSharp::Game.Client.CommodityIcons
   entries:
-  - commodity: 6
+  - commodity: 5
     sprite: {fileID: 21300000, guid: a81b4b777505a39e0b3ccef10cccf431, type: 3}
   - commodity: 1
     sprite: {fileID: 21300000, guid: 832e3e510d887f6b983a4d403ae6628f, type: 3}
-  - commodity: 5
+  - commodity: 4
     sprite: {fileID: 21300000, guid: a6f679b298688766d999a824a9805141, type: 3}
-  - commodity: 7
+  - commodity: 6
     sprite: {fileID: 21300000, guid: 646fb4121f3933ea694d5e63f2e5daac, type: 3}
   - commodity: 2
     sprite: {fileID: 21300000, guid: 28c1775d9ad3afd78b5e8c51fa6e7e13, type: 3}

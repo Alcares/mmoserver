@@ -11,7 +11,7 @@ namespace Game.Client
     /// with one slot per commodity: icon, dollar value (top right), units (bottom right).
     /// Commodities you don't hold are drawn grayed out and translucent.
     /// Value comes from the latest MarketState quotes rather than the server, so price has
-    /// one live source of truth.
+    /// one live source of truth. Each TradeReceipt shows briefly above the order sizes.
     /// </summary>
     [RequireComponent(typeof(GameClient), typeof(GameState), typeof(GameInput))]
     public class Hud : MonoBehaviour
@@ -26,6 +26,7 @@ namespace Game.Client
         private const float BottomMargin = 14f;
         private const float EmptyAlpha = 0.5f; // slot and icon for a commodity you don't hold
         private const float EmptyTextAlpha = 0.9f;
+        private const float ReceiptSeconds = 2.5f;
 
         [Tooltip("Optional. Icon drawn in each hotbar slot.")]
         [SerializeField] private CommodityIcons commodityIcons;
@@ -35,6 +36,9 @@ namespace Game.Client
         private GameInput _input;
         private readonly List<(string label, string value, Color valueColor)> _rows = new();
         private readonly Dictionary<Sprite, Texture2D> _grayIcons = new();
+        private string _receiptText;
+        private bool _receiptOk;
+        private float _receiptUntil;
 
         private static readonly Color MoneyGreen = new Color32(0x86, 0xef, 0xac, 0xff);
         private static readonly Color LabelGold = new Color32(0xd9, 0xc4, 0x8a, 0xff);
@@ -48,6 +52,29 @@ namespace Game.Client
             _state = GetComponent<GameState>();
             _input = GetComponent<GameInput>();
         }
+
+        private void OnEnable() => _client.OnTradeReceipt += OnReceipt;
+
+        private void OnDisable() => _client.OnTradeReceipt -= OnReceipt;
+
+        private void OnReceipt(TradeReceipt r)
+        {
+            _receiptOk = r.Success;
+            _receiptUntil = Time.time + ReceiptSeconds;
+            _receiptText = r.Success
+                ? $"{(r.Intent == OrderIntent.IntentBuy ? "Bought" : "Sold")} {r.UnitsTransacted} {GameState.Label(r.Commodity)} @ {GameState.MoneyCents(r.PriceCents)} = {GameState.MoneyCents(r.TotalBalanceChange)}"
+                : RejectionText(r.Rejection);
+        }
+
+        private static string RejectionText(TradeRejection reason) => reason switch
+        {
+            TradeRejection.NotAtStation => "Not at a trading station",
+            TradeRejection.PriceMoved => "Price moved, trade cancelled",
+            TradeRejection.InsufficientCash => "Not enough cash",
+            TradeRejection.InsufficientUnits => "Not enough units to sell",
+            TradeRejection.PoolExhausted => "Market can't fill that order",
+            _ => "Trade rejected",
+        };
 
         private string StatusText()
         {
@@ -78,9 +105,21 @@ namespace Game.Client
             DrawStats();
             DrawHotbar(screenW, screenH);
             DrawMultiplier(screenW, screenH);
+            DrawReceipt(screenW, screenH);
         }
 
-        // Every multiplier in a row above the hotbar, the selected one highlighted; T cycles.
+        // The last trade's result, centered above the order-size row, until it expires.
+        private void DrawReceipt(float screenW, float screenH)
+        {
+            if (_receiptText == null || Time.time > _receiptUntil) return;
+
+            float y = screenH - SlotSize - BottomMargin - MultiplierHeight - 10f - 26f;
+            _slotText.alignment = TextAnchor.MiddleCenter;
+            GUI.color = Color.white;
+            DrawOutlined(new Rect(0f, y, screenW, 22f), _receiptText, _receiptOk ? MoneyGreen : new Color32(0xf8, 0x71, 0x71, 0xff));
+        }
+
+        // Every order size the server quotes in a row above the hotbar, the selected one highlighted; T cycles.
         private void DrawMultiplier(float screenW, float screenH)
         {
             var options = _input.Multipliers;
@@ -105,7 +144,7 @@ namespace Game.Client
                 GUI.DrawTexture(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), selected ? _selectedFill : _slotFill);
 
                 _multiplierText.normal.textColor = selected ? new Color32(0xfd, 0xe6, 0x8a, 0xff) : new Color32(0xd4, 0xd4, 0xd8, 0xff);
-                GUI.Label(rect, options[i].ToString("0.##", CultureInfo.InvariantCulture) + "x", _multiplierText);
+                GUI.Label(rect, options[i].ToString(CultureInfo.InvariantCulture) + "x", _multiplierText);
 
                 x += MultiplierWidth + MultiplierGap;
             }
@@ -190,7 +229,7 @@ namespace Game.Client
             _slotText.alignment = TextAnchor.UpperRight;
             DrawOutlined(new Rect(slot.x, slot.y - 1f, slot.width - 3f, 18f), GameState.Money(_state.ValueOf(c)), valueColor);
             _slotText.alignment = TextAnchor.LowerRight;
-            DrawOutlined(new Rect(slot.x, slot.yMax - 18f, slot.width - 3f, 17f), GameState.Units(c).ToString("F2", CultureInfo.InvariantCulture), unitsColor);
+            DrawOutlined(new Rect(slot.x, slot.yMax - 18f, slot.width - 3f, 17f), c.Amount.ToString(CultureInfo.InvariantCulture), unitsColor);
         }
 
         // Desaturated copy of an icon. Falls back to the colour icon if the texture isn't readable.

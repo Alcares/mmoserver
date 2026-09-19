@@ -9,23 +9,21 @@ namespace Game.Client
 {
     /// <summary>
     /// Keyboard input: WASD/arrows move, E buys and Q sells at the nearby station, T cycles the
-    /// order-size multiplier. Movement is only sent when the vector changes (including back to
-    /// zero on release), since the server keeps moving the player along the last direction it received.
+    /// order size. Movement is only sent when the vector changes (including back to zero on
+    /// release), since the server keeps moving the player along the last direction it received.
     /// </summary>
     [RequireComponent(typeof(GameClient), typeof(GameState))]
     public class GameInput : MonoBehaviour
     {
-        [Tooltip("Order sizes T cycles through. A buy offers the displayed price times this in cash; a sell offers this many units.")]
-        [SerializeField] private float[] multipliers = { 1f, 2f, 5f, 10f };
-
         /// <summary>Current input in server axes (+y is down), normalized.</summary>
         public Vector2 Move { get; private set; }
 
-        public IReadOnlyList<float> Multipliers => multipliers;
+        /// <summary>Order sizes T cycles through, in whole units; the server's quoted sizes.</summary>
+        public IReadOnlyList<uint> Multipliers => _state.OrderSizes;
         public int MultiplierIndex { get; private set; }
 
-        /// <summary>The selected order-size multiplier; 1 if none are configured.</summary>
-        public double Multiplier => multipliers.Length == 0 ? 1d : multipliers[MultiplierIndex];
+        /// <summary>Units in the selected order; 0 before the first MarketState.</summary>
+        public uint OrderUnits => Multipliers.Count == 0 ? 0 : Multipliers[Math.Min(MultiplierIndex, Multipliers.Count - 1)];
 
         private GameClient _client;
         private GameState _state;
@@ -49,9 +47,9 @@ namespace Game.Client
             if (move.sqrMagnitude > 1f) move.Normalize();
             Move = move;
 
-            if (kb.tKey.wasPressedThisFrame && multipliers.Length > 0)
+            if (kb.tKey.wasPressedThisFrame && Multipliers.Count > 0)
             {
-                MultiplierIndex = (MultiplierIndex + 1) % multipliers.Length;
+                MultiplierIndex = (MultiplierIndex + 1) % Multipliers.Count;
             }
 
             if (!_client.IsConnected) return;
@@ -62,47 +60,27 @@ namespace Game.Client
                 _sent = move;
             }
 
-            if (kb.eKey.wasPressedThisFrame) TryBuy();
-            if (kb.qKey.wasPressedThisFrame) TrySell();
+            if (kb.eKey.wasPressedThisFrame) TryTrade(OrderIntent.IntentBuy);
+            if (kb.qKey.wasPressedThisFrame) TryTrade(OrderIntent.IntentSell);
         }
 
-        // Offers the price shown at the station (cents, the cost of one unit) times the selected
-        // multiplier. The server converts it at its price when the order executes: a hair over
-        // that many units if the price held, and nothing (order rejected, no charge) if it rose so
-        // far that the cash no longer buys a whole unit. Bigger orders move the price while they
-        // fill, so they get slightly fewer units than multiplier x 1.
-        private void TryBuy()
+        // Buys or sells exactly the selected number of units, sending the per-unit price shown at
+        // the station for that size. The server fills the whole order at one price or rejects it
+        // (not enough cash or units, or the price moved against us) and answers with a TradeReceipt.
+        private void TryTrade(OrderIntent intent)
         {
             if (!_state.TryGetNearbyStation(out var station)) return;
-            if (!_state.Prices.TryGetValue(station.Commodity, out var quote)) return;
+            if (!_state.TryGetOrderQuote(station.Commodity, OrderUnits, out var quote)) return;
 
-            ulong cash = (ulong)Math.Ceiling(quote.BuyPriceCents * Multiplier);
-            if (quote.BuyPriceCents == 0 || _state.Balance == null || _state.Balance.Value < cash) return;
+            ulong price = intent == OrderIntent.IntentBuy ? quote.BuyPriceCents : quote.SellPriceCents;
+            if (price == 0) return;
 
             _client.SendTrade(new TradeRequest
             {
                 SequenceId = ++_tradeSequenceId,
-                Intent = OrderIntent.IntentAllocateFixed,
-                CashAmount = cash,
-            });
-        }
-
-        // Sells as many units as the selected multiplier says, or whatever is held if that is less,
-        // so small remainders can be cleared. Nothing is sent when the player holds none, mirroring
-        // how buying needs enough cash.
-        private void TrySell()
-        {
-            if (!_state.TryGetNearbyStation(out var station)) return;
-            if (!_state.Prices.TryGetValue(station.Commodity, out var quote) || quote.SellPriceCents == 0) return;
-
-            ulong held = _state.AmountOf(station.Commodity);
-            if (held == 0) return;
-
-            _client.SendTrade(new TradeRequest
-            {
-                SequenceId = ++_tradeSequenceId,
-                Intent = OrderIntent.IntentSellFixed,
-                UnitAmount = Math.Min(held, (ulong)Math.Round(Multiplier * GameState.UnitScale)),
+                Intent = intent,
+                Units = OrderUnits,
+                PriceCents = price,
             });
         }
 

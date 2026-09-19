@@ -351,7 +351,7 @@ namespace Game.V1 {
     public const int AmountFieldNumber = 2;
     private ulong amount_;
     /// <summary>
-    /// Micro-units: 1,000,000 = one whole unit
+    /// Whole units
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]

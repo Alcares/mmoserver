@@ -33,30 +33,33 @@ namespace Game.V1 {
             "eWVyX2lkGAIgASgNIkQKDVdvcmxkU25hcHNob3QSDAoEdGljaxgBIAEoBBIl",
             "CgdwbGF5ZXJzGAIgAygLMhQuZ2FtZS52MS5QbGF5ZXJTdGF0ZSJACgtNYXJr",
             "ZXRTdGF0ZRIMCgR0aWNrGAEgASgEEiMKBnF1b3RlcxgCIAMoCzITLmdhbWUu",
-            "djEuUHJpY2VRdW90ZSLVAQoKUHJpY2VRdW90ZRIpCgljb21tb2RpdHkYASAB",
-            "KA4yFi5nYW1lLnYxLkNvbW1vZGl0eVR5cGUSFwoPYnV5X3ByaWNlX2NlbnRz",
-            "GAIgASgNEhoKEmRlbHRhX2Jhc2lzX3BvaW50cxgDIAEoBRIcChRhdmFpbGFi",
-            "bGVfcG9vbF91bml0cxgEIAEoDRIZChFkb21pbmFudF93aGFsZV9pZBgFIAEo",
-            "DRIYChBzZWxsX3ByaWNlX2NlbnRzGAcgASgNSgQIBhAHUg5idXlfY29zdF9j",
-            "ZW50cyK8AQoMVHJhZGVSZWNlaXB0EhMKC3NlcXVlbmNlX2lkGAEgASgNEg8K",
-            "B3N1Y2Nlc3MYAiABKAgSHAoUdG90YWxfYmFsYW5jZV9jaGFuZ2UYAyABKAQS",
-            "GAoQdW5pdHNfdHJhbnNhY3RlZBgEIAEoBBITCgtwcmljZV9jZW50cxgFIAEo",
-            "BBIeChZuZXdfY2FzaF9iYWxhbmNlX2NlbnRzGAYgASgEEhkKEW5ld19ob2xk",
-            "aW5nX3VuaXRzGAcgASgEImAKDlRyYWRpbmdTdGF0aW9uEikKCWNvbW1vZGl0",
-            "eRgBIAEoDjIWLmdhbWUudjEuQ29tbW9kaXR5VHlwZRIJCgF4GAIgASgCEgkK",
-            "AXkYAyABKAISDQoFbGFiZWwYBCABKAkiQwoQSW5pdGlhbEdhbWVTdGF0ZRIv",
-            "Cg5zdGF0aW9uX2xheW91dBgBIAMoCzIXLmdhbWUudjEuVHJhZGluZ1N0YXRp",
-            "b24i9gIKDVNlcnZlck1lc3NhZ2USMAoOd29ybGRfc25hcHNob3QYASABKAsy",
-            "Fi5nYW1lLnYxLldvcmxkU25hcHNob3RIABIsCgxtYXJrZXRfc3RhdGUYAiAB",
-            "KAsyFC5nYW1lLnYxLk1hcmtldFN0YXRlSAASMwoQcG93ZXJfdXBfc3Bhd25l",
-            "ZBgDIAEoCzIXLmdhbWUudjEuUG93ZXJVcFNwYXduZWRIABI3ChJwb3dlcl91",
-            "cF9kZXNwYXduZWQYBCABKAsyGS5nYW1lLnYxLlBvd2VyVXBEZXNwYXduZWRI",
-            "ABIyCg1pbml0aWFsX3N0YXRlGAUgASgLMhkuZ2FtZS52MS5Jbml0aWFsR2Ft",
-            "ZVN0YXRlSAASJgoFdHJhZGUYBiABKAsyFS5nYW1lLnYxLlRyYWRlUmVjZWlw",
-            "dEgAEjQKEHBsYXllcl9pbnZlbnRvcnkYByABKAsyGC5nYW1lLnYxLlBsYXll",
-            "ckludmVudG9yeUgAQgUKA21zZ0I+WjJnaXRodWIuY29tL2FsY2FyZXMvbW1v",
-            "c2VydmVyL2dlbi9nby9nYW1lL3YxO2dhbWV2MaoCB0dhbWUuVjFiBnByb3Rv",
-            "Mw=="));
+            "djEuUHJpY2VRdW90ZSKxAQoKUHJpY2VRdW90ZRIpCgljb21tb2RpdHkYASAB",
+            "KA4yFi5nYW1lLnYxLkNvbW1vZGl0eVR5cGUSGgoSZGVsdGFfYmFzaXNfcG9p",
+            "bnRzGAIgASgFEhwKFGF2YWlsYWJsZV9wb29sX3VuaXRzGAMgASgNEhkKEWRv",
+            "bWluYW50X3doYWxlX2lkGAQgASgNEiMKBm9yZGVycxgFIAMoCzITLmdhbWUu",
+            "djEuT3JkZXJRdW90ZSJOCgpPcmRlclF1b3RlEg0KBXVuaXRzGAEgASgNEhcK",
+            "D2J1eV9wcmljZV9jZW50cxgCIAEoBBIYChBzZWxsX3ByaWNlX2NlbnRzGAMg",
+            "ASgEIrkCCgxUcmFkZVJlY2VpcHQSEwoLc2VxdWVuY2VfaWQYASABKA0SDwoH",
+            "c3VjY2VzcxgCIAEoCBIqCglyZWplY3Rpb24YAyABKA4yFy5nYW1lLnYxLlRy",
+            "YWRlUmVqZWN0aW9uEiQKBmludGVudBgEIAEoDjIULmdhbWUudjEuT3JkZXJJ",
+            "bnRlbnQSKQoJY29tbW9kaXR5GAUgASgOMhYuZ2FtZS52MS5Db21tb2RpdHlU",
+            "eXBlEhwKFHRvdGFsX2JhbGFuY2VfY2hhbmdlGAYgASgEEhgKEHVuaXRzX3Ry",
+            "YW5zYWN0ZWQYByABKAQSEwoLcHJpY2VfY2VudHMYCCABKAQSHgoWbmV3X2Nh",
+            "c2hfYmFsYW5jZV9jZW50cxgJIAEoBBIZChFuZXdfaG9sZGluZ191bml0cxgK",
+            "IAEoBCJgCg5UcmFkaW5nU3RhdGlvbhIpCgljb21tb2RpdHkYASABKA4yFi5n",
+            "YW1lLnYxLkNvbW1vZGl0eVR5cGUSCQoBeBgCIAEoAhIJCgF5GAMgASgCEg0K",
+            "BWxhYmVsGAQgASgJIkMKEEluaXRpYWxHYW1lU3RhdGUSLwoOc3RhdGlvbl9s",
+            "YXlvdXQYASADKAsyFy5nYW1lLnYxLlRyYWRpbmdTdGF0aW9uIvYCCg1TZXJ2",
+            "ZXJNZXNzYWdlEjAKDndvcmxkX3NuYXBzaG90GAEgASgLMhYuZ2FtZS52MS5X",
+            "b3JsZFNuYXBzaG90SAASLAoMbWFya2V0X3N0YXRlGAIgASgLMhQuZ2FtZS52",
+            "MS5NYXJrZXRTdGF0ZUgAEjMKEHBvd2VyX3VwX3NwYXduZWQYAyABKAsyFy5n",
+            "YW1lLnYxLlBvd2VyVXBTcGF3bmVkSAASNwoScG93ZXJfdXBfZGVzcGF3bmVk",
+            "GAQgASgLMhkuZ2FtZS52MS5Qb3dlclVwRGVzcGF3bmVkSAASMgoNaW5pdGlh",
+            "bF9zdGF0ZRgFIAEoCzIZLmdhbWUudjEuSW5pdGlhbEdhbWVTdGF0ZUgAEiYK",
+            "BXRyYWRlGAYgASgLMhUuZ2FtZS52MS5UcmFkZVJlY2VpcHRIABI0ChBwbGF5",
+            "ZXJfaW52ZW50b3J5GAcgASgLMhguZ2FtZS52MS5QbGF5ZXJJbnZlbnRvcnlI",
+            "AEIFCgNtc2dCPloyZ2l0aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9nZW4v",
+            "Z28vZ2FtZS92MTtnYW1ldjGqAgdHYW1lLlYxYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, global::Game.V1.PlayerReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -65,8 +68,9 @@ namespace Game.V1 {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PowerUpDespawned), global::Game.V1.PowerUpDespawned.Parser, new[]{ "Id", "CollectedByPlayerId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.WorldSnapshot), global::Game.V1.WorldSnapshot.Parser, new[]{ "Tick", "Players" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.MarketState), global::Game.V1.MarketState.Parser, new[]{ "Tick", "Quotes" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PriceQuote), global::Game.V1.PriceQuote.Parser, new[]{ "Commodity", "BuyPriceCents", "DeltaBasisPoints", "AvailablePoolUnits", "DominantWhaleId", "SellPriceCents" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeReceipt), global::Game.V1.TradeReceipt.Parser, new[]{ "SequenceId", "Success", "TotalBalanceChange", "UnitsTransacted", "PriceCents", "NewCashBalanceCents", "NewHoldingUnits" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PriceQuote), global::Game.V1.PriceQuote.Parser, new[]{ "Commodity", "DeltaBasisPoints", "AvailablePoolUnits", "DominantWhaleId", "Orders" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.OrderQuote), global::Game.V1.OrderQuote.Parser, new[]{ "Units", "BuyPriceCents", "SellPriceCents" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeReceipt), global::Game.V1.TradeReceipt.Parser, new[]{ "SequenceId", "Success", "Rejection", "Intent", "Commodity", "TotalBalanceChange", "UnitsTransacted", "PriceCents", "NewCashBalanceCents", "NewHoldingUnits" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradingStation), global::Game.V1.TradingStation.Parser, new[]{ "Commodity", "X", "Y", "Label" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.InitialGameState), global::Game.V1.InitialGameState.Parser, new[]{ "StationLayout" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ServerMessage), global::Game.V1.ServerMessage.Parser, new[]{ "WorldSnapshot", "MarketState", "PowerUpSpawned", "PowerUpDespawned", "InitialState", "Trade", "PlayerInventory" }, new[]{ "Msg" }, null, null, null)
@@ -1326,11 +1330,10 @@ namespace Game.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PriceQuote(PriceQuote other) : this() {
       commodity_ = other.commodity_;
-      buyPriceCents_ = other.buyPriceCents_;
       deltaBasisPoints_ = other.deltaBasisPoints_;
       availablePoolUnits_ = other.availablePoolUnits_;
       dominantWhaleId_ = other.dominantWhaleId_;
-      sellPriceCents_ = other.sellPriceCents_;
+      orders_ = other.orders_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1352,28 +1355,11 @@ namespace Game.V1 {
       }
     }
 
-    /// <summary>Field number for the "buy_price_cents" field.</summary>
-    public const int BuyPriceCentsFieldNumber = 2;
-    private uint buyPriceCents_;
-    /// <summary>
-    /// Buy price: cash (in cents) for exactly one whole unit right now, rounded up to the cent.
-    /// Clients show it and send exactly it as the order; the minimum buy is one unit.
-    /// 0 means the pool can't sell a whole unit.
-    /// </summary>
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public uint BuyPriceCents {
-      get { return buyPriceCents_; }
-      set {
-        buyPriceCents_ = value;
-      }
-    }
-
     /// <summary>Field number for the "delta_basis_points" field.</summary>
-    public const int DeltaBasisPointsFieldNumber = 3;
+    public const int DeltaBasisPointsFieldNumber = 2;
     private int deltaBasisPoints_;
     /// <summary>
-    /// Shift since last tick (+350 = +3.5%)
+    /// Shift of the one-unit buy price since last tick (+350 = +3.5%)
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1385,7 +1371,7 @@ namespace Game.V1 {
     }
 
     /// <summary>Field number for the "available_pool_units" field.</summary>
-    public const int AvailablePoolUnitsFieldNumber = 4;
+    public const int AvailablePoolUnitsFieldNumber = 3;
     private uint availablePoolUnits_;
     /// <summary>
     /// Total units left in the AMM pool (or total circulating units held by players)
@@ -1400,7 +1386,7 @@ namespace Game.V1 {
     }
 
     /// <summary>Field number for the "dominant_whale_id" field.</summary>
-    public const int DominantWhaleIdFieldNumber = 5;
+    public const int DominantWhaleIdFieldNumber = 4;
     private uint dominantWhaleId_;
     /// <summary>
     /// Optional: ID of the biggest bagholder in this pit for client visuals
@@ -1414,20 +1400,19 @@ namespace Game.V1 {
       }
     }
 
-    /// <summary>Field number for the "sell_price_cents" field.</summary>
-    public const int SellPriceCentsFieldNumber = 7;
-    private uint sellPriceCents_;
+    /// <summary>Field number for the "orders" field.</summary>
+    public const int OrdersFieldNumber = 5;
+    private static readonly pb::FieldCodec<global::Game.V1.OrderQuote> _repeated_orders_codec
+        = pb::FieldCodec.ForMessage(42, global::Game.V1.OrderQuote.Parser);
+    private readonly pbc::RepeatedField<global::Game.V1.OrderQuote> orders_ = new pbc::RepeatedField<global::Game.V1.OrderQuote>();
     /// <summary>
-    /// Sell price: cash (in cents) received for selling exactly one whole unit right now, rounded
-    /// down to the cent. It is always a little below the buy price: the pool keeps the spread.
+    /// One quote per order size the server offers (1, 2, 5, 10 units), smallest first.
+    /// Clients offer exactly these sizes as their multipliers.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public uint SellPriceCents {
-      get { return sellPriceCents_; }
-      set {
-        sellPriceCents_ = value;
-      }
+    public pbc::RepeatedField<global::Game.V1.OrderQuote> Orders {
+      get { return orders_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1446,11 +1431,10 @@ namespace Game.V1 {
         return true;
       }
       if (Commodity != other.Commodity) return false;
-      if (BuyPriceCents != other.BuyPriceCents) return false;
       if (DeltaBasisPoints != other.DeltaBasisPoints) return false;
       if (AvailablePoolUnits != other.AvailablePoolUnits) return false;
       if (DominantWhaleId != other.DominantWhaleId) return false;
-      if (SellPriceCents != other.SellPriceCents) return false;
+      if(!orders_.Equals(other.orders_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1459,11 +1443,10 @@ namespace Game.V1 {
     public override int GetHashCode() {
       int hash = 1;
       if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) hash ^= Commodity.GetHashCode();
-      if (BuyPriceCents != 0) hash ^= BuyPriceCents.GetHashCode();
       if (DeltaBasisPoints != 0) hash ^= DeltaBasisPoints.GetHashCode();
       if (AvailablePoolUnits != 0) hash ^= AvailablePoolUnits.GetHashCode();
       if (DominantWhaleId != 0) hash ^= DominantWhaleId.GetHashCode();
-      if (SellPriceCents != 0) hash ^= SellPriceCents.GetHashCode();
+      hash ^= orders_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1486,26 +1469,19 @@ namespace Game.V1 {
         output.WriteRawTag(8);
         output.WriteEnum((int) Commodity);
       }
-      if (BuyPriceCents != 0) {
-        output.WriteRawTag(16);
-        output.WriteUInt32(BuyPriceCents);
-      }
       if (DeltaBasisPoints != 0) {
-        output.WriteRawTag(24);
+        output.WriteRawTag(16);
         output.WriteInt32(DeltaBasisPoints);
       }
       if (AvailablePoolUnits != 0) {
-        output.WriteRawTag(32);
+        output.WriteRawTag(24);
         output.WriteUInt32(AvailablePoolUnits);
       }
       if (DominantWhaleId != 0) {
-        output.WriteRawTag(40);
+        output.WriteRawTag(32);
         output.WriteUInt32(DominantWhaleId);
       }
-      if (SellPriceCents != 0) {
-        output.WriteRawTag(56);
-        output.WriteUInt32(SellPriceCents);
-      }
+      orders_.WriteTo(output, _repeated_orders_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1520,26 +1496,19 @@ namespace Game.V1 {
         output.WriteRawTag(8);
         output.WriteEnum((int) Commodity);
       }
-      if (BuyPriceCents != 0) {
-        output.WriteRawTag(16);
-        output.WriteUInt32(BuyPriceCents);
-      }
       if (DeltaBasisPoints != 0) {
-        output.WriteRawTag(24);
+        output.WriteRawTag(16);
         output.WriteInt32(DeltaBasisPoints);
       }
       if (AvailablePoolUnits != 0) {
-        output.WriteRawTag(32);
+        output.WriteRawTag(24);
         output.WriteUInt32(AvailablePoolUnits);
       }
       if (DominantWhaleId != 0) {
-        output.WriteRawTag(40);
+        output.WriteRawTag(32);
         output.WriteUInt32(DominantWhaleId);
       }
-      if (SellPriceCents != 0) {
-        output.WriteRawTag(56);
-        output.WriteUInt32(SellPriceCents);
-      }
+      orders_.WriteTo(ref output, _repeated_orders_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1553,9 +1522,6 @@ namespace Game.V1 {
       if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Commodity);
       }
-      if (BuyPriceCents != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(BuyPriceCents);
-      }
       if (DeltaBasisPoints != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(DeltaBasisPoints);
       }
@@ -1565,9 +1531,7 @@ namespace Game.V1 {
       if (DominantWhaleId != 0) {
         size += 1 + pb::CodedOutputStream.ComputeUInt32Size(DominantWhaleId);
       }
-      if (SellPriceCents != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(SellPriceCents);
-      }
+      size += orders_.CalculateSize(_repeated_orders_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1583,9 +1547,6 @@ namespace Game.V1 {
       if (other.Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
         Commodity = other.Commodity;
       }
-      if (other.BuyPriceCents != 0) {
-        BuyPriceCents = other.BuyPriceCents;
-      }
       if (other.DeltaBasisPoints != 0) {
         DeltaBasisPoints = other.DeltaBasisPoints;
       }
@@ -1595,9 +1556,7 @@ namespace Game.V1 {
       if (other.DominantWhaleId != 0) {
         DominantWhaleId = other.DominantWhaleId;
       }
-      if (other.SellPriceCents != 0) {
-        SellPriceCents = other.SellPriceCents;
-      }
+      orders_.Add(other.orders_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1622,23 +1581,19 @@ namespace Game.V1 {
             break;
           }
           case 16: {
-            BuyPriceCents = input.ReadUInt32();
-            break;
-          }
-          case 24: {
             DeltaBasisPoints = input.ReadInt32();
             break;
           }
-          case 32: {
+          case 24: {
             AvailablePoolUnits = input.ReadUInt32();
             break;
           }
-          case 40: {
+          case 32: {
             DominantWhaleId = input.ReadUInt32();
             break;
           }
-          case 56: {
-            SellPriceCents = input.ReadUInt32();
+          case 42: {
+            orders_.AddEntriesFrom(input, _repeated_orders_codec);
             break;
           }
         }
@@ -1665,23 +1620,19 @@ namespace Game.V1 {
             break;
           }
           case 16: {
-            BuyPriceCents = input.ReadUInt32();
-            break;
-          }
-          case 24: {
             DeltaBasisPoints = input.ReadInt32();
             break;
           }
-          case 32: {
+          case 24: {
             AvailablePoolUnits = input.ReadUInt32();
             break;
           }
-          case 40: {
+          case 32: {
             DominantWhaleId = input.ReadUInt32();
             break;
           }
-          case 56: {
-            SellPriceCents = input.ReadUInt32();
+          case 42: {
+            orders_.AddEntriesFrom(ref input, _repeated_orders_codec);
             break;
           }
         }
@@ -1692,7 +1643,290 @@ namespace Game.V1 {
   }
 
   /// <summary>
-  /// Server -> Client: After successfully executing a trade
+  /// Per-unit prices for an order of a given size. Every unit in an order trades at the same
+  /// price, so the order's total is exactly units * price. Bigger orders move the pool further,
+  /// so they buy higher and sell lower per unit.
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class OrderQuote : pb::IMessage<OrderQuote>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<OrderQuote> _parser = new pb::MessageParser<OrderQuote>(() => new OrderQuote());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<OrderQuote> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[6]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public OrderQuote() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public OrderQuote(OrderQuote other) : this() {
+      units_ = other.units_;
+      buyPriceCents_ = other.buyPriceCents_;
+      sellPriceCents_ = other.sellPriceCents_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public OrderQuote Clone() {
+      return new OrderQuote(this);
+    }
+
+    /// <summary>Field number for the "units" field.</summary>
+    public const int UnitsFieldNumber = 1;
+    private uint units_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public uint Units {
+      get { return units_; }
+      set {
+        units_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "buy_price_cents" field.</summary>
+    public const int BuyPriceCentsFieldNumber = 2;
+    private ulong buyPriceCents_;
+    /// <summary>
+    /// Cents per unit to buy this many, rounded up; 0 if the pool can't sell this many
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong BuyPriceCents {
+      get { return buyPriceCents_; }
+      set {
+        buyPriceCents_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "sell_price_cents" field.</summary>
+    public const int SellPriceCentsFieldNumber = 3;
+    private ulong sellPriceCents_;
+    /// <summary>
+    /// Cents per unit received for selling this many, rounded down; 0 if worth under a cent each
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong SellPriceCents {
+      get { return sellPriceCents_; }
+      set {
+        sellPriceCents_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as OrderQuote);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(OrderQuote other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Units != other.Units) return false;
+      if (BuyPriceCents != other.BuyPriceCents) return false;
+      if (SellPriceCents != other.SellPriceCents) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Units != 0) hash ^= Units.GetHashCode();
+      if (BuyPriceCents != 0UL) hash ^= BuyPriceCents.GetHashCode();
+      if (SellPriceCents != 0UL) hash ^= SellPriceCents.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Units != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(Units);
+      }
+      if (BuyPriceCents != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(BuyPriceCents);
+      }
+      if (SellPriceCents != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(SellPriceCents);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Units != 0) {
+        output.WriteRawTag(8);
+        output.WriteUInt32(Units);
+      }
+      if (BuyPriceCents != 0UL) {
+        output.WriteRawTag(16);
+        output.WriteUInt64(BuyPriceCents);
+      }
+      if (SellPriceCents != 0UL) {
+        output.WriteRawTag(24);
+        output.WriteUInt64(SellPriceCents);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Units != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Units);
+      }
+      if (BuyPriceCents != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(BuyPriceCents);
+      }
+      if (SellPriceCents != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(SellPriceCents);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(OrderQuote other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Units != 0) {
+        Units = other.Units;
+      }
+      if (other.BuyPriceCents != 0UL) {
+        BuyPriceCents = other.BuyPriceCents;
+      }
+      if (other.SellPriceCents != 0UL) {
+        SellPriceCents = other.SellPriceCents;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Units = input.ReadUInt32();
+            break;
+          }
+          case 16: {
+            BuyPriceCents = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            SellPriceCents = input.ReadUInt64();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Units = input.ReadUInt32();
+            break;
+          }
+          case 16: {
+            BuyPriceCents = input.ReadUInt64();
+            break;
+          }
+          case 24: {
+            SellPriceCents = input.ReadUInt64();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
+  /// Server -> Client: Answer to every TradeRequest, sent only to the trader
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class TradeReceipt : pb::IMessage<TradeReceipt>
@@ -1709,7 +1943,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1731,6 +1965,9 @@ namespace Game.V1 {
     public TradeReceipt(TradeReceipt other) : this() {
       sequenceId_ = other.sequenceId_;
       success_ = other.success_;
+      rejection_ = other.rejection_;
+      intent_ = other.intent_;
+      commodity_ = other.commodity_;
       totalBalanceChange_ = other.totalBalanceChange_;
       unitsTransacted_ = other.unitsTransacted_;
       priceCents_ = other.priceCents_;
@@ -1772,11 +2009,53 @@ namespace Game.V1 {
       }
     }
 
+    /// <summary>Field number for the "rejection" field.</summary>
+    public const int RejectionFieldNumber = 3;
+    private global::Game.V1.TradeRejection rejection_ = global::Game.V1.TradeRejection.Unspecified;
+    /// <summary>
+    /// Why it failed; UNSPECIFIED on success
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.TradeRejection Rejection {
+      get { return rejection_; }
+      set {
+        rejection_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "intent" field.</summary>
+    public const int IntentFieldNumber = 4;
+    private global::Game.V1.OrderIntent intent_ = global::Game.V1.OrderIntent.IntentUnspecified;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.OrderIntent Intent {
+      get { return intent_; }
+      set {
+        intent_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "commodity" field.</summary>
+    public const int CommodityFieldNumber = 5;
+    private global::Game.V1.CommodityType commodity_ = global::Game.V1.CommodityType.CommodityUnspecified;
+    /// <summary>
+    /// Unspecified if the player wasn't at a station
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.CommodityType Commodity {
+      get { return commodity_; }
+      set {
+        commodity_ = value;
+      }
+    }
+
     /// <summary>Field number for the "total_balance_change" field.</summary>
-    public const int TotalBalanceChangeFieldNumber = 3;
+    public const int TotalBalanceChangeFieldNumber = 6;
     private ulong totalBalanceChange_;
     /// <summary>
-    /// Actual cash spent or gained
+    /// Cash spent or gained (cents): units_transacted * price_cents
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1788,10 +2067,10 @@ namespace Game.V1 {
     }
 
     /// <summary>Field number for the "units_transacted" field.</summary>
-    public const int UnitsTransactedFieldNumber = 4;
+    public const int UnitsTransactedFieldNumber = 7;
     private ulong unitsTransacted_;
     /// <summary>
-    /// Micro-units added/removed (scaled by 1e6)
+    /// Whole units bought or sold
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1803,7 +2082,7 @@ namespace Game.V1 {
     }
 
     /// <summary>Field number for the "price_cents" field.</summary>
-    public const int PriceCentsFieldNumber = 5;
+    public const int PriceCentsFieldNumber = 8;
     private ulong priceCents_;
     /// <summary>
     /// Execution price per unit
@@ -1818,7 +2097,7 @@ namespace Game.V1 {
     }
 
     /// <summary>Field number for the "new_cash_balance_cents" field.</summary>
-    public const int NewCashBalanceCentsFieldNumber = 6;
+    public const int NewCashBalanceCentsFieldNumber = 9;
     private ulong newCashBalanceCents_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1830,7 +2109,7 @@ namespace Game.V1 {
     }
 
     /// <summary>Field number for the "new_holding_units" field.</summary>
-    public const int NewHoldingUnitsFieldNumber = 7;
+    public const int NewHoldingUnitsFieldNumber = 10;
     private ulong newHoldingUnits_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1858,6 +2137,9 @@ namespace Game.V1 {
       }
       if (SequenceId != other.SequenceId) return false;
       if (Success != other.Success) return false;
+      if (Rejection != other.Rejection) return false;
+      if (Intent != other.Intent) return false;
+      if (Commodity != other.Commodity) return false;
       if (TotalBalanceChange != other.TotalBalanceChange) return false;
       if (UnitsTransacted != other.UnitsTransacted) return false;
       if (PriceCents != other.PriceCents) return false;
@@ -1872,6 +2154,9 @@ namespace Game.V1 {
       int hash = 1;
       if (SequenceId != 0) hash ^= SequenceId.GetHashCode();
       if (Success != false) hash ^= Success.GetHashCode();
+      if (Rejection != global::Game.V1.TradeRejection.Unspecified) hash ^= Rejection.GetHashCode();
+      if (Intent != global::Game.V1.OrderIntent.IntentUnspecified) hash ^= Intent.GetHashCode();
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) hash ^= Commodity.GetHashCode();
       if (TotalBalanceChange != 0UL) hash ^= TotalBalanceChange.GetHashCode();
       if (UnitsTransacted != 0UL) hash ^= UnitsTransacted.GetHashCode();
       if (PriceCents != 0UL) hash ^= PriceCents.GetHashCode();
@@ -1903,24 +2188,36 @@ namespace Game.V1 {
         output.WriteRawTag(16);
         output.WriteBool(Success);
       }
-      if (TotalBalanceChange != 0UL) {
+      if (Rejection != global::Game.V1.TradeRejection.Unspecified) {
         output.WriteRawTag(24);
+        output.WriteEnum((int) Rejection);
+      }
+      if (Intent != global::Game.V1.OrderIntent.IntentUnspecified) {
+        output.WriteRawTag(32);
+        output.WriteEnum((int) Intent);
+      }
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        output.WriteRawTag(40);
+        output.WriteEnum((int) Commodity);
+      }
+      if (TotalBalanceChange != 0UL) {
+        output.WriteRawTag(48);
         output.WriteUInt64(TotalBalanceChange);
       }
       if (UnitsTransacted != 0UL) {
-        output.WriteRawTag(32);
+        output.WriteRawTag(56);
         output.WriteUInt64(UnitsTransacted);
       }
       if (PriceCents != 0UL) {
-        output.WriteRawTag(40);
+        output.WriteRawTag(64);
         output.WriteUInt64(PriceCents);
       }
       if (NewCashBalanceCents != 0UL) {
-        output.WriteRawTag(48);
+        output.WriteRawTag(72);
         output.WriteUInt64(NewCashBalanceCents);
       }
       if (NewHoldingUnits != 0UL) {
-        output.WriteRawTag(56);
+        output.WriteRawTag(80);
         output.WriteUInt64(NewHoldingUnits);
       }
       if (_unknownFields != null) {
@@ -1941,24 +2238,36 @@ namespace Game.V1 {
         output.WriteRawTag(16);
         output.WriteBool(Success);
       }
-      if (TotalBalanceChange != 0UL) {
+      if (Rejection != global::Game.V1.TradeRejection.Unspecified) {
         output.WriteRawTag(24);
+        output.WriteEnum((int) Rejection);
+      }
+      if (Intent != global::Game.V1.OrderIntent.IntentUnspecified) {
+        output.WriteRawTag(32);
+        output.WriteEnum((int) Intent);
+      }
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        output.WriteRawTag(40);
+        output.WriteEnum((int) Commodity);
+      }
+      if (TotalBalanceChange != 0UL) {
+        output.WriteRawTag(48);
         output.WriteUInt64(TotalBalanceChange);
       }
       if (UnitsTransacted != 0UL) {
-        output.WriteRawTag(32);
+        output.WriteRawTag(56);
         output.WriteUInt64(UnitsTransacted);
       }
       if (PriceCents != 0UL) {
-        output.WriteRawTag(40);
+        output.WriteRawTag(64);
         output.WriteUInt64(PriceCents);
       }
       if (NewCashBalanceCents != 0UL) {
-        output.WriteRawTag(48);
+        output.WriteRawTag(72);
         output.WriteUInt64(NewCashBalanceCents);
       }
       if (NewHoldingUnits != 0UL) {
-        output.WriteRawTag(56);
+        output.WriteRawTag(80);
         output.WriteUInt64(NewHoldingUnits);
       }
       if (_unknownFields != null) {
@@ -1976,6 +2285,15 @@ namespace Game.V1 {
       }
       if (Success != false) {
         size += 1 + 1;
+      }
+      if (Rejection != global::Game.V1.TradeRejection.Unspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Rejection);
+      }
+      if (Intent != global::Game.V1.OrderIntent.IntentUnspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Intent);
+      }
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Commodity);
       }
       if (TotalBalanceChange != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(TotalBalanceChange);
@@ -2009,6 +2327,15 @@ namespace Game.V1 {
       }
       if (other.Success != false) {
         Success = other.Success;
+      }
+      if (other.Rejection != global::Game.V1.TradeRejection.Unspecified) {
+        Rejection = other.Rejection;
+      }
+      if (other.Intent != global::Game.V1.OrderIntent.IntentUnspecified) {
+        Intent = other.Intent;
+      }
+      if (other.Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        Commodity = other.Commodity;
       }
       if (other.TotalBalanceChange != 0UL) {
         TotalBalanceChange = other.TotalBalanceChange;
@@ -2053,22 +2380,34 @@ namespace Game.V1 {
             break;
           }
           case 24: {
-            TotalBalanceChange = input.ReadUInt64();
+            Rejection = (global::Game.V1.TradeRejection) input.ReadEnum();
             break;
           }
           case 32: {
-            UnitsTransacted = input.ReadUInt64();
+            Intent = (global::Game.V1.OrderIntent) input.ReadEnum();
             break;
           }
           case 40: {
-            PriceCents = input.ReadUInt64();
+            Commodity = (global::Game.V1.CommodityType) input.ReadEnum();
             break;
           }
           case 48: {
-            NewCashBalanceCents = input.ReadUInt64();
+            TotalBalanceChange = input.ReadUInt64();
             break;
           }
           case 56: {
+            UnitsTransacted = input.ReadUInt64();
+            break;
+          }
+          case 64: {
+            PriceCents = input.ReadUInt64();
+            break;
+          }
+          case 72: {
+            NewCashBalanceCents = input.ReadUInt64();
+            break;
+          }
+          case 80: {
             NewHoldingUnits = input.ReadUInt64();
             break;
           }
@@ -2100,22 +2439,34 @@ namespace Game.V1 {
             break;
           }
           case 24: {
-            TotalBalanceChange = input.ReadUInt64();
+            Rejection = (global::Game.V1.TradeRejection) input.ReadEnum();
             break;
           }
           case 32: {
-            UnitsTransacted = input.ReadUInt64();
+            Intent = (global::Game.V1.OrderIntent) input.ReadEnum();
             break;
           }
           case 40: {
-            PriceCents = input.ReadUInt64();
+            Commodity = (global::Game.V1.CommodityType) input.ReadEnum();
             break;
           }
           case 48: {
-            NewCashBalanceCents = input.ReadUInt64();
+            TotalBalanceChange = input.ReadUInt64();
             break;
           }
           case 56: {
+            UnitsTransacted = input.ReadUInt64();
+            break;
+          }
+          case 64: {
+            PriceCents = input.ReadUInt64();
+            break;
+          }
+          case 72: {
+            NewCashBalanceCents = input.ReadUInt64();
+            break;
+          }
+          case 80: {
             NewHoldingUnits = input.ReadUInt64();
             break;
           }
@@ -2141,7 +2492,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2450,7 +2801,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[8]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2641,7 +2992,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[9]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
