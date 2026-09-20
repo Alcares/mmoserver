@@ -3,6 +3,7 @@ package sim
 import (
 	"errors"
 	"math/rand"
+	"time"
 
 	pb "github.com/alcares/mmoserver/gen/go/game/v1"
 	"github.com/alcares/mmoserver/internal/bot"
@@ -54,7 +55,12 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 	e.done = true
 
 	e.rng = rand.New(rand.NewSource(seed))
-	e.world = game.NewWorld(e.rng)
+	e.world = game.NewWorld("sim", game.WorldConfig{
+		MinPlayers:     0,
+		StartCountdown: 0 * time.Second,
+		Duration:       5 * time.Minute,
+		Rng:            e.rng,
+	})
 	e.client = &game.Client{
 		Send: make(chan []byte, game.SendBufferSize),
 	}

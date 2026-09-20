@@ -33,7 +33,29 @@ namespace Game.Client
         /// <summary>Order sizes (whole units) the server quotes, smallest first; empty before the first MarketState.</summary>
         public IReadOnlyList<uint> OrderSizes => _orderSizes;
 
+        /// <summary>True once the server has put us in a game; false while we are in the lobby.</summary>
+        public bool Joined { get; private set; }
+        /// <summary>The join code of the game we are in, for sharing with other players.</summary>
+        public string GameId { get; private set; }
+        /// <summary>Where the round is: waiting for players, counting down, running or finished.</summary>
+        public GamePhase Phase { get; private set; } = GamePhase.Unspecified;
+        public int PlayerCount { get; private set; }
+        public int MinPlayers { get; private set; }
+        /// <summary>Final standings once the round is over, null before that.</summary>
+        public GameOver Standings { get; private set; }
+        /// <summary>Why the last create or join attempt failed, null if none has.</summary>
+        public JoinRejection? LastRejection { get; private set; }
+
+        // Counted down locally from the remaining_ms the server sent with the last phase change,
+        // so the label ticks smoothly instead of once per status message.
+        private float? _phaseEndsAt;
+
+        /// <summary>Seconds left in the current phase, null when the phase is open-ended.</summary>
+        public float? SecondsLeft => _phaseEndsAt.HasValue ? Mathf.Max(0f, _phaseEndsAt.Value - Time.time) : (float?)null;
+
         public event Action PricesChanged;
+        /// <summary>Raised when the phase, the player count or the join result changes.</summary>
+        public event Action SessionChanged;
 
         private void Awake()
         {
@@ -46,6 +68,9 @@ namespace Game.Client
             _client.OnPlayerInventory += OnInventory;
             _client.OnMarketState += OnMarket;
             _client.OnInitialState += OnInitial;
+            _client.OnGameStatus += OnGameStatus;
+            _client.OnJoinRejected += OnJoinRejected;
+            _client.OnGameOver += OnGameOver;
         }
 
         private void OnDisable()
@@ -54,6 +79,9 @@ namespace Game.Client
             _client.OnPlayerInventory -= OnInventory;
             _client.OnMarketState -= OnMarket;
             _client.OnInitialState -= OnInitial;
+            _client.OnGameStatus -= OnGameStatus;
+            _client.OnJoinRejected -= OnJoinRejected;
+            _client.OnGameOver -= OnGameOver;
         }
 
         // The server lists the receiving player first in its own snapshot.
@@ -83,10 +111,39 @@ namespace Game.Client
             PricesChanged?.Invoke();
         }
 
+        // InitialGameState is the server's confirmation that we are in a game: it arrives
+        // once per join and carries the code and this game's station layout.
         private void OnInitial(InitialGameState s)
         {
             _stations.Clear();
             _stations.AddRange(s.StationLayout);
+
+            Joined = true;
+            GameId = s.GameId;
+            Standings = null;
+            LastRejection = null;
+            SessionChanged?.Invoke();
+        }
+
+        private void OnGameStatus(GameStatus s)
+        {
+            Phase = s.Phase;
+            PlayerCount = s.PlayerCount;
+            MinPlayers = s.MinPlayers;
+            _phaseEndsAt = s.RemainingMs > 0 ? Time.time + s.RemainingMs / 1000f : (float?)null;
+            SessionChanged?.Invoke();
+        }
+
+        private void OnJoinRejected(JoinRejected r)
+        {
+            LastRejection = r.Reason;
+            SessionChanged?.Invoke();
+        }
+
+        private void OnGameOver(GameOver o)
+        {
+            Standings = o;
+            SessionChanged?.Invoke();
         }
 
         private bool SameSizes(PriceQuote q)

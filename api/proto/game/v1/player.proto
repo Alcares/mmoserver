@@ -32,3 +32,10 @@ message PlayerInventory {
   repeated OwnedCommodity commodities = 2;
   repeated ActiveEffect active_effects = 3;
 }
+
+// Server -> Client: Sent with GameOver message
+message PlayerFinalStanding {
+  uint32 id = 1;
+  string name = 2;
+  uint64 net_worth = 3;
+}

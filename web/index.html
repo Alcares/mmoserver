@@ -30,16 +30,110 @@
       z-index: 10;
     }
     canvas { display: block; width: 100vw; height: 100vh; }
+
+    /* Lobby and results share one centered panel look */
+    .overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(6, 10, 20, 0.95);
+      border: 2px solid #8a6a30;
+      border-radius: 6px;
+      padding: 22px 26px;
+      min-width: 320px;
+      text-align: center;
+      z-index: 20;
+    }
+    .overlay h1 {
+      font-size: 17px;
+      letter-spacing: 1px;
+      color: #d9c48a;
+      margin-bottom: 16px;
+    }
+    .overlay button {
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: bold;
+      color: #f8fafc;
+      background: #1e293b;
+      border: 1px solid #8a6a30;
+      border-radius: 4px;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    .overlay button:hover { background: #334155; }
+    #createBtn { width: 100%; }
+    .or { color: #a1a1aa; font-size: 13px; margin: 14px 0 8px; }
+    .join-row { display: flex; gap: 8px; }
+    #codeInput {
+      flex: 1;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #f8fafc;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 8px;
+    }
+    #lobbyError { color: #f87171; font-size: 13px; margin-top: 12px; min-height: 16px; }
+    #standings { list-style: none; text-align: left; }
+    #standings li { display: flex; justify-content: space-between; gap: 24px; padding: 3px 0; font-size: 14px; }
+    #standings li:first-child { color: #d9c48a; }
+    #standings .worth { color: #86efac; }
+    #banner {
+      position: absolute;
+      top: 46px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 6px 16px;
+      font-size: 13px;
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    #banner .code { color: #d9c48a; font-weight: bold; }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
 <div id="status">Status: Connecting...</div>
+<div id="banner" hidden></div>
 <canvas id="gameCanvas"></canvas>
+
+<div id="lobby" class="overlay" hidden>
+  <h1>CREWMATE MARKETS</h1>
+  <button id="createBtn">Create a new game</button>
+  <div class="or">or join with a code</div>
+  <div class="join-row">
+    <input id="codeInput" maxlength="6" placeholder="CODE" autocomplete="off" spellcheck="false">
+    <button id="joinBtn">Join</button>
+  </div>
+  <div id="lobbyError"></div>
+</div>
+
+<div id="results" class="overlay" hidden>
+  <h1>GAME OVER</h1>
+  <ol id="standings"></ol>
+</div>
 
 <script>
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
   const statusDiv = document.getElementById("status");
+  const bannerDiv = document.getElementById("banner");
+  const lobbyDiv = document.getElementById("lobby");
+  const lobbyError = document.getElementById("lobbyError");
+  const resultsDiv = document.getElementById("results");
+  const standingsList = document.getElementById("standings");
+  const codeInput = document.getElementById("codeInput");
 
   function resizeCanvas() {
     canvas.width = window.innerWidth;
@@ -69,6 +163,23 @@
   let ClientMessage = null;
   let ServerMessage = null;
   let socket = null;
+
+  // Lobby / round state. The server puts every connection in a lobby until it sends
+  // CreateGame or JoinGame, and answers with InitialGameState or JoinRejected.
+  let joined = false;
+  let gameId = "";
+  let phase = null; // GAME_PHASE_* from the latest GameStatus
+  let playerCount = 0;
+  let minPlayers = 0;
+  let phaseEndsAt = null; // performance.now() timestamp, counted down locally
+  let standings = null;
+
+  const JOIN_REJECTION_TEXT = {
+    JOIN_REJECTION_GAME_NOT_FOUND: "No game with that code",
+    JOIN_REJECTION_GAME_FULL: "That game is full",
+    JOIN_REJECTION_GAME_IN_PROGRESS: "That game has already started",
+    JOIN_REJECTION_SERVER_FULL: "The server is hosting too many games",
+  };
 
   const facingDirections = new Map();
   const lastPositions = new Map();
@@ -107,13 +218,91 @@
     }
   );
 
+  function send(message) {
+    if (!socket || socket.readyState !== WebSocket.OPEN || !ClientMessage) return;
+    socket.send(ClientMessage.encode(message).finish());
+  }
+
+  function createGame() {
+    lobbyError.innerText = "";
+    send({ createGame: {} });
+  }
+
+  function joinGame() {
+    const code = codeInput.value.trim();
+    if (!code) return;
+    lobbyError.innerText = "";
+    send({ joinGame: { id: code } });
+  }
+
+  document.getElementById("createBtn").addEventListener("click", createGame);
+  document.getElementById("joinBtn").addEventListener("click", joinGame);
+  codeInput.addEventListener("keydown", (e) => {
+    e.stopPropagation(); // typing a code must not steer the player
+    if (e.key === "Enter") joinGame();
+  });
+
+  // The countdown ticks locally from the remaining_ms of the last phase change, so the
+  // label counts down smoothly; the server still decides when the round actually ends.
+  function secondsLeft() {
+    return phaseEndsAt === null ? null : Math.max(0, Math.ceil((phaseEndsAt - performance.now()) / 1000));
+  }
+
+  function clock(seconds) {
+    return Math.floor(seconds / 60) + ":" + String(seconds % 60).padStart(2, "0");
+  }
+
+  function updateBanner() {
+    if (!joined || phase === null) {
+      bannerDiv.hidden = true;
+      return;
+    }
+
+    const left = secondsLeft();
+    let text = null;
+    if (phase === "GAME_PHASE_WAITING") text = `WAITING FOR PLAYERS ${playerCount}/${minPlayers}`;
+    else if (phase === "GAME_PHASE_COUNTDOWN") text = `STARTING IN ${left ?? 0}`;
+    else if (phase === "GAME_PHASE_RUNNING") text = `TIME LEFT ${clock(left ?? 0)}`;
+
+    if (text === null) {
+      bannerDiv.hidden = true;
+      return;
+    }
+
+    const showCode = gameId && phase !== "GAME_PHASE_RUNNING";
+    bannerDiv.innerHTML = showCode ? `${text}<br><span class="code">CODE ${gameId}</span>` : text;
+    bannerDiv.hidden = false;
+  }
+
+  function showStandings() {
+    standingsList.innerHTML = "";
+    for (const s of standings || []) {
+      const li = document.createElement("li");
+      const name = document.createElement("span");
+      name.innerText = s.name;
+      const worth = document.createElement("span");
+      worth.className = "worth";
+      worth.innerText = money(s.netWorth);
+      li.append(name, worth);
+      standingsList.appendChild(li);
+    }
+    resultsDiv.hidden = false;
+  }
+
   function initNetwork() {
     const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
     socket = new WebSocket(`${proto}//${window.location.host}/ws`);
     socket.binaryType = "arraybuffer";
 
-    socket.onopen = () => { statusDiv.innerText = "Status: Connected. Tracking local player."; };
-    socket.onclose = () => { statusDiv.innerText = "Status: Disconnected. Server stopped."; };
+    socket.onopen = () => {
+      statusDiv.innerText = "Status: Connected. Pick a game.";
+      lobbyDiv.hidden = false; // the server waits for CreateGame or JoinGame
+      codeInput.focus();
+    };
+    socket.onclose = () => {
+      statusDiv.innerText = "Status: Disconnected. Server stopped.";
+      bannerDiv.hidden = true;
+    };
 
     socket.onmessage = (event) => {
       try {
@@ -124,7 +313,16 @@
         if (message.msg === "worldSnapshot") {
           handleWorldSnapshot(message.worldSnapshot);
         } else if (message.msg === "initialState") {
+          // The server's join confirmation: we are in a game, and it carries its code.
           stations = message.initialState.stationLayout || [];
+          gameId = message.initialState.gameId || "";
+          joined = true;
+          myPlayerId = null;
+          standings = null;
+          lobbyDiv.hidden = true;
+          resultsDiv.hidden = true;
+          lobbyError.innerText = "";
+          statusDiv.innerText = "Status: Connected. Tracking local player.";
         } else if (message.msg === "playerInventory") {
           myBalance = message.playerInventory.balance;
           myCommodities = (message.playerInventory.commodities || [])
@@ -138,6 +336,18 @@
           if (quotes.length > 0) orderSizes = (quotes[0].orders || []).map(o => o.units);
         } else if (message.msg === "trade") {
           handleTradeReceipt(message.trade);
+        } else if (message.msg === "gameStatus") {
+          const s = message.gameStatus;
+          phase = s.phase;
+          playerCount = s.playerCount;
+          minPlayers = s.minPlayers;
+          phaseEndsAt = s.remainingMs > 0 ? performance.now() + s.remainingMs : null;
+        } else if (message.msg === "joinRejected") {
+          // The connection stays open, so a mistyped code can be retried as-is.
+          lobbyError.innerText = JOIN_REJECTION_TEXT[message.joinRejected.reason] || "Could not join that game";
+        } else if (message.msg === "gameOver") {
+          standings = message.gameOver.standings || [];
+          showStandings();
         }
       } catch (e) {
         console.error("Failed to decode message:", e);
@@ -251,6 +461,7 @@
   }
 
   window.addEventListener("keydown", (e) => {
+    if (!joined) return; // the lobby owns the keyboard until we are in a game
     if (e.key === "e" || e.key === "E") {
       e.preventDefault();
       sendTrade(INTENT_BUY);
@@ -273,12 +484,15 @@
   });
 
   window.addEventListener("keyup", (e) => {
+    if (!joined) return;
     if (!pressedKeys.has(e.key)) return;
     pressedKeys.delete(e.key);
     sendInput();
   });
 
   function render(time) {
+    updateBanner();
+
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = "#cbd5e1";
     ctx.fillRect(0, 0, canvas.width, canvas.height);

@@ -31,18 +31,26 @@ namespace Game.V1 {
             "TU1PRElUWV9DT0ZGRUUQAhIVChFDT01NT0RJVFlfTElUSElVTRADEhIKDkNP",
             "TU1PRElUWV9HT0xEEAQSEQoNQ09NTU9ESVRZX09JTBAFEhQKEENPTU1PRElU",
             "WV9TSUxWRVIQBipGCgtPcmRlckludGVudBIWChJJTlRFTlRfVU5TUEVDSUZJ",
-            "RUQQABIOCgpJTlRFTlRfQlVZEAESDwoLSU5URU5UX1NFTEwQAiqMAgoOVHJh",
+            "RUQQABIOCgpJTlRFTlRfQlVZEAESDwoLSU5URU5UX1NFTEwQAiqyAgoOVHJh",
             "ZGVSZWplY3Rpb24SHwobVFJBREVfUkVKRUNUSU9OX1VOU1BFQ0lGSUVEEAAS",
             "IgoeVFJBREVfUkVKRUNUSU9OX05PVF9BVF9TVEFUSU9OEAESIQodVFJBREVf",
             "UkVKRUNUSU9OX0lOVkFMSURfT1JERVIQAhIfChtUUkFERV9SRUpFQ1RJT05f",
             "UFJJQ0VfTU9WRUQQAxIlCiFUUkFERV9SRUpFQ1RJT05fSU5TVUZGSUNJRU5U",
             "X0NBU0gQBBImCiJUUkFERV9SRUpFQ1RJT05fSU5TVUZGSUNJRU5UX1VOSVRT",
-            "EAUSIgoeVFJBREVfUkVKRUNUSU9OX1BPT0xfRVhIQVVTVEVEEAZCPloyZ2l0",
-            "aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9nZW4vZ28vZ2FtZS92MTtnYW1l",
-            "djGqAgdHYW1lLlYxYgZwcm90bzM="));
+            "EAUSIgoeVFJBREVfUkVKRUNUSU9OX1BPT0xfRVhIQVVTVEVEEAYSJAogVFJB",
+            "REVfUkVKRUNUSU9OX0dBTUVfTk9UX1JVTk5JTkcQByq1AQoNSm9pblJlamVj",
+            "dGlvbhIeChpKT0lOX1JFSkVDVElPTl9VTlNQRUNJRklFRBAAEiEKHUpPSU5f",
+            "UkVKRUNUSU9OX0dBTUVfTk9UX0ZPVU5EEAESHAoYSk9JTl9SRUpFQ1RJT05f",
+            "R0FNRV9GVUxMEAISIwofSk9JTl9SRUpFQ1RJT05fR0FNRV9JTl9QUk9HUkVT",
+            "UxADEh4KGkpPSU5fUkVKRUNUSU9OX1NFUlZFUl9GVUxMEAQqigEKCUdhbWVQ",
+            "aGFzZRIaChZHQU1FX1BIQVNFX1VOU1BFQ0lGSUVEEAASFgoSR0FNRV9QSEFT",
+            "RV9XQUlUSU5HEAESGAoUR0FNRV9QSEFTRV9DT1VOVERPV04QAhIWChJHQU1F",
+            "X1BIQVNFX1JVTk5JTkcQAxIXChNHQU1FX1BIQVNFX0ZJTklTSEVEEARCPloy",
+            "Z2l0aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9nZW4vZ28vZ2FtZS92MTtn",
+            "YW1ldjGqAgdHYW1lLlYxYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Game.V1.PowerUpType), typeof(global::Game.V1.CommodityType), typeof(global::Game.V1.OrderIntent), typeof(global::Game.V1.TradeRejection), }, null, null));
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Game.V1.PowerUpType), typeof(global::Game.V1.CommodityType), typeof(global::Game.V1.OrderIntent), typeof(global::Game.V1.TradeRejection), typeof(global::Game.V1.JoinRejection), typeof(global::Game.V1.GamePhase), }, null, null));
     }
     #endregion
 
@@ -107,6 +115,38 @@ namespace Game.V1 {
     /// The pool can't fill it: buying its last unit, or units worth under a cent
     /// </summary>
     [pbr::OriginalName("TRADE_REJECTION_POOL_EXHAUSTED")] PoolExhausted = 6,
+    [pbr::OriginalName("TRADE_REJECTION_GAME_NOT_RUNNING")] GameNotRunning = 7,
+  }
+
+  public enum JoinRejection {
+    [pbr::OriginalName("JOIN_REJECTION_UNSPECIFIED")] Unspecified = 0,
+    [pbr::OriginalName("JOIN_REJECTION_GAME_NOT_FOUND")] GameNotFound = 1,
+    [pbr::OriginalName("JOIN_REJECTION_GAME_FULL")] GameFull = 2,
+    [pbr::OriginalName("JOIN_REJECTION_GAME_IN_PROGRESS")] GameInProgress = 3,
+    /// <summary>
+    /// This server already hosts its maximum number of games
+    /// </summary>
+    [pbr::OriginalName("JOIN_REJECTION_SERVER_FULL")] ServerFull = 4,
+  }
+
+  public enum GamePhase {
+    [pbr::OriginalName("GAME_PHASE_UNSPECIFIED")] Unspecified = 0,
+    /// <summary>
+    /// fewer than MinPlayers connected
+    /// </summary>
+    [pbr::OriginalName("GAME_PHASE_WAITING")] Waiting = 1,
+    /// <summary>
+    /// threshold reached, about to start
+    /// </summary>
+    [pbr::OriginalName("GAME_PHASE_COUNTDOWN")] Countdown = 2,
+    /// <summary>
+    /// the 5-minute round
+    /// </summary>
+    [pbr::OriginalName("GAME_PHASE_RUNNING")] Running = 3,
+    /// <summary>
+    /// GameOver sent
+    /// </summary>
+    [pbr::OriginalName("GAME_PHASE_FINISHED")] Finished = 4,
   }
 
   #endregion

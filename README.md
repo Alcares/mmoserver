@@ -1,2 +1,2 @@
 ### Project Setup
-`make proto && make run`
+see `Makefile`

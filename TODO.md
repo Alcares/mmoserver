@@ -9,3 +9,7 @@
 ### Add market moving events
 ### Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
 ### Add random events (trading stations swapping places)
+
+
+# Code Quality
+Break up world.go 

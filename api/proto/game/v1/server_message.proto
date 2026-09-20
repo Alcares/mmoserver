@@ -86,10 +86,25 @@ message TradingStation {
 
 message InitialGameState {
   repeated TradingStation station_layout = 1;
+  string game_id = 2;
 }
 
+message JoinRejected {
+  JoinRejection reason = 1;
+}
 
-// Server -> Client: Discriminated wrapper for all server messages.
+message GameOver {
+  repeated PlayerFinalStanding standings = 1;
+}
+
+message GameStatus {
+  GamePhase phase = 1;
+  int32 player_count = 2;
+  int32 min_players = 3;
+  int32 remaining_ms = 4;
+}
+
+// Discriminated wrapper for all server messages.
 // Add new server message types as new oneof members.
 message ServerMessage {
   oneof msg {
@@ -100,12 +115,17 @@ message ServerMessage {
     // Discrete events
     PowerUpSpawned power_up_spawned     = 3;
     PowerUpDespawned power_up_despawned = 4;
+    GameStatus game_status = 10;
 
     // Initial join/reconnect
     InitialGameState initial_state      = 5;
+    JoinRejected join_rejected = 8;
 
     // Private inventory updates (sent only to owning player)
     TradeReceipt trade                  = 6;
     PlayerInventory player_inventory    = 7;
+
+    // One off
+    GameOver game_over = 9;
   }
 }

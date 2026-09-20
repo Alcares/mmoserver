@@ -14,7 +14,7 @@ namespace Game.Client
     /// one live source of truth. Each TradeReceipt shows briefly above the order sizes.
     /// </summary>
     [RequireComponent(typeof(GameClient), typeof(GameState), typeof(GameInput))]
-    public class Hud : MonoBehaviour
+    public partial class Hud : MonoBehaviour
     {
         private const float MultiplierWidth = 56f;
         private const float MultiplierHeight = 26f;
@@ -100,12 +100,23 @@ namespace Game.Client
             GUI.DrawTexture(statusRect, _panel);
             GUI.Label(statusRect, status, _status);
 
+            // In the lobby there is no game to draw yet, only the create/join panel.
+            if (!_state.Joined)
+            {
+                DrawLobby(screenW, screenH);
+                return;
+            }
+
+            DrawPhaseBanner(screenW);
+
             if (_state.Position == null) return;
 
             DrawStats();
             DrawHotbar(screenW, screenH);
             DrawMultiplier(screenW, screenH);
             DrawReceipt(screenW, screenH);
+
+            if (_state.Standings != null) DrawStandings(screenW, screenH);
         }
 
         // The last trade's result, centered above the order-size row, until it expires.

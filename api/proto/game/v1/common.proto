@@ -34,4 +34,21 @@ enum TradeRejection {
   TRADE_REJECTION_INSUFFICIENT_CASH  = 4; // Can't afford units * price
   TRADE_REJECTION_INSUFFICIENT_UNITS = 5; // Holds fewer units than the order sells
   TRADE_REJECTION_POOL_EXHAUSTED     = 6; // The pool can't fill it: buying its last unit, or units worth under a cent
+  TRADE_REJECTION_GAME_NOT_RUNNING   = 7;
+}
+
+enum JoinRejection {
+  JOIN_REJECTION_UNSPECIFIED = 0;
+  JOIN_REJECTION_GAME_NOT_FOUND = 1;
+  JOIN_REJECTION_GAME_FULL = 2;
+  JOIN_REJECTION_GAME_IN_PROGRESS = 3;
+  JOIN_REJECTION_SERVER_FULL      = 4; // This server already hosts its maximum number of games
+}
+
+enum GamePhase {
+  GAME_PHASE_UNSPECIFIED = 0;
+  GAME_PHASE_WAITING     = 1;  // fewer than MinPlayers connected
+  GAME_PHASE_COUNTDOWN   = 2;  // threshold reached, about to start
+  GAME_PHASE_RUNNING     = 3;  // the 5-minute round
+  GAME_PHASE_FINISHED    = 4;  // GameOver sent
 }

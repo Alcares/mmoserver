@@ -188,6 +188,7 @@ const (
 	TradeRejection_TRADE_REJECTION_INSUFFICIENT_CASH  TradeRejection = 4 // Can't afford units * price
 	TradeRejection_TRADE_REJECTION_INSUFFICIENT_UNITS TradeRejection = 5 // Holds fewer units than the order sells
 	TradeRejection_TRADE_REJECTION_POOL_EXHAUSTED     TradeRejection = 6 // The pool can't fill it: buying its last unit, or units worth under a cent
+	TradeRejection_TRADE_REJECTION_GAME_NOT_RUNNING   TradeRejection = 7
 )
 
 // Enum value maps for TradeRejection.
@@ -200,6 +201,7 @@ var (
 		4: "TRADE_REJECTION_INSUFFICIENT_CASH",
 		5: "TRADE_REJECTION_INSUFFICIENT_UNITS",
 		6: "TRADE_REJECTION_POOL_EXHAUSTED",
+		7: "TRADE_REJECTION_GAME_NOT_RUNNING",
 	}
 	TradeRejection_value = map[string]int32{
 		"TRADE_REJECTION_UNSPECIFIED":        0,
@@ -209,6 +211,7 @@ var (
 		"TRADE_REJECTION_INSUFFICIENT_CASH":  4,
 		"TRADE_REJECTION_INSUFFICIENT_UNITS": 5,
 		"TRADE_REJECTION_POOL_EXHAUSTED":     6,
+		"TRADE_REJECTION_GAME_NOT_RUNNING":   7,
 	}
 )
 
@@ -239,6 +242,116 @@ func (TradeRejection) EnumDescriptor() ([]byte, []int) {
 	return file_game_v1_common_proto_rawDescGZIP(), []int{3}
 }
 
+type JoinRejection int32
+
+const (
+	JoinRejection_JOIN_REJECTION_UNSPECIFIED      JoinRejection = 0
+	JoinRejection_JOIN_REJECTION_GAME_NOT_FOUND   JoinRejection = 1
+	JoinRejection_JOIN_REJECTION_GAME_FULL        JoinRejection = 2
+	JoinRejection_JOIN_REJECTION_GAME_IN_PROGRESS JoinRejection = 3
+	JoinRejection_JOIN_REJECTION_SERVER_FULL      JoinRejection = 4 // This server already hosts its maximum number of games
+)
+
+// Enum value maps for JoinRejection.
+var (
+	JoinRejection_name = map[int32]string{
+		0: "JOIN_REJECTION_UNSPECIFIED",
+		1: "JOIN_REJECTION_GAME_NOT_FOUND",
+		2: "JOIN_REJECTION_GAME_FULL",
+		3: "JOIN_REJECTION_GAME_IN_PROGRESS",
+		4: "JOIN_REJECTION_SERVER_FULL",
+	}
+	JoinRejection_value = map[string]int32{
+		"JOIN_REJECTION_UNSPECIFIED":      0,
+		"JOIN_REJECTION_GAME_NOT_FOUND":   1,
+		"JOIN_REJECTION_GAME_FULL":        2,
+		"JOIN_REJECTION_GAME_IN_PROGRESS": 3,
+		"JOIN_REJECTION_SERVER_FULL":      4,
+	}
+)
+
+func (x JoinRejection) Enum() *JoinRejection {
+	p := new(JoinRejection)
+	*p = x
+	return p
+}
+
+func (x JoinRejection) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (JoinRejection) Descriptor() protoreflect.EnumDescriptor {
+	return file_game_v1_common_proto_enumTypes[4].Descriptor()
+}
+
+func (JoinRejection) Type() protoreflect.EnumType {
+	return &file_game_v1_common_proto_enumTypes[4]
+}
+
+func (x JoinRejection) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use JoinRejection.Descriptor instead.
+func (JoinRejection) EnumDescriptor() ([]byte, []int) {
+	return file_game_v1_common_proto_rawDescGZIP(), []int{4}
+}
+
+type GamePhase int32
+
+const (
+	GamePhase_GAME_PHASE_UNSPECIFIED GamePhase = 0
+	GamePhase_GAME_PHASE_WAITING     GamePhase = 1 // fewer than MinPlayers connected
+	GamePhase_GAME_PHASE_COUNTDOWN   GamePhase = 2 // threshold reached, about to start
+	GamePhase_GAME_PHASE_RUNNING     GamePhase = 3 // the 5-minute round
+	GamePhase_GAME_PHASE_FINISHED    GamePhase = 4 // GameOver sent
+)
+
+// Enum value maps for GamePhase.
+var (
+	GamePhase_name = map[int32]string{
+		0: "GAME_PHASE_UNSPECIFIED",
+		1: "GAME_PHASE_WAITING",
+		2: "GAME_PHASE_COUNTDOWN",
+		3: "GAME_PHASE_RUNNING",
+		4: "GAME_PHASE_FINISHED",
+	}
+	GamePhase_value = map[string]int32{
+		"GAME_PHASE_UNSPECIFIED": 0,
+		"GAME_PHASE_WAITING":     1,
+		"GAME_PHASE_COUNTDOWN":   2,
+		"GAME_PHASE_RUNNING":     3,
+		"GAME_PHASE_FINISHED":    4,
+	}
+)
+
+func (x GamePhase) Enum() *GamePhase {
+	p := new(GamePhase)
+	*p = x
+	return p
+}
+
+func (x GamePhase) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (GamePhase) Descriptor() protoreflect.EnumDescriptor {
+	return file_game_v1_common_proto_enumTypes[5].Descriptor()
+}
+
+func (GamePhase) Type() protoreflect.EnumType {
+	return &file_game_v1_common_proto_enumTypes[5]
+}
+
+func (x GamePhase) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use GamePhase.Descriptor instead.
+func (GamePhase) EnumDescriptor() ([]byte, []int) {
+	return file_game_v1_common_proto_rawDescGZIP(), []int{5}
+}
+
 var File_game_v1_common_proto protoreflect.FileDescriptor
 
 const file_game_v1_common_proto_rawDesc = "" +
@@ -259,7 +372,7 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x12INTENT_UNSPECIFIED\x10\x00\x12\x0e\n" +
 	"\n" +
 	"INTENT_BUY\x10\x01\x12\x0f\n" +
-	"\vINTENT_SELL\x10\x02*\x8c\x02\n" +
+	"\vINTENT_SELL\x10\x02*\xb2\x02\n" +
 	"\x0eTradeRejection\x12\x1f\n" +
 	"\x1bTRADE_REJECTION_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eTRADE_REJECTION_NOT_AT_STATION\x10\x01\x12!\n" +
@@ -267,7 +380,20 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x1bTRADE_REJECTION_PRICE_MOVED\x10\x03\x12%\n" +
 	"!TRADE_REJECTION_INSUFFICIENT_CASH\x10\x04\x12&\n" +
 	"\"TRADE_REJECTION_INSUFFICIENT_UNITS\x10\x05\x12\"\n" +
-	"\x1eTRADE_REJECTION_POOL_EXHAUSTED\x10\x06B>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
+	"\x1eTRADE_REJECTION_POOL_EXHAUSTED\x10\x06\x12$\n" +
+	" TRADE_REJECTION_GAME_NOT_RUNNING\x10\a*\xb5\x01\n" +
+	"\rJoinRejection\x12\x1e\n" +
+	"\x1aJOIN_REJECTION_UNSPECIFIED\x10\x00\x12!\n" +
+	"\x1dJOIN_REJECTION_GAME_NOT_FOUND\x10\x01\x12\x1c\n" +
+	"\x18JOIN_REJECTION_GAME_FULL\x10\x02\x12#\n" +
+	"\x1fJOIN_REJECTION_GAME_IN_PROGRESS\x10\x03\x12\x1e\n" +
+	"\x1aJOIN_REJECTION_SERVER_FULL\x10\x04*\x8a\x01\n" +
+	"\tGamePhase\x12\x1a\n" +
+	"\x16GAME_PHASE_UNSPECIFIED\x10\x00\x12\x16\n" +
+	"\x12GAME_PHASE_WAITING\x10\x01\x12\x18\n" +
+	"\x14GAME_PHASE_COUNTDOWN\x10\x02\x12\x16\n" +
+	"\x12GAME_PHASE_RUNNING\x10\x03\x12\x17\n" +
+	"\x13GAME_PHASE_FINISHED\x10\x04B>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
 	file_game_v1_common_proto_rawDescOnce sync.Once
@@ -281,12 +407,14 @@ func file_game_v1_common_proto_rawDescGZIP() []byte {
 	return file_game_v1_common_proto_rawDescData
 }
 
-var file_game_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_game_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
 var file_game_v1_common_proto_goTypes = []any{
 	(PowerUpType)(0),    // 0: game.v1.PowerUpType
 	(CommodityType)(0),  // 1: game.v1.CommodityType
 	(OrderIntent)(0),    // 2: game.v1.OrderIntent
 	(TradeRejection)(0), // 3: game.v1.TradeRejection
+	(JoinRejection)(0),  // 4: game.v1.JoinRejection
+	(GamePhase)(0),      // 5: game.v1.GamePhase
 }
 var file_game_v1_common_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -306,7 +434,7 @@ func file_game_v1_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_common_proto_rawDesc), len(file_game_v1_common_proto_rawDesc)),
-			NumEnums:      4,
+			NumEnums:      6,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,

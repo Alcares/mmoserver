@@ -626,6 +626,7 @@ func (x *TradingStation) GetLabel() string {
 type InitialGameState struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	StationLayout []*TradingStation      `protobuf:"bytes,1,rep,name=station_layout,json=stationLayout,proto3" json:"station_layout,omitempty"`
+	GameId        string                 `protobuf:"bytes,2,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -667,7 +668,170 @@ func (x *InitialGameState) GetStationLayout() []*TradingStation {
 	return nil
 }
 
-// Server -> Client: Discriminated wrapper for all server messages.
+func (x *InitialGameState) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+type JoinRejected struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Reason        JoinRejection          `protobuf:"varint,1,opt,name=reason,proto3,enum=game.v1.JoinRejection" json:"reason,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *JoinRejected) Reset() {
+	*x = JoinRejected{}
+	mi := &file_game_v1_server_message_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *JoinRejected) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JoinRejected) ProtoMessage() {}
+
+func (x *JoinRejected) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_server_message_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JoinRejected.ProtoReflect.Descriptor instead.
+func (*JoinRejected) Descriptor() ([]byte, []int) {
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *JoinRejected) GetReason() JoinRejection {
+	if x != nil {
+		return x.Reason
+	}
+	return JoinRejection_JOIN_REJECTION_UNSPECIFIED
+}
+
+type GameOver struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Standings     []*PlayerFinalStanding `protobuf:"bytes,1,rep,name=standings,proto3" json:"standings,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GameOver) Reset() {
+	*x = GameOver{}
+	mi := &file_game_v1_server_message_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GameOver) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GameOver) ProtoMessage() {}
+
+func (x *GameOver) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_server_message_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GameOver.ProtoReflect.Descriptor instead.
+func (*GameOver) Descriptor() ([]byte, []int) {
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GameOver) GetStandings() []*PlayerFinalStanding {
+	if x != nil {
+		return x.Standings
+	}
+	return nil
+}
+
+type GameStatus struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Phase         GamePhase              `protobuf:"varint,1,opt,name=phase,proto3,enum=game.v1.GamePhase" json:"phase,omitempty"`
+	PlayerCount   int32                  `protobuf:"varint,2,opt,name=player_count,json=playerCount,proto3" json:"player_count,omitempty"`
+	MinPlayers    int32                  `protobuf:"varint,3,opt,name=min_players,json=minPlayers,proto3" json:"min_players,omitempty"`
+	RemainingMs   int32                  `protobuf:"varint,4,opt,name=remaining_ms,json=remainingMs,proto3" json:"remaining_ms,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GameStatus) Reset() {
+	*x = GameStatus{}
+	mi := &file_game_v1_server_message_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GameStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GameStatus) ProtoMessage() {}
+
+func (x *GameStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_server_message_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GameStatus.ProtoReflect.Descriptor instead.
+func (*GameStatus) Descriptor() ([]byte, []int) {
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GameStatus) GetPhase() GamePhase {
+	if x != nil {
+		return x.Phase
+	}
+	return GamePhase_GAME_PHASE_UNSPECIFIED
+}
+
+func (x *GameStatus) GetPlayerCount() int32 {
+	if x != nil {
+		return x.PlayerCount
+	}
+	return 0
+}
+
+func (x *GameStatus) GetMinPlayers() int32 {
+	if x != nil {
+		return x.MinPlayers
+	}
+	return 0
+}
+
+func (x *GameStatus) GetRemainingMs() int32 {
+	if x != nil {
+		return x.RemainingMs
+	}
+	return 0
+}
+
+// Discriminated wrapper for all server messages.
 // Add new server message types as new oneof members.
 type ServerMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -677,9 +841,12 @@ type ServerMessage struct {
 	//	*ServerMessage_MarketState
 	//	*ServerMessage_PowerUpSpawned
 	//	*ServerMessage_PowerUpDespawned
+	//	*ServerMessage_GameStatus
 	//	*ServerMessage_InitialState
+	//	*ServerMessage_JoinRejected
 	//	*ServerMessage_Trade
 	//	*ServerMessage_PlayerInventory
+	//	*ServerMessage_GameOver
 	Msg           isServerMessage_Msg `protobuf_oneof:"msg"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -687,7 +854,7 @@ type ServerMessage struct {
 
 func (x *ServerMessage) Reset() {
 	*x = ServerMessage{}
-	mi := &file_game_v1_server_message_proto_msgTypes[10]
+	mi := &file_game_v1_server_message_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -699,7 +866,7 @@ func (x *ServerMessage) String() string {
 func (*ServerMessage) ProtoMessage() {}
 
 func (x *ServerMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_server_message_proto_msgTypes[10]
+	mi := &file_game_v1_server_message_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -712,7 +879,7 @@ func (x *ServerMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerMessage.ProtoReflect.Descriptor instead.
 func (*ServerMessage) Descriptor() ([]byte, []int) {
-	return file_game_v1_server_message_proto_rawDescGZIP(), []int{10}
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ServerMessage) GetMsg() isServerMessage_Msg {
@@ -758,10 +925,28 @@ func (x *ServerMessage) GetPowerUpDespawned() *PowerUpDespawned {
 	return nil
 }
 
+func (x *ServerMessage) GetGameStatus() *GameStatus {
+	if x != nil {
+		if x, ok := x.Msg.(*ServerMessage_GameStatus); ok {
+			return x.GameStatus
+		}
+	}
+	return nil
+}
+
 func (x *ServerMessage) GetInitialState() *InitialGameState {
 	if x != nil {
 		if x, ok := x.Msg.(*ServerMessage_InitialState); ok {
 			return x.InitialState
+		}
+	}
+	return nil
+}
+
+func (x *ServerMessage) GetJoinRejected() *JoinRejected {
+	if x != nil {
+		if x, ok := x.Msg.(*ServerMessage_JoinRejected); ok {
+			return x.JoinRejected
 		}
 	}
 	return nil
@@ -780,6 +965,15 @@ func (x *ServerMessage) GetPlayerInventory() *PlayerInventory {
 	if x != nil {
 		if x, ok := x.Msg.(*ServerMessage_PlayerInventory); ok {
 			return x.PlayerInventory
+		}
+	}
+	return nil
+}
+
+func (x *ServerMessage) GetGameOver() *GameOver {
+	if x != nil {
+		if x, ok := x.Msg.(*ServerMessage_GameOver); ok {
+			return x.GameOver
 		}
 	}
 	return nil
@@ -807,9 +1001,17 @@ type ServerMessage_PowerUpDespawned struct {
 	PowerUpDespawned *PowerUpDespawned `protobuf:"bytes,4,opt,name=power_up_despawned,json=powerUpDespawned,proto3,oneof"`
 }
 
+type ServerMessage_GameStatus struct {
+	GameStatus *GameStatus `protobuf:"bytes,10,opt,name=game_status,json=gameStatus,proto3,oneof"`
+}
+
 type ServerMessage_InitialState struct {
 	// Initial join/reconnect
 	InitialState *InitialGameState `protobuf:"bytes,5,opt,name=initial_state,json=initialState,proto3,oneof"`
+}
+
+type ServerMessage_JoinRejected struct {
+	JoinRejected *JoinRejected `protobuf:"bytes,8,opt,name=join_rejected,json=joinRejected,proto3,oneof"`
 }
 
 type ServerMessage_Trade struct {
@@ -821,6 +1023,11 @@ type ServerMessage_PlayerInventory struct {
 	PlayerInventory *PlayerInventory `protobuf:"bytes,7,opt,name=player_inventory,json=playerInventory,proto3,oneof"`
 }
 
+type ServerMessage_GameOver struct {
+	// One off
+	GameOver *GameOver `protobuf:"bytes,9,opt,name=game_over,json=gameOver,proto3,oneof"`
+}
+
 func (*ServerMessage_WorldSnapshot) isServerMessage_Msg() {}
 
 func (*ServerMessage_MarketState) isServerMessage_Msg() {}
@@ -829,11 +1036,17 @@ func (*ServerMessage_PowerUpSpawned) isServerMessage_Msg() {}
 
 func (*ServerMessage_PowerUpDespawned) isServerMessage_Msg() {}
 
+func (*ServerMessage_GameStatus) isServerMessage_Msg() {}
+
 func (*ServerMessage_InitialState) isServerMessage_Msg() {}
+
+func (*ServerMessage_JoinRejected) isServerMessage_Msg() {}
 
 func (*ServerMessage_Trade) isServerMessage_Msg() {}
 
 func (*ServerMessage_PlayerInventory) isServerMessage_Msg() {}
+
+func (*ServerMessage_GameOver) isServerMessage_Msg() {}
 
 var File_game_v1_server_message_proto protoreflect.FileDescriptor
 
@@ -886,17 +1099,34 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\tcommodity\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x12\f\n" +
 	"\x01x\x18\x02 \x01(\x02R\x01x\x12\f\n" +
 	"\x01y\x18\x03 \x01(\x02R\x01y\x12\x14\n" +
-	"\x05label\x18\x04 \x01(\tR\x05label\"R\n" +
+	"\x05label\x18\x04 \x01(\tR\x05label\"k\n" +
 	"\x10InitialGameState\x12>\n" +
-	"\x0estation_layout\x18\x01 \x03(\v2\x17.game.v1.TradingStationR\rstationLayout\"\xda\x03\n" +
+	"\x0estation_layout\x18\x01 \x03(\v2\x17.game.v1.TradingStationR\rstationLayout\x12\x17\n" +
+	"\agame_id\x18\x02 \x01(\tR\x06gameId\">\n" +
+	"\fJoinRejected\x12.\n" +
+	"\x06reason\x18\x01 \x01(\x0e2\x16.game.v1.JoinRejectionR\x06reason\"F\n" +
+	"\bGameOver\x12:\n" +
+	"\tstandings\x18\x01 \x03(\v2\x1c.game.v1.PlayerFinalStandingR\tstandings\"\x9d\x01\n" +
+	"\n" +
+	"GameStatus\x12(\n" +
+	"\x05phase\x18\x01 \x01(\x0e2\x12.game.v1.GamePhaseR\x05phase\x12!\n" +
+	"\fplayer_count\x18\x02 \x01(\x05R\vplayerCount\x12\x1f\n" +
+	"\vmin_players\x18\x03 \x01(\x05R\n" +
+	"minPlayers\x12!\n" +
+	"\fremaining_ms\x18\x04 \x01(\x05R\vremainingMs\"\x82\x05\n" +
 	"\rServerMessage\x12?\n" +
 	"\x0eworld_snapshot\x18\x01 \x01(\v2\x16.game.v1.WorldSnapshotH\x00R\rworldSnapshot\x129\n" +
 	"\fmarket_state\x18\x02 \x01(\v2\x14.game.v1.MarketStateH\x00R\vmarketState\x12C\n" +
 	"\x10power_up_spawned\x18\x03 \x01(\v2\x17.game.v1.PowerUpSpawnedH\x00R\x0epowerUpSpawned\x12I\n" +
-	"\x12power_up_despawned\x18\x04 \x01(\v2\x19.game.v1.PowerUpDespawnedH\x00R\x10powerUpDespawned\x12@\n" +
-	"\rinitial_state\x18\x05 \x01(\v2\x19.game.v1.InitialGameStateH\x00R\finitialState\x12-\n" +
+	"\x12power_up_despawned\x18\x04 \x01(\v2\x19.game.v1.PowerUpDespawnedH\x00R\x10powerUpDespawned\x126\n" +
+	"\vgame_status\x18\n" +
+	" \x01(\v2\x13.game.v1.GameStatusH\x00R\n" +
+	"gameStatus\x12@\n" +
+	"\rinitial_state\x18\x05 \x01(\v2\x19.game.v1.InitialGameStateH\x00R\finitialState\x12<\n" +
+	"\rjoin_rejected\x18\b \x01(\v2\x15.game.v1.JoinRejectedH\x00R\fjoinRejected\x12-\n" +
 	"\x05trade\x18\x06 \x01(\v2\x15.game.v1.TradeReceiptH\x00R\x05trade\x12E\n" +
-	"\x10player_inventory\x18\a \x01(\v2\x18.game.v1.PlayerInventoryH\x00R\x0fplayerInventoryB\x05\n" +
+	"\x10player_inventory\x18\a \x01(\v2\x18.game.v1.PlayerInventoryH\x00R\x0fplayerInventory\x120\n" +
+	"\tgame_over\x18\t \x01(\v2\x11.game.v1.GameOverH\x00R\bgameOverB\x05\n" +
 	"\x03msgB>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
@@ -911,50 +1141,62 @@ func file_game_v1_server_message_proto_rawDescGZIP() []byte {
 	return file_game_v1_server_message_proto_rawDescData
 }
 
-var file_game_v1_server_message_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_game_v1_server_message_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_game_v1_server_message_proto_goTypes = []any{
-	(*PowerUp)(nil),          // 0: game.v1.PowerUp
-	(*PowerUpSpawned)(nil),   // 1: game.v1.PowerUpSpawned
-	(*PowerUpDespawned)(nil), // 2: game.v1.PowerUpDespawned
-	(*WorldSnapshot)(nil),    // 3: game.v1.WorldSnapshot
-	(*MarketState)(nil),      // 4: game.v1.MarketState
-	(*PriceQuote)(nil),       // 5: game.v1.PriceQuote
-	(*OrderQuote)(nil),       // 6: game.v1.OrderQuote
-	(*TradeReceipt)(nil),     // 7: game.v1.TradeReceipt
-	(*TradingStation)(nil),   // 8: game.v1.TradingStation
-	(*InitialGameState)(nil), // 9: game.v1.InitialGameState
-	(*ServerMessage)(nil),    // 10: game.v1.ServerMessage
-	(PowerUpType)(0),         // 11: game.v1.PowerUpType
-	(*PlayerState)(nil),      // 12: game.v1.PlayerState
-	(CommodityType)(0),       // 13: game.v1.CommodityType
-	(TradeRejection)(0),      // 14: game.v1.TradeRejection
-	(OrderIntent)(0),         // 15: game.v1.OrderIntent
-	(*PlayerInventory)(nil),  // 16: game.v1.PlayerInventory
+	(*PowerUp)(nil),             // 0: game.v1.PowerUp
+	(*PowerUpSpawned)(nil),      // 1: game.v1.PowerUpSpawned
+	(*PowerUpDespawned)(nil),    // 2: game.v1.PowerUpDespawned
+	(*WorldSnapshot)(nil),       // 3: game.v1.WorldSnapshot
+	(*MarketState)(nil),         // 4: game.v1.MarketState
+	(*PriceQuote)(nil),          // 5: game.v1.PriceQuote
+	(*OrderQuote)(nil),          // 6: game.v1.OrderQuote
+	(*TradeReceipt)(nil),        // 7: game.v1.TradeReceipt
+	(*TradingStation)(nil),      // 8: game.v1.TradingStation
+	(*InitialGameState)(nil),    // 9: game.v1.InitialGameState
+	(*JoinRejected)(nil),        // 10: game.v1.JoinRejected
+	(*GameOver)(nil),            // 11: game.v1.GameOver
+	(*GameStatus)(nil),          // 12: game.v1.GameStatus
+	(*ServerMessage)(nil),       // 13: game.v1.ServerMessage
+	(PowerUpType)(0),            // 14: game.v1.PowerUpType
+	(*PlayerState)(nil),         // 15: game.v1.PlayerState
+	(CommodityType)(0),          // 16: game.v1.CommodityType
+	(TradeRejection)(0),         // 17: game.v1.TradeRejection
+	(OrderIntent)(0),            // 18: game.v1.OrderIntent
+	(JoinRejection)(0),          // 19: game.v1.JoinRejection
+	(*PlayerFinalStanding)(nil), // 20: game.v1.PlayerFinalStanding
+	(GamePhase)(0),              // 21: game.v1.GamePhase
+	(*PlayerInventory)(nil),     // 22: game.v1.PlayerInventory
 }
 var file_game_v1_server_message_proto_depIdxs = []int32{
-	11, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
+	14, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
 	0,  // 1: game.v1.PowerUpSpawned.power_up:type_name -> game.v1.PowerUp
-	12, // 2: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
+	15, // 2: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
 	5,  // 3: game.v1.MarketState.quotes:type_name -> game.v1.PriceQuote
-	13, // 4: game.v1.PriceQuote.commodity:type_name -> game.v1.CommodityType
+	16, // 4: game.v1.PriceQuote.commodity:type_name -> game.v1.CommodityType
 	6,  // 5: game.v1.PriceQuote.orders:type_name -> game.v1.OrderQuote
-	14, // 6: game.v1.TradeReceipt.rejection:type_name -> game.v1.TradeRejection
-	15, // 7: game.v1.TradeReceipt.intent:type_name -> game.v1.OrderIntent
-	13, // 8: game.v1.TradeReceipt.commodity:type_name -> game.v1.CommodityType
-	13, // 9: game.v1.TradingStation.commodity:type_name -> game.v1.CommodityType
+	17, // 6: game.v1.TradeReceipt.rejection:type_name -> game.v1.TradeRejection
+	18, // 7: game.v1.TradeReceipt.intent:type_name -> game.v1.OrderIntent
+	16, // 8: game.v1.TradeReceipt.commodity:type_name -> game.v1.CommodityType
+	16, // 9: game.v1.TradingStation.commodity:type_name -> game.v1.CommodityType
 	8,  // 10: game.v1.InitialGameState.station_layout:type_name -> game.v1.TradingStation
-	3,  // 11: game.v1.ServerMessage.world_snapshot:type_name -> game.v1.WorldSnapshot
-	4,  // 12: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
-	1,  // 13: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
-	2,  // 14: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
-	9,  // 15: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
-	7,  // 16: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
-	16, // 17: game.v1.ServerMessage.player_inventory:type_name -> game.v1.PlayerInventory
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	19, // 11: game.v1.JoinRejected.reason:type_name -> game.v1.JoinRejection
+	20, // 12: game.v1.GameOver.standings:type_name -> game.v1.PlayerFinalStanding
+	21, // 13: game.v1.GameStatus.phase:type_name -> game.v1.GamePhase
+	3,  // 14: game.v1.ServerMessage.world_snapshot:type_name -> game.v1.WorldSnapshot
+	4,  // 15: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
+	1,  // 16: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
+	2,  // 17: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
+	12, // 18: game.v1.ServerMessage.game_status:type_name -> game.v1.GameStatus
+	9,  // 19: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
+	10, // 20: game.v1.ServerMessage.join_rejected:type_name -> game.v1.JoinRejected
+	7,  // 21: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
+	22, // 22: game.v1.ServerMessage.player_inventory:type_name -> game.v1.PlayerInventory
+	11, // 23: game.v1.ServerMessage.game_over:type_name -> game.v1.GameOver
+	24, // [24:24] is the sub-list for method output_type
+	24, // [24:24] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_server_message_proto_init() }
@@ -964,14 +1206,17 @@ func file_game_v1_server_message_proto_init() {
 	}
 	file_game_v1_common_proto_init()
 	file_game_v1_player_proto_init()
-	file_game_v1_server_message_proto_msgTypes[10].OneofWrappers = []any{
+	file_game_v1_server_message_proto_msgTypes[13].OneofWrappers = []any{
 		(*ServerMessage_WorldSnapshot)(nil),
 		(*ServerMessage_MarketState)(nil),
 		(*ServerMessage_PowerUpSpawned)(nil),
 		(*ServerMessage_PowerUpDespawned)(nil),
+		(*ServerMessage_GameStatus)(nil),
 		(*ServerMessage_InitialState)(nil),
+		(*ServerMessage_JoinRejected)(nil),
 		(*ServerMessage_Trade)(nil),
 		(*ServerMessage_PlayerInventory)(nil),
+		(*ServerMessage_GameOver)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -979,7 +1224,7 @@ func file_game_v1_server_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_server_message_proto_rawDesc), len(file_game_v1_server_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

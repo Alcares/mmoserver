@@ -6,13 +6,20 @@ option csharp_namespace = "Game.V1";
 
 import "game/v1/common.proto";
 
-// Client -> Server: Sent whenever a key is pressed
+// Sent whenever a key is pressed
 message MovementCommand {
   float vx = 1;
   float vy = 2;
 }
 
-// Client -> Server: Sent when the player presses buy/sell at a station. The server trades
+// TODO: add create game config params
+message CreateGame {}
+
+message JoinGame {
+  string id = 1;
+}
+
+// Sent when the player presses buy/sell at a station. The server trades
 // against the station the player is standing at, for the whole order or nothing.
 message TradeRequest {
   uint32 sequence_id = 1;         // Client sequence counter, echoed in TradeReceipt
@@ -28,5 +35,7 @@ message ClientMessage {
   oneof cmd {
     MovementCommand input = 1;
     TradeRequest trade = 2;
+    CreateGame create_game = 3;
+    JoinGame join_game = 4;
   }
 }

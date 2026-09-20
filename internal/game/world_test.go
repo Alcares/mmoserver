@@ -27,7 +27,7 @@ func drain(t *testing.T, c *Client) []*pb.ServerMessage {
 }
 
 func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
-	w := NewWorld(rand.New(rand.NewSource(1)))
+	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1))})
 	c := &Client{Send: make(chan []byte, SendBufferSize)}
 
 	if _, err := w.Join(c); err != nil {
@@ -56,7 +56,7 @@ func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 }
 
 func TestJoinSpawnsAtCentre(t *testing.T) {
-	w := NewWorld(rand.New(rand.NewSource(1)))
+	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1))})
 	for range 3 {
 		player, err := w.Join(&Client{Send: make(chan []byte, SendBufferSize)})
 		if err != nil {
@@ -69,7 +69,7 @@ func TestJoinSpawnsAtCentre(t *testing.T) {
 }
 
 func TestJoinRejectsWhenFull(t *testing.T) {
-	w := NewWorld(rand.New(rand.NewSource(1)))
+	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1))})
 	for range MaxPlayers {
 		if _, err := w.Join(&Client{Send: make(chan []byte, SendBufferSize)}); err != nil {
 			t.Fatal(err)

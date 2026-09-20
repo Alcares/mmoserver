@@ -18,7 +18,9 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func handleWS(world *game.World, w http.ResponseWriter, r *http.Request) {
+// handleWS upgrades the connection and hands it to the pumps. The client starts in the
+// lobby with no world; ReadPump joins it to one when a CreateGame or JoinGame arrives.
+func handleWS(master *game.Master, defaults game.WorldConfig, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("Upgrade failed: %v", err)
@@ -30,28 +32,21 @@ func handleWS(world *game.World, w http.ResponseWriter, r *http.Request) {
 		Send: make(chan []byte, game.SendBufferSize),
 	}
 
-	player, err := world.Join(client)
-	if err != nil {
-		log.Printf("Rejected client: %v", err)
-		conn.WriteMessage(
-			websocket.CloseMessage,
-			websocket.FormatCloseMessage(websocket.ClosePolicyViolation, err.Error()),
-		)
-		conn.Close()
-		return
-	}
-
-	log.Printf("Player %d (%s) joined at (%.1f, %.1f)", player.ID, player.Name, player.Pos.X, player.Pos.Y)
-
-	// Spin up dedicated reader and writer routines
 	go client.WritePump()
-	go client.ReadPump(world)
+	go client.ReadPump(master, defaults)
 }
 
 func main() {
-	world := game.NewWorld(rand.New(rand.NewSource(time.Now().Unix())))
+	// Defaults for every game created on this server; a client's CreateGame may
+	// override them, within the bounds WorldConfig.sanitize enforces.
+	defaults := game.WorldConfig{
+		MinPlayers:     2,
+		StartCountdown: 10 * time.Second,
+		Duration:       5 * time.Minute,
+		LobbyTTL:       game.DefaultLobbyTTL,
+	}
 
-	go world.Run()
+	gameMaster := game.NewMaster(rand.New(rand.NewSource(time.Now().UnixNano())))
 	fmt.Println("Server initialized")
 
 	// Static file delivery
@@ -61,7 +56,7 @@ func main() {
 	http.Handle("/game/", http.StripPrefix("/game/", http.FileServer(http.Dir("./api/proto/game"))))
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		handleWS(world, w, r)
+		handleWS(gameMaster, defaults, w, r)
 	})
 
 	log.Println("Listening on http://localhost:8080")

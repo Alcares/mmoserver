@@ -39,6 +39,10 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 		return receipt
 	}
 
+	if w.phase != pb.GamePhase_GAME_PHASE_RUNNING {
+		return reject(pb.TradeRejection_TRADE_REJECTION_GAME_NOT_RUNNING)
+	}
+
 	station := w.nearestStation(player.Pos)
 	if station == nil {
 		return reject(pb.TradeRejection_TRADE_REJECTION_NOT_AT_STATION)

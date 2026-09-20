@@ -257,6 +257,67 @@ func (x *PlayerInventory) GetActiveEffects() []*ActiveEffect {
 	return nil
 }
 
+// Server -> Client: Sent with GameOver message
+type PlayerFinalStanding struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	NetWorth      uint64                 `protobuf:"varint,3,opt,name=net_worth,json=netWorth,proto3" json:"net_worth,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlayerFinalStanding) Reset() {
+	*x = PlayerFinalStanding{}
+	mi := &file_game_v1_player_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlayerFinalStanding) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlayerFinalStanding) ProtoMessage() {}
+
+func (x *PlayerFinalStanding) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_player_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlayerFinalStanding.ProtoReflect.Descriptor instead.
+func (*PlayerFinalStanding) Descriptor() ([]byte, []int) {
+	return file_game_v1_player_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *PlayerFinalStanding) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *PlayerFinalStanding) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *PlayerFinalStanding) GetNetWorth() uint64 {
+	if x != nil {
+		return x.NetWorth
+	}
+	return 0
+}
+
 var File_game_v1_player_proto protoreflect.FileDescriptor
 
 const file_game_v1_player_proto_rawDesc = "" +
@@ -276,7 +337,11 @@ const file_game_v1_player_proto_rawDesc = "" +
 	"\x0fPlayerInventory\x12\x18\n" +
 	"\abalance\x18\x01 \x01(\x04R\abalance\x129\n" +
 	"\vcommodities\x18\x02 \x03(\v2\x17.game.v1.OwnedCommodityR\vcommodities\x12<\n" +
-	"\x0eactive_effects\x18\x03 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffectsB>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
+	"\x0eactive_effects\x18\x03 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffects\"V\n" +
+	"\x13PlayerFinalStanding\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
+	"\tnet_worth\x18\x03 \x01(\x04R\bnetWorthB>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
 	file_game_v1_player_proto_rawDescOnce sync.Once
@@ -290,18 +355,19 @@ func file_game_v1_player_proto_rawDescGZIP() []byte {
 	return file_game_v1_player_proto_rawDescData
 }
 
-var file_game_v1_player_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_game_v1_player_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_game_v1_player_proto_goTypes = []any{
-	(*ActiveEffect)(nil),    // 0: game.v1.ActiveEffect
-	(*OwnedCommodity)(nil),  // 1: game.v1.OwnedCommodity
-	(*PlayerState)(nil),     // 2: game.v1.PlayerState
-	(*PlayerInventory)(nil), // 3: game.v1.PlayerInventory
-	(PowerUpType)(0),        // 4: game.v1.PowerUpType
-	(CommodityType)(0),      // 5: game.v1.CommodityType
+	(*ActiveEffect)(nil),        // 0: game.v1.ActiveEffect
+	(*OwnedCommodity)(nil),      // 1: game.v1.OwnedCommodity
+	(*PlayerState)(nil),         // 2: game.v1.PlayerState
+	(*PlayerInventory)(nil),     // 3: game.v1.PlayerInventory
+	(*PlayerFinalStanding)(nil), // 4: game.v1.PlayerFinalStanding
+	(PowerUpType)(0),            // 5: game.v1.PowerUpType
+	(CommodityType)(0),          // 6: game.v1.CommodityType
 }
 var file_game_v1_player_proto_depIdxs = []int32{
-	4, // 0: game.v1.ActiveEffect.type:type_name -> game.v1.PowerUpType
-	5, // 1: game.v1.OwnedCommodity.type:type_name -> game.v1.CommodityType
+	5, // 0: game.v1.ActiveEffect.type:type_name -> game.v1.PowerUpType
+	6, // 1: game.v1.OwnedCommodity.type:type_name -> game.v1.CommodityType
 	1, // 2: game.v1.PlayerInventory.commodities:type_name -> game.v1.OwnedCommodity
 	0, // 3: game.v1.PlayerInventory.active_effects:type_name -> game.v1.ActiveEffect
 	4, // [4:4] is the sub-list for method output_type
@@ -323,7 +389,7 @@ func file_game_v1_player_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_player_proto_rawDesc), len(file_game_v1_player_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

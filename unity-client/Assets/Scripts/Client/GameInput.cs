@@ -41,6 +41,10 @@ namespace Game.Client
             var kb = Keyboard.current;
             if (kb == null) return;
 
+            // While the lobby panel is up the keyboard belongs to it: typing a join code
+            // must not walk the player around or fire trades.
+            if (!_state.Joined) return;
+
             var move = new Vector2(
                 Axis(kb.dKey, kb.rightArrowKey) - Axis(kb.aKey, kb.leftArrowKey),
                 Axis(kb.sKey, kb.downArrowKey) - Axis(kb.wKey, kb.upArrowKey));

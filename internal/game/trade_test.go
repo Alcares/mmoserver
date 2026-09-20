@@ -3,14 +3,14 @@ package game
 import (
 	"math/rand"
 	"testing"
-	"time"
 
 	pb "github.com/alcares/mmoserver/gen/go/game/v1"
 )
 
 // newTradeWorld returns a world with one player standing on the first station
 func newTradeWorld() (*World, *Player, *TradingStation) {
-	w := NewWorld(rand.New(rand.NewSource(time.Now().Unix())))
+	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1))})
+	w.phase = pb.GamePhase_GAME_PHASE_RUNNING
 	station := w.Stations[0]
 	player := NewPlayer(1, station.Pos)
 	w.players[player.ID] = player

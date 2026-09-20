@@ -8,7 +8,12 @@ import (
 )
 
 func main() {
-	world := game.NewWorld(rand.New(rand.NewSource(time.Now().Unix())))
+	world := game.NewWorld("sim", game.WorldConfig{
+		MinPlayers:     0,
+		StartCountdown: 0 * time.Second,
+		Duration:       5 * time.Minute,
+		Rng:            rand.New(rand.NewSource(time.Now().UnixNano())),
+	})
 	grid := game.NewSpatialGrid()
 
 	for {

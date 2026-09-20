@@ -25,6 +25,9 @@ namespace Game.Networking
         public event Action<TradeReceipt> OnTradeReceipt;
         public event Action<PowerUpSpawned> OnPowerUpSpawned;
         public event Action<PowerUpDespawned> OnPowerUpDespawned;
+        public event Action<GameStatus> OnGameStatus;
+        public event Action<JoinRejected> OnJoinRejected;
+        public event Action<GameOver> OnGameOver;
 
         private async void Start()
         {
@@ -73,7 +76,29 @@ namespace Game.Networking
                 case ServerMessage.MsgOneofCase.PowerUpDespawned:
                     OnPowerUpDespawned?.Invoke(message.PowerUpDespawned);
                     break;
+                case ServerMessage.MsgOneofCase.GameStatus:
+                    OnGameStatus?.Invoke(message.GameStatus);
+                    break;
+                case ServerMessage.MsgOneofCase.JoinRejected:
+                    OnJoinRejected?.Invoke(message.JoinRejected);
+                    break;
+                case ServerMessage.MsgOneofCase.GameOver:
+                    OnGameOver?.Invoke(message.GameOver);
+                    break;
             }
+        }
+
+        /// <summary>Asks the server for a new game; it answers with InitialGameState carrying the join code.</summary>
+        public void SendCreateGame()
+        {
+            Connection?.Send(new ClientMessage { CreateGame = new CreateGame() });
+        }
+
+        /// <summary>Joins an existing game by its code. The server trims and upper-cases it,
+        /// and answers with either InitialGameState or JoinRejected.</summary>
+        public void SendJoinGame(string code)
+        {
+            Connection?.Send(new ClientMessage { JoinGame = new JoinGame { Id = code } });
         }
 
         public void SendMovement(float vx, float vy)
