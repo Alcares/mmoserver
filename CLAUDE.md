@@ -1,16 +1,8 @@
 # Project conventions
 
-## Commands
-- See `Makefile`
-
 ## Stack
-- Go 1.26, gorilla/websocket, google.golang.org/protobuf
 - Protobuf schemas in `api/proto/game/`, Go output in `gen/go/`
 - Browser client in `web/`, plain JS, loads the `.proto` at runtime with protobufjs (no JS codegen)
-- Unity client in `unity-client/` (Unity 6000.6.2f1, URP 2D template, new Input System only, Steam desktop target), C# proto output generated
-  via `protoc --csharp_out`. Game code in `Assets/Scr2ipts/{Networking,Client}`; server y is down, Unity world is `(x, -y)`.
-  Player art is `Assets/Art/Player/{idle,walk}.png` (rows = 8 directions, columns = frames), see `DirectionalAnimationSet`.
-  Commodity icons are `Assets/Art/Commodities/<name>.png`, mapped by the `CommodityIcons` asset; Game > Commodity Art > Create Missing Icons never overwrites real art.
 
 ## Rules
 - Never edit `gen/` or `unity-client/Assets/Scripts/Generated/` by hand; edit `api/proto/` and run `make proto`

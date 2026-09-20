@@ -1,0 +1,91 @@
+package game
+
+import (
+	"errors"
+	"math/rand"
+	"time"
+)
+
+const (
+	MoveSpeed        = 12.0 // World units per second
+	DefaultFOVRadius = 25.0 // Float-based vision circle
+	WorldMinX        = 0.0
+	WorldMaxX        = 500.0
+	WorldMinY        = 0.0
+	WorldMaxY        = 500.0
+	TickDuration     = 0.05 // 50ms = 20Hz
+	TradeRange       = 5.0  // Max distance to a station a player can trade from
+	MaxPlayers       = 50
+)
+
+// Bounds every WorldConfig is clamped to, so client-supplied settings can't create
+// a round that never ends or a lobby that holds a game slot forever
+const (
+	MinRoundDuration  = 1 * time.Minute
+	MaxRoundDuration  = 30 * time.Minute
+	MaxStartCountdown = 1 * time.Minute
+	DefaultLobbyTTL   = 10 * time.Minute
+)
+
+var (
+	ErrGameInProgress = errors.New("game already in progress")
+	ErrGameFull       = errors.New("game is full")
+)
+
+// SpawnPos is where every player joins: the centre of the map
+var SpawnPos = Vec2f{X: (WorldMinX + WorldMaxX) / 2, Y: (WorldMinY + WorldMaxY) / 2}
+
+// WorldConfig holds one game's settings
+type WorldConfig struct {
+	Duration       time.Duration // How long a round lasts once it starts
+	StartCountdown time.Duration // Delay between reaching MinPlayers and the round starting
+	LobbyTTL       time.Duration // How long a game waits for MinPlayers before giving up
+	MinPlayers     int           // Players needed to start the countdown; 0 starts immediately
+	// Rng seeds the station layout. Master mints one per game and overwrites whatever is
+	// passed, so only direct NewWorld callers (tests, the sim) set it.
+	Rng *rand.Rand
+}
+
+// sanitize forces cfg into the supported range, filling in defaults for unset fields.
+// Every world goes through it, so no caller can skip the clamps.
+func (cfg *WorldConfig) sanitize() {
+	cfg.Duration = clampDuration(cfg.Duration, MinRoundDuration, MaxRoundDuration)
+	cfg.StartCountdown = clampDuration(cfg.StartCountdown, 0, MaxStartCountdown)
+
+	if cfg.LobbyTTL <= 0 {
+		cfg.LobbyTTL = DefaultLobbyTTL
+	}
+	if cfg.MinPlayers < 0 {
+		cfg.MinPlayers = 0
+	}
+	if cfg.MinPlayers > MaxPlayers {
+		cfg.MinPlayers = MaxPlayers
+	}
+	if cfg.Rng == nil {
+		cfg.Rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+	}
+}
+
+func clampFloat(val, min, max float64) float64 {
+	if val < min {
+		return min
+	}
+	if val > max {
+		return max
+	}
+	return val
+}
+
+func ticks(d time.Duration) uint64 {
+	return uint64(d.Seconds() / TickDuration)
+}
+
+func clampDuration(val, min, max time.Duration) time.Duration {
+	if val < min {
+		return min
+	}
+	if val > max {
+		return max
+	}
+	return val
+}
