@@ -1,10 +1,10 @@
 MODULE := github.com/alcares/mmoserver/backend
 BACKEND := backend
 PROTO_DIR := $(BACKEND)/api/proto
-CSHARP_OUT := unity-client/Assets/Scripts/Generated
+CSHARP_OUT := unity/Assets/Scripts/Generated
 UNITY_VERSION := 6000.6.2f1
 UNITY := $(HOME)/Unity/Hub/Editor/$(UNITY_VERSION)/Editor/Unity
-UNITY_PROJECT := $(CURDIR)/unity-client
+UNITY_PROJECT := $(CURDIR)/unity
 SERVER_BIN := $(BACKEND)/bin/server
 SERVER_PID := $(BACKEND)/server.pid
 SERVER_LOG := $(BACKEND)/server.log
@@ -46,7 +46,7 @@ test:
 hooks:
 	git config core.hooksPath .githooks
 
-# Unity client builds land in unity-client/Builds/; the Editor must be closed.
+# Unity client builds land in unity/Builds/; the Editor must be closed.
 # client builds Linux and macOS in one Unity run, so the project loads only once.
 client:
 	$(UNITY_BATCH) Game.EditorTools.ClientBuilder.BuildAll
@@ -65,4 +65,4 @@ all:
 
 run:
 	$(MAKE) server-start
-	~/Projects/MMOServer/unity-client/Builds/Linux/MMOClient.x86_64
+	$(UNITY_PROJECT)/Builds/Linux/MMOClient.x86_64
