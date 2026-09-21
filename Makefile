@@ -6,8 +6,8 @@ UNITY_VERSION := 6000.6.2f1
 UNITY := $(HOME)/Unity/Hub/Editor/$(UNITY_VERSION)/Editor/Unity
 UNITY_PROJECT := $(CURDIR)/unity-client
 SERVER_BIN := $(BACKEND)/bin/server
-SERVER_PID := server.pid
-SERVER_LOG := server.log
+SERVER_PID := $(BACKEND)/server.pid
+SERVER_LOG := $(BACKEND)/server.log
 UNITY_BATCH = LD_LIBRARY_PATH=$(HOME)/.local/lib/unity-compat:$$LD_LIBRARY_PATH $(UNITY) \
 	-batchmode -quit -projectPath $(UNITY_PROJECT) -logFile - -executeMethod
 
