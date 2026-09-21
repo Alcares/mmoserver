@@ -1,0 +1,6 @@
+.git/
+unity/
+backend/bin/
+backend/events.jsonl
+backend/server.log
+backend/server.pid
