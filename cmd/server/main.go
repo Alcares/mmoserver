@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/alcares/mmoserver/internal/game"
@@ -37,6 +39,12 @@ func handleWS(master *game.Master, defaults game.WorldConfig, w http.ResponseWri
 }
 
 func main() {
+	// One JSON object per line, appended across runs: the durable record of every order
+	tradeLog, err := os.OpenFile("trades.jsonl", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		log.Fatalf("Trade log: %v", err)
+	}
+
 	// Defaults for every game created on this server; a client's CreateGame may
 	// override them, within the bounds WorldConfig.sanitize enforces.
 	defaults := game.WorldConfig{
@@ -44,6 +52,7 @@ func main() {
 		StartCountdown: 10 * time.Second,
 		Duration:       5 * time.Minute,
 		LobbyTTL:       game.DefaultLobbyTTL,
+		Logger:         slog.New(slog.NewJSONHandler(tradeLog, nil)),
 	}
 
 	gameMaster := game.NewMaster(rand.New(rand.NewSource(time.Now().UnixNano())))

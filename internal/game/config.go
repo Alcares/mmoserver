@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"log/slog"
 	"math/rand"
 	"time"
 )
@@ -44,6 +45,9 @@ type WorldConfig struct {
 	// Rng seeds the station layout. Master mints one per game and overwrites whatever is
 	// passed, so only direct NewWorld callers (tests, the sim) set it.
 	Rng *rand.Rand
+	// Logger receives game events. sanitize defaults it to a discarding logger, so the
+	// training sim and the tests stay silent without every call site checking.
+	Logger *slog.Logger
 }
 
 // sanitize forces cfg into the supported range, filling in defaults for unset fields.
@@ -55,6 +59,7 @@ func (cfg *WorldConfig) sanitize() {
 	if cfg.LobbyTTL <= 0 {
 		cfg.LobbyTTL = DefaultLobbyTTL
 	}
+
 	if cfg.MinPlayers < 0 {
 		cfg.MinPlayers = 0
 	}
@@ -63,6 +68,9 @@ func (cfg *WorldConfig) sanitize() {
 	}
 	if cfg.Rng == nil {
 		cfg.Rng = rand.New(rand.NewSource(time.Now().UnixNano()))
+	}
+	if cfg.Logger == nil {
+		cfg.Logger = slog.New(slog.DiscardHandler)
 	}
 }
 

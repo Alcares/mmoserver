@@ -1,6 +1,8 @@
 package game
 
 import (
+	"context"
+	"log/slog"
 	"sync"
 	"time"
 
@@ -9,8 +11,7 @@ import (
 
 // World represents the central authoritative game state
 type World struct {
-	Mu sync.RWMutex
-
+	Mu     sync.RWMutex
 	gameID string
 
 	// Game state
@@ -37,6 +38,7 @@ type World struct {
 
 func NewWorld(gameID string, cfg WorldConfig) *World {
 	cfg.sanitize()
+	cfg.Logger = cfg.Logger.With("game", gameID)
 
 	return &World{
 		gameID:        gameID,
@@ -77,4 +79,38 @@ func (w *World) Run() {
 			return
 		}
 	}
+}
+
+// logTrade records one order's outcome, filled or rejected. The pool's reserves are part of
+// the record so the price of any order size at that moment can be recomputed offline; pool is
+// nil when the order was rejected before a station was found.
+func (w *World) logTrade(player *Player, o TradeOrder, receipt *pb.TradeReceipt, pool *CommodityState) {
+	// The sim and the tests discard, so skip building the record for them
+	if !w.config.Logger.Enabled(context.Background(), slog.LevelInfo) {
+		return
+	}
+
+	attrs := []slog.Attr{
+		slog.Uint64("tick", w.tick),
+		slog.Uint64("player", uint64(player.ID)),
+		slog.String("intent", o.Intent.String()),
+		slog.String("commodity", receipt.Commodity.String()),
+		slog.Uint64("units", o.Units),
+		slog.Bool("filled", receipt.Success),
+		slog.Uint64("price_cents", receipt.PriceCents),
+		slog.Uint64("total_cents", receipt.TotalBalanceChange),
+		slog.Uint64("balance_cents", receipt.NewCashBalanceCents),
+		slog.Uint64("holding_units", receipt.NewHoldingUnits),
+	}
+	if !receipt.Success {
+		attrs = append(attrs, slog.String("rejection", receipt.Rejection.String()))
+	}
+	if pool != nil {
+		attrs = append(attrs,
+			slog.Uint64("pool_cash_cents", pool.cashReserve),
+			slog.Uint64("pool_units", pool.unitReserve),
+		)
+	}
+
+	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "trade", attrs...)
 }

@@ -6,3 +6,4 @@
 /bin/
 /server.pid
 /server.log
+/trades.jsonl

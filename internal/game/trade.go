@@ -34,10 +34,13 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 		SequenceId: o.SequenceID,
 		Intent:     o.Intent,
 	}
+	// set once the station is known, so a rejection before that still logs, without pool state
+	var pool *CommodityState
 	reject := func(reason pb.TradeRejection) *pb.TradeReceipt {
 		receipt.Rejection = reason
 		receipt.NewCashBalanceCents = player.balance
 		receipt.NewHoldingUnits = player.commodities[receipt.Commodity]
+		w.logTrade(player, o, receipt, pool)
 		return receipt
 	}
 
@@ -50,7 +53,7 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 		return reject(pb.TradeRejection_TRADE_REJECTION_NOT_AT_STATION)
 	}
 	receipt.Commodity = station.Commodity
-	pool := w.Commodities[station.Commodity]
+	pool = w.Commodities[station.Commodity]
 
 	if o.Units == 0 {
 		return reject(pb.TradeRejection_TRADE_REJECTION_INVALID_ORDER)
@@ -100,5 +103,6 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 	receipt.TotalBalanceChange = total
 	receipt.NewCashBalanceCents = player.balance
 	receipt.NewHoldingUnits = player.commodities[station.Commodity]
+	w.logTrade(player, o, receipt, pool)
 	return receipt
 }
