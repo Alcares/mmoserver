@@ -69,9 +69,11 @@ func (w *World) finish() {
 	standings := make([]*pb.PlayerFinalStanding, 0, len(w.players))
 	for _, player := range w.players {
 		standings = append(standings, &pb.PlayerFinalStanding{
-			Id:       player.ID,
-			Name:     player.Name,
-			NetWorth: w.netWorth(player),
+			Id:               player.ID,
+			Name:             player.Name,
+			NetWorth:         w.netWorth(player),
+			TradeVolumeCents: player.tradeVolume,
+			UnitsTraded:      player.unitsTraded,
 		})
 	}
 	sort.Slice(standings, func(i, j int) bool {

@@ -38,4 +38,6 @@ message PlayerFinalStanding {
   uint32 id = 1;
   string name = 2;
   uint64 net_worth = 3;
+  uint64 trade_volume_cents = 4;
+  uint64 units_traded = 5;
 }

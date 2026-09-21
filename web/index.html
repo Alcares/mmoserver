@@ -81,10 +81,15 @@
       padding: 8px;
     }
     #lobbyError { color: #f87171; font-size: 13px; margin-top: 12px; min-height: 16px; }
+    #results { min-width: 430px; }
     #standings { list-style: none; text-align: left; }
-    #standings li { display: flex; justify-content: space-between; gap: 24px; padding: 3px 0; font-size: 14px; }
+    /* Name column takes what the three numeric columns leave; both the header and the rows use it */
+    .standings-row { display: grid; grid-template-columns: minmax(110px, 1fr) 96px 96px 52px; gap: 16px; padding: 3px 0; font-size: 14px; }
+    .standings-row span + span { text-align: right; }
+    #standingsHead { color: #a1a1aa; font-size: 12px; border-bottom: 1px solid #334155; padding-bottom: 6px; margin-bottom: 4px; }
     #standings li:first-child { color: #d9c48a; }
     #standings .worth { color: #86efac; }
+    #standings .volume, #standings .units { color: #a1a1aa; }
     #banner {
       position: absolute;
       top: 46px;
@@ -121,6 +126,9 @@
 
 <div id="results" class="overlay" hidden>
   <h1>GAME OVER</h1>
+  <div id="standingsHead" class="standings-row">
+    <span>PLAYER</span><span>NET WORTH</span><span>VOLUME</span><span>UNITS</span>
+  </div>
   <ol id="standings"></ol>
 </div>
 
@@ -278,12 +286,19 @@
     standingsList.innerHTML = "";
     for (const s of standings || []) {
       const li = document.createElement("li");
+      li.className = "standings-row";
       const name = document.createElement("span");
       name.innerText = s.name;
       const worth = document.createElement("span");
       worth.className = "worth";
       worth.innerText = money(s.netWorth);
-      li.append(name, worth);
+      const volume = document.createElement("span");
+      volume.className = "volume";
+      volume.innerText = money(s.tradeVolumeCents);
+      const units = document.createElement("span");
+      units.className = "units";
+      units.innerText = s.unitsTraded;
+      li.append(name, worth, volume, units);
       standingsList.appendChild(li);
     }
     resultsDiv.hidden = false;

@@ -288,6 +288,9 @@ namespace Game.V1 {
 
   }
 
+  /// <summary>
+  /// TODO: add create game config params
+  /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class CreateGame : pb::IMessage<CreateGame>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE

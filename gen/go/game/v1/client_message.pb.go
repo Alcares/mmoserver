@@ -74,6 +74,7 @@ func (x *MovementCommand) GetVy() float32 {
 	return 0
 }
 
+// TODO: add create game config params
 type CreateGame struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields

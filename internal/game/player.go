@@ -19,6 +19,8 @@ type Player struct {
 	// private
 	balance     uint64
 	commodities map[pb.CommodityType]uint64 // whole units
+	tradeVolume uint64
+	unitsTraded uint64
 }
 
 func NewPlayer(id uint32, pos Vec2f) *Player {

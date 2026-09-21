@@ -259,12 +259,14 @@ func (x *PlayerInventory) GetActiveEffects() []*ActiveEffect {
 
 // Server -> Client: Sent with GameOver message
 type PlayerFinalStanding struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	NetWorth      uint64                 `protobuf:"varint,3,opt,name=net_worth,json=netWorth,proto3" json:"net_worth,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name             string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	NetWorth         uint64                 `protobuf:"varint,3,opt,name=net_worth,json=netWorth,proto3" json:"net_worth,omitempty"`
+	TradeVolumeCents uint64                 `protobuf:"varint,4,opt,name=trade_volume_cents,json=tradeVolumeCents,proto3" json:"trade_volume_cents,omitempty"`
+	UnitsTraded      uint64                 `protobuf:"varint,5,opt,name=units_traded,json=unitsTraded,proto3" json:"units_traded,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *PlayerFinalStanding) Reset() {
@@ -318,6 +320,20 @@ func (x *PlayerFinalStanding) GetNetWorth() uint64 {
 	return 0
 }
 
+func (x *PlayerFinalStanding) GetTradeVolumeCents() uint64 {
+	if x != nil {
+		return x.TradeVolumeCents
+	}
+	return 0
+}
+
+func (x *PlayerFinalStanding) GetUnitsTraded() uint64 {
+	if x != nil {
+		return x.UnitsTraded
+	}
+	return 0
+}
+
 var File_game_v1_player_proto protoreflect.FileDescriptor
 
 const file_game_v1_player_proto_rawDesc = "" +
@@ -337,11 +353,13 @@ const file_game_v1_player_proto_rawDesc = "" +
 	"\x0fPlayerInventory\x12\x18\n" +
 	"\abalance\x18\x01 \x01(\x04R\abalance\x129\n" +
 	"\vcommodities\x18\x02 \x03(\v2\x17.game.v1.OwnedCommodityR\vcommodities\x12<\n" +
-	"\x0eactive_effects\x18\x03 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffects\"V\n" +
+	"\x0eactive_effects\x18\x03 \x03(\v2\x15.game.v1.ActiveEffectR\ractiveEffects\"\xa7\x01\n" +
 	"\x13PlayerFinalStanding\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
-	"\tnet_worth\x18\x03 \x01(\x04R\bnetWorthB>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
+	"\tnet_worth\x18\x03 \x01(\x04R\bnetWorth\x12,\n" +
+	"\x12trade_volume_cents\x18\x04 \x01(\x04R\x10tradeVolumeCents\x12!\n" +
+	"\funits_traded\x18\x05 \x01(\x04R\vunitsTradedB>Z2github.com/alcares/mmoserver/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
 	file_game_v1_player_proto_rawDescOnce sync.Once

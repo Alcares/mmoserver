@@ -32,10 +32,12 @@ namespace Game.V1 {
             "aWQYASABKA0SDAoEbmFtZRgCIAEoCRIJCgF4GAMgASgCEgkKAXkYBCABKAIi",
             "fwoPUGxheWVySW52ZW50b3J5Eg8KB2JhbGFuY2UYASABKAQSLAoLY29tbW9k",
             "aXRpZXMYAiADKAsyFy5nYW1lLnYxLk93bmVkQ29tbW9kaXR5Ei0KDmFjdGl2",
-            "ZV9lZmZlY3RzGAMgAygLMhUuZ2FtZS52MS5BY3RpdmVFZmZlY3QiQgoTUGxh",
+            "ZV9lZmZlY3RzGAMgAygLMhUuZ2FtZS52MS5BY3RpdmVFZmZlY3QidAoTUGxh",
             "eWVyRmluYWxTdGFuZGluZxIKCgJpZBgBIAEoDRIMCgRuYW1lGAIgASgJEhEK",
-            "CW5ldF93b3J0aBgDIAEoBEI+WjJnaXRodWIuY29tL2FsY2FyZXMvbW1vc2Vy",
-            "dmVyL2dlbi9nby9nYW1lL3YxO2dhbWV2MaoCB0dhbWUuVjFiBnByb3RvMw=="));
+            "CW5ldF93b3J0aBgDIAEoBBIaChJ0cmFkZV92b2x1bWVfY2VudHMYBCABKAQS",
+            "FAoMdW5pdHNfdHJhZGVkGAUgASgEQj5aMmdpdGh1Yi5jb20vYWxjYXJlcy9t",
+            "bW9zZXJ2ZXIvZ2VuL2dvL2dhbWUvdjE7Z2FtZXYxqgIHR2FtZS5WMWIGcHJv",
+            "dG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -43,7 +45,7 @@ namespace Game.V1 {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.OwnedCommodity), global::Game.V1.OwnedCommodity.Parser, new[]{ "Type", "Amount" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PlayerState), global::Game.V1.PlayerState.Parser, new[]{ "Id", "Name", "X", "Y" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PlayerInventory), global::Game.V1.PlayerInventory.Parser, new[]{ "Balance", "Commodities", "ActiveEffects" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PlayerFinalStanding), global::Game.V1.PlayerFinalStanding.Parser, new[]{ "Id", "Name", "NetWorth" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PlayerFinalStanding), global::Game.V1.PlayerFinalStanding.Parser, new[]{ "Id", "Name", "NetWorth", "TradeVolumeCents", "UnitsTraded" }, null, null, null, null)
           }));
     }
     #endregion
@@ -1138,6 +1140,8 @@ namespace Game.V1 {
       id_ = other.id_;
       name_ = other.name_;
       netWorth_ = other.netWorth_;
+      tradeVolumeCents_ = other.tradeVolumeCents_;
+      unitsTraded_ = other.unitsTraded_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1183,6 +1187,30 @@ namespace Game.V1 {
       }
     }
 
+    /// <summary>Field number for the "trade_volume_cents" field.</summary>
+    public const int TradeVolumeCentsFieldNumber = 4;
+    private ulong tradeVolumeCents_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong TradeVolumeCents {
+      get { return tradeVolumeCents_; }
+      set {
+        tradeVolumeCents_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "units_traded" field.</summary>
+    public const int UnitsTradedFieldNumber = 5;
+    private ulong unitsTraded_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong UnitsTraded {
+      get { return unitsTraded_; }
+      set {
+        unitsTraded_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -1201,6 +1229,8 @@ namespace Game.V1 {
       if (Id != other.Id) return false;
       if (Name != other.Name) return false;
       if (NetWorth != other.NetWorth) return false;
+      if (TradeVolumeCents != other.TradeVolumeCents) return false;
+      if (UnitsTraded != other.UnitsTraded) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1211,6 +1241,8 @@ namespace Game.V1 {
       if (Id != 0) hash ^= Id.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       if (NetWorth != 0UL) hash ^= NetWorth.GetHashCode();
+      if (TradeVolumeCents != 0UL) hash ^= TradeVolumeCents.GetHashCode();
+      if (UnitsTraded != 0UL) hash ^= UnitsTraded.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1241,6 +1273,14 @@ namespace Game.V1 {
         output.WriteRawTag(24);
         output.WriteUInt64(NetWorth);
       }
+      if (TradeVolumeCents != 0UL) {
+        output.WriteRawTag(32);
+        output.WriteUInt64(TradeVolumeCents);
+      }
+      if (UnitsTraded != 0UL) {
+        output.WriteRawTag(40);
+        output.WriteUInt64(UnitsTraded);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1263,6 +1303,14 @@ namespace Game.V1 {
         output.WriteRawTag(24);
         output.WriteUInt64(NetWorth);
       }
+      if (TradeVolumeCents != 0UL) {
+        output.WriteRawTag(32);
+        output.WriteUInt64(TradeVolumeCents);
+      }
+      if (UnitsTraded != 0UL) {
+        output.WriteRawTag(40);
+        output.WriteUInt64(UnitsTraded);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1281,6 +1329,12 @@ namespace Game.V1 {
       }
       if (NetWorth != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(NetWorth);
+      }
+      if (TradeVolumeCents != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(TradeVolumeCents);
+      }
+      if (UnitsTraded != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(UnitsTraded);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1302,6 +1356,12 @@ namespace Game.V1 {
       }
       if (other.NetWorth != 0UL) {
         NetWorth = other.NetWorth;
+      }
+      if (other.TradeVolumeCents != 0UL) {
+        TradeVolumeCents = other.TradeVolumeCents;
+      }
+      if (other.UnitsTraded != 0UL) {
+        UnitsTraded = other.UnitsTraded;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1334,6 +1394,14 @@ namespace Game.V1 {
             NetWorth = input.ReadUInt64();
             break;
           }
+          case 32: {
+            TradeVolumeCents = input.ReadUInt64();
+            break;
+          }
+          case 40: {
+            UnitsTraded = input.ReadUInt64();
+            break;
+          }
         }
       }
     #endif
@@ -1363,6 +1431,14 @@ namespace Game.V1 {
           }
           case 24: {
             NetWorth = input.ReadUInt64();
+            break;
+          }
+          case 32: {
+            TradeVolumeCents = input.ReadUInt64();
+            break;
+          }
+          case 40: {
+            UnitsTraded = input.ReadUInt64();
             break;
           }
         }

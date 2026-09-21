@@ -15,6 +15,11 @@ namespace Game.Client
         private const float LobbyRowHeight = 30f;
         private const int CodeLength = 6;
 
+        // The standings table is wider than the lobby panel: it carries three numeric columns.
+        private const float StandingsWidth = 440f;
+        private const float MoneyColumn = 104f;
+        private const float UnitsColumn = 56f;
+
         private string _codeInput = "";
         private GUIStyle _title, _lobbyText, _codeField, _button;
 
@@ -120,14 +125,14 @@ namespace Game.Client
             }
         }
 
-        // Final standings, highest net worth first.
+        // Final standings, highest net worth first, with how much each player traded to get there.
         private void DrawStandings(float screenW, float screenH)
         {
             if (_title == null) CreateLobbyStyles();
 
             var standings = _state.Standings.Standings;
-            float height = 60f + standings.Count * 26f;
-            var rect = new Rect((screenW - LobbyWidth) / 2f, (screenH - height) / 2f, LobbyWidth, height);
+            float height = 80f + standings.Count * 26f;
+            var rect = new Rect((screenW - StandingsWidth) / 2f, (screenH - height) / 2f, StandingsWidth, height);
 
             GUI.color = Color.white;
             GUI.DrawTexture(rect, _slotBorder);
@@ -139,16 +144,38 @@ namespace Game.Client
             _title.normal.textColor = LabelGold;
             GUI.Label(new Rect(x, rect.y + 14f, width, LobbyRowHeight), "GAME OVER", _title);
 
+            DrawStandingsRow(new Rect(x, rect.y + 50f, width, 20f), "PLAYER", "NET WORTH", "VOLUME", "UNITS", Dim, Dim);
+
             for (int i = 0; i < standings.Count; i++)
             {
-                var row = new Rect(x, rect.y + 52f + i * 26f, width, 24f);
+                var s = standings[i];
+                var row = new Rect(x, rect.y + 72f + i * 26f, width, 24f);
                 var place = (i + 1).ToString(CultureInfo.InvariantCulture) + ".";
 
-                _slotText.alignment = TextAnchor.MiddleLeft;
-                DrawOutlined(row, $"{place} {standings[i].Name}", i == 0 ? LabelGold : Color.white);
-                _slotText.alignment = TextAnchor.MiddleRight;
-                DrawOutlined(row, GameState.MoneyCents(standings[i].NetWorth), MoneyGreen);
+                DrawStandingsRow(row,
+                    $"{place} {s.Name}",
+                    GameState.MoneyCents(s.NetWorth),
+                    GameState.MoneyCents(s.TradeVolumeCents),
+                    s.UnitsTraded.ToString(CultureInfo.InvariantCulture),
+                    i == 0 ? LabelGold : Color.white,
+                    MoneyGreen);
             }
+        }
+
+        // One standings line: the name fills what the three right-aligned numeric columns leave.
+        private void DrawStandingsRow(Rect row, string name, string worth, string volume, string units, Color nameColor, Color worthColor)
+        {
+            var unitsRect = new Rect(row.xMax - UnitsColumn, row.y, UnitsColumn, row.height);
+            var volumeRect = new Rect(unitsRect.x - MoneyColumn, row.y, MoneyColumn, row.height);
+            var worthRect = new Rect(volumeRect.x - MoneyColumn, row.y, MoneyColumn, row.height);
+
+            _slotText.alignment = TextAnchor.MiddleLeft;
+            DrawOutlined(new Rect(row.x, row.y, worthRect.x - row.x, row.height), name, nameColor);
+
+            _slotText.alignment = TextAnchor.MiddleRight;
+            DrawOutlined(worthRect, worth, worthColor);
+            DrawOutlined(volumeRect, volume, Dim);
+            DrawOutlined(unitsRect, units, Dim);
         }
 
         private static string Seconds(float? left) =>

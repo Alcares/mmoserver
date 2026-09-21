@@ -1,6 +1,8 @@
 package game
 
-import pb "github.com/alcares/mmoserver/gen/go/game/v1"
+import (
+	pb "github.com/alcares/mmoserver/gen/go/game/v1"
+)
 
 // TradeOrder created out of proto TradeRequest
 type TradeOrder struct {
@@ -69,7 +71,9 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 		}
 		total = pool.buy(o.Units)
 		player.balance -= total
+		player.tradeVolume += total
 		player.commodities[station.Commodity] += o.Units
+		player.unitsTraded += o.Units
 	case pb.OrderIntent_INTENT_SELL:
 		if player.commodities[station.Commodity] < o.Units {
 			return reject(pb.TradeRejection_TRADE_REJECTION_INSUFFICIENT_UNITS)
@@ -82,8 +86,10 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 			return reject(pb.TradeRejection_TRADE_REJECTION_PRICE_MOVED)
 		}
 		total = pool.sell(o.Units)
-		player.commodities[station.Commodity] -= o.Units
 		player.balance += total
+		player.tradeVolume += total
+		player.commodities[station.Commodity] -= o.Units
+		player.unitsTraded += o.Units
 	default:
 		return reject(pb.TradeRejection_TRADE_REJECTION_INVALID_ORDER)
 	}

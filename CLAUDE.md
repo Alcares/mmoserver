@@ -1,5 +1,8 @@
 # Project conventions
 
+## Commands
+@Makefile
+
 ## Stack
 - Protobuf schemas in `api/proto/game/`, Go output in `gen/go/`
 - Browser client in `web/`, plain JS, loads the `.proto` at runtime with protobufjs (no JS codegen)
