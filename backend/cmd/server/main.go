@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	game "github.com/alcares/mmoserver/backend/internal/game"
+	"github.com/alcares/mmoserver/backend/internal/game"
 	"github.com/gorilla/websocket"
 )
 

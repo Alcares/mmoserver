@@ -3,18 +3,21 @@
 ## Commands
 @Makefile
 
-## Stack
-- Protobuf schemas in `backend/api`, Go output in `backend/gen`
-- Browser client in `web/`, plain JS, loads the `.proto` at runtime with protobufjs (no JS codegen)
+## Layout
+- `backend/` — Go server and the protobuf schemas.
+- `unity-client/` — Unity 6 desktop client.
+- `web/` — browser client, plain JS, loads the `.proto` at runtime with protobufjs (no JS codegen)
+- `docs/` — past and future design decision
 
-## Rules
-- Never edit `backend/gen` or `unity-client/Assets/Scripts/Generated/` by hand; edit `backend/api` and run `make proto`
+## Wire protocol
+Rules both the server and every client have to hold up:
+
+- Never edit `backend/gen/` or `unity-client/Assets/Scripts/Generated/` by hand; edit `backend/api/proto/` and run `make proto`
 - One `oneof` envelope per direction (`ClientMessage`, `ServerMessage`); add new messages as oneof members
-- Only `World.Run` mutates game state; `ReadPump`s only push onto queues, `WritePump`s only drain `Client.Send`
-- All sends are non-blocking; drop the message when a buffer is full
-- Each tick sends every client a `WorldSnapshot` with only the players inside its FOV radius, found through `SpatialGrid`
 - A client's own player must stay first in its `WorldSnapshot.players`; the Unity client identifies itself that way
-- After editing the `unity-client` code, it may be necessary to recompile the client. Do that using the Unity MCP server.
-- Cash is whole cents everywhere (clients only format it as dollars); commodity quantities are whole units everywhere, never fractional. AMM rounding must always favour the pool (buys round up, sells round down, `k` never shrinks); see `docs/PRICING.md`
-- Trading: `TradeRequest` is `INTENT_BUY`/`INTENT_SELL` of whole `units` plus the per-unit `price_cents` the client saw; the whole order fills at one per-unit price (`buyPrice(n)`/`sellPrice(n)`, which depend on order size) or is rejected with a `TradeReceipt` reason. Pool depth per commodity is `poolUnits` in `commodity.go`
-- Each tick's `MarketState` quotes every size in `OrderSizes` (1, 2, 5, 10) as `PriceQuote.orders`; clients take their multipliers from those quotes, never hard-code them
+- Trading: `TradeRequest` is `INTENT_BUY`/`INTENT_SELL` of whole `units` plus the per-unit `price_cents` the client saw; the whole order fills at one per-unit price or is rejected with a `TradeReceipt` reason
+
+## Domain
+- Cash is whole cents everywhere; only clients format it as dollars
+- Commodity quantities are whole units everywhere, never fractional
+- AMM rounding must always favour the pool (buys round up, sells round down, `k` never shrinks); see `docs/PRICING.md`
