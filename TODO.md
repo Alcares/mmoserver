@@ -1,5 +1,6 @@
 # Backend
 ### Make the server able to host multiple games. Users can create a game or join a game with a generated join code.
+- Logg players joining and leaving - logging trades is the reference
 
 
 # UI
@@ -12,4 +13,4 @@
 
 
 # Code Quality
-Break up world.go 
+Break up world.go

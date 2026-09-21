@@ -40,7 +40,7 @@ func handleWS(master *game.Master, defaults game.WorldConfig, w http.ResponseWri
 
 func main() {
 	// One JSON object per line, appended across runs: the durable record of every order
-	tradeLog, err := os.OpenFile("trades.jsonl", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	tradeLog, err := os.OpenFile("events.jsonl", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		log.Fatalf("Trade log: %v", err)
 	}
