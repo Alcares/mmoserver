@@ -60,7 +60,7 @@ namespace Game.Client
         private void OnReceipt(TradeReceipt r)
         {
             _receiptOk = r.Success;
-            _receiptUntil = Time.time + ReceiptSeconds;
+            _receiptUntil = Time.realtimeSinceStartup + ReceiptSeconds;
             _receiptText = r.Success
                 ? $"{(r.Intent == OrderIntent.IntentBuy ? "Bought" : "Sold")} {r.UnitsTransacted} {GameState.Label(r.Commodity)} @ {GameState.MoneyCents(r.PriceCents)} = {GameState.MoneyCents(r.TotalBalanceChange)}"
                 : RejectionText(r.Rejection);
@@ -122,7 +122,7 @@ namespace Game.Client
         // The last trade's result, centered above the order-size row, until it expires.
         private void DrawReceipt(float screenW, float screenH)
         {
-            if (_receiptText == null || Time.time > _receiptUntil) return;
+            if (_receiptText == null || Time.realtimeSinceStartup > _receiptUntil) return;
 
             float y = screenH - SlotSize - BottomMargin - MultiplierHeight - 10f - 26f;
             _slotText.alignment = TextAnchor.MiddleCenter;

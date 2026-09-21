@@ -4,6 +4,4 @@
 .env
 # Server build and background run files
 /bin/
-/server.pid
-/server.log
 /*.jsonl

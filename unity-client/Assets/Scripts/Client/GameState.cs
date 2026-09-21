@@ -47,11 +47,14 @@ namespace Game.Client
         public JoinRejection? LastRejection { get; private set; }
 
         // Counted down locally from the remaining_ms the server sent with the last phase change,
-        // so the label ticks smoothly instead of once per status message.
+        // so the label ticks smoothly instead of once per status message. Anchored to
+        // realtimeSinceStartup, not Time.time: Time.time only advances by deltaTime, which Unity
+        // clamps to maximumDeltaTime, so it falls permanently behind whenever frames are slow or
+        // the window is unfocused, and the server only resends the status on a phase change.
         private float? _phaseEndsAt;
 
         /// <summary>Seconds left in the current phase, null when the phase is open-ended.</summary>
-        public float? SecondsLeft => _phaseEndsAt.HasValue ? Mathf.Max(0f, _phaseEndsAt.Value - Time.time) : (float?)null;
+        public float? SecondsLeft => _phaseEndsAt.HasValue ? Mathf.Max(0f, _phaseEndsAt.Value - Time.realtimeSinceStartup) : (float?)null;
 
         public event Action PricesChanged;
         /// <summary>Raised when the phase, the player count or the join result changes.</summary>
@@ -130,7 +133,7 @@ namespace Game.Client
             Phase = s.Phase;
             PlayerCount = s.PlayerCount;
             MinPlayers = s.MinPlayers;
-            _phaseEndsAt = s.RemainingMs > 0 ? Time.time + s.RemainingMs / 1000f : (float?)null;
+            _phaseEndsAt = s.RemainingMs > 0 ? Time.realtimeSinceStartup + s.RemainingMs / 1000f : (float?)null;
             SessionChanged?.Invoke();
         }
 
