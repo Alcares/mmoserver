@@ -13,7 +13,7 @@ namespace Game.Client
     [RequireComponent(typeof(GameClient), typeof(GameInput), typeof(GameState))]
     public class WorldView : MonoBehaviour
     {
-        // Mirrors internal/game/world.go WorldMaxX/WorldMaxY.
+        // Mirrors backend/internal/game/world.go WorldMaxX/WorldMaxY.
         private const float WorldSize = 500f;
         private const float CrewmateSize = 1.3f;
         private const float StationRadius = 0.9f;

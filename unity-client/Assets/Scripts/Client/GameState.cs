@@ -15,7 +15,7 @@ namespace Game.Client
     [RequireComponent(typeof(GameClient))]
     public class GameState : MonoBehaviour
     {
-        /// <summary>Mirrors internal/game/world.go TradeRange; the server is authoritative.</summary>
+        /// <summary>Mirrors backend/internal/game/world.go TradeRange; the server is authoritative.</summary>
         public const float TradeRange = 5f;
 
         private GameClient _client;

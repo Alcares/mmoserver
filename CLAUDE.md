@@ -4,11 +4,11 @@
 @Makefile
 
 ## Stack
-- Protobuf schemas in `api/proto/game/`, Go output in `gen/go/`
+- Protobuf schemas in `backend/api`, Go output in `backend/gen`
 - Browser client in `web/`, plain JS, loads the `.proto` at runtime with protobufjs (no JS codegen)
 
 ## Rules
-- Never edit `gen/` or `unity-client/Assets/Scripts/Generated/` by hand; edit `api/proto/` and run `make proto`
+- Never edit `backend/gen` or `unity-client/Assets/Scripts/Generated/` by hand; edit `backend/api` and run `make proto`
 - One `oneof` envelope per direction (`ClientMessage`, `ServerMessage`); add new messages as oneof members
 - Only `World.Run` mutates game state; `ReadPump`s only push onto queues, `WritePump`s only drain `Client.Send`
 - All sends are non-blocking; drop the message when a buffer is full

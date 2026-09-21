@@ -66,9 +66,9 @@ namespace Game.V1 {
             "Z2FtZS52MS5Kb2luUmVqZWN0ZWRIABImCgV0cmFkZRgGIAEoCzIVLmdhbWUu",
             "djEuVHJhZGVSZWNlaXB0SAASNAoQcGxheWVyX2ludmVudG9yeRgHIAEoCzIY",
             "LmdhbWUudjEuUGxheWVySW52ZW50b3J5SAASJgoJZ2FtZV9vdmVyGAkgASgL",
-            "MhEuZ2FtZS52MS5HYW1lT3ZlckgAQgUKA21zZ0I+WjJnaXRodWIuY29tL2Fs",
-            "Y2FyZXMvbW1vc2VydmVyL2dlbi9nby9nYW1lL3YxO2dhbWV2MaoCB0dhbWUu",
-            "VjFiBnByb3RvMw=="));
+            "MhEuZ2FtZS52MS5HYW1lT3ZlckgAQgUKA21zZ0JGWjpnaXRodWIuY29tL2Fs",
+            "Y2FyZXMvbW1vc2VydmVyL2JhY2tlbmQvZ2VuL2dvL2dhbWUvdjE7Z2FtZXYx",
+            "qgIHR2FtZS5WMWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, global::Game.V1.PlayerReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {

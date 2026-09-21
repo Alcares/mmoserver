@@ -25,7 +25,7 @@ namespace Game.Networking
         public event Action<Exception> OnError;
         public event Action OnDisconnected;
 
-        // Mirrors the server's own Client.Send buffer size (internal/game/client.go);
+        // Mirrors the server's own Client.Send buffer size (backend/internal/game/client.go);
         // outgoing sends are non-blocking and dropped when this fills up.
         private const int MaxOutgoingQueue = 32;
 

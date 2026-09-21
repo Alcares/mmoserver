@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package game.v1;
+option go_package = "github.com/alcares/mmoserver/backend/gen/go/game/v1;gamev1";
+option csharp_namespace = "Game.V1";
+
+import "game/v1/common.proto";
+
+// Server -> Client: What power-ups are attached to the player
+message ActiveEffect {
+  PowerUpType type = 1;
+  uint32 duration_ticks_left = 2;
+}
+
+// Server -> Client: What commodities in what quantities is the player holding
+message OwnedCommodity {
+    CommodityType type = 1;
+    uint64 amount = 2; // Whole units
+}
+
+// Server -> Client: Represents an individual player's state (position only, sent every tick)
+message PlayerState {
+  uint32 id = 1;
+  string name = 2;
+  float x = 3;
+  float y = 4;
+}
+
+// Server -> Client: Private inventory sent only to the owning player (on connect and on change)
+message PlayerInventory {
+  uint64 balance = 1; // Cash in cents: 10000 = $100.00
+  repeated OwnedCommodity commodities = 2;
+  repeated ActiveEffect active_effects = 3;
+}
+
+// Server -> Client: Sent with GameOver message
+message PlayerFinalStanding {
+  uint32 id = 1;
+  string name = 2;
+  uint64 net_worth = 3;
+  uint64 trade_volume_cents = 4;
+  uint64 units_traded = 5;
+}

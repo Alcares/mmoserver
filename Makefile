@@ -1,10 +1,11 @@
-MODULE := github.com/alcares/mmoserver
-PROTO_DIR := api/proto
+MODULE := github.com/alcares/mmoserver/backend
+BACKEND := backend
+PROTO_DIR := $(BACKEND)/api/proto
 CSHARP_OUT := unity-client/Assets/Scripts/Generated
 UNITY_VERSION := 6000.6.2f1
 UNITY := $(HOME)/Unity/Hub/Editor/$(UNITY_VERSION)/Editor/Unity
 UNITY_PROJECT := $(CURDIR)/unity-client
-SERVER_BIN := bin/server
+SERVER_BIN := $(BACKEND)/bin/server
 SERVER_PID := server.pid
 SERVER_LOG := server.log
 UNITY_BATCH = LD_LIBRARY_PATH=$(HOME)/.local/lib/unity-compat:$$LD_LIBRARY_PATH $(UNITY) \
@@ -15,7 +16,7 @@ UNITY_BATCH = LD_LIBRARY_PATH=$(HOME)/.local/lib/unity-compat:$$LD_LIBRARY_PATH 
 proto:
 	protoc \
 		--proto_path=$(PROTO_DIR) \
-		--go_out=. \
+		--go_out=$(BACKEND) \
 		--go_opt=module=$(MODULE) \
 		$(PROTO_DIR)/game/v1/*.proto
 	mkdir -p $(CSHARP_OUT)
@@ -25,12 +26,12 @@ proto:
 		$(PROTO_DIR)/game/v1/*.proto
 
 clean:
-	rm -rf gen/
+	rm -rf $(BACKEND)/gen/
 	rm -f $(CSHARP_OUT)/*.cs
 
 # Rebuilds and (re)starts the server in the background; output goes to $(SERVER_LOG).
 server-start: server-stop
-	go build -o $(SERVER_BIN) ./cmd/server
+	go -C $(BACKEND) build -o bin/server ./cmd/server
 	nohup ./$(SERVER_BIN) > $(SERVER_LOG) 2>&1 & echo $$! > $(SERVER_PID)
 	@sleep 1; kill -0 $$(cat $(SERVER_PID)) 2>/dev/null \
 		&& echo "server running, pid $$(cat $(SERVER_PID))" \
@@ -40,7 +41,7 @@ server-stop:
 	@if [ -f $(SERVER_PID) ]; then kill $$(cat $(SERVER_PID)) 2>/dev/null && echo "server stopped"; rm -f $(SERVER_PID); fi
 
 test:
-	go test ./...
+	go -C $(BACKEND) test ./...
 
 hooks:
 	git config core.hooksPath .githooks

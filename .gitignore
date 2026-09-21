@@ -3,5 +3,7 @@
 # Secrets
 .env
 # Server build and background run files
-/bin/
+/backend/bin/
+/server.pid
+/server.log
 /*.jsonl

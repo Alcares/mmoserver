@@ -45,9 +45,9 @@ namespace Game.V1 {
             "UxADEh4KGkpPSU5fUkVKRUNUSU9OX1NFUlZFUl9GVUxMEAQqigEKCUdhbWVQ",
             "aGFzZRIaChZHQU1FX1BIQVNFX1VOU1BFQ0lGSUVEEAASFgoSR0FNRV9QSEFT",
             "RV9XQUlUSU5HEAESGAoUR0FNRV9QSEFTRV9DT1VOVERPV04QAhIWChJHQU1F",
-            "X1BIQVNFX1JVTk5JTkcQAxIXChNHQU1FX1BIQVNFX0ZJTklTSEVEEARCPloy",
-            "Z2l0aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9nZW4vZ28vZ2FtZS92MTtn",
-            "YW1ldjGqAgdHYW1lLlYxYgZwcm90bzM="));
+            "X1BIQVNFX1JVTk5JTkcQAxIXChNHQU1FX1BIQVNFX0ZJTklTSEVEEARCRlo6",
+            "Z2l0aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9iYWNrZW5kL2dlbi9nby9n",
+            "YW1lL3YxO2dhbWV2MaoCB0dhbWUuVjFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Game.V1.PowerUpType), typeof(global::Game.V1.CommodityType), typeof(global::Game.V1.OrderIntent), typeof(global::Game.V1.TradeRejection), typeof(global::Game.V1.JoinRejection), typeof(global::Game.V1.GamePhase), }, null, null));

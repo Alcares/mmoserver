@@ -19,7 +19,7 @@ if (( ${#unformatted[@]} )); then
   exit 1
 fi
 
-if ! out=$(go test ./... 2>&1); then
+if ! out=$(go -C backend test ./... 2>&1); then
   echo "pre-commit: go test ./... failed:" >&2
   echo "$out" | tail -n 40 >&2
   exit 1

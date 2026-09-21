@@ -1,7 +1,7 @@
 # Commodity Pricing: Constant-Product AMM
 
 This describes how commodity prices move in the trading floor game, implemented in
-`../internal/game/commodity.go` and wired into trade execution in `../internal/game/trade.go`.
+`../backend/internal/game/commodity.go` and wired into trade execution in `../backend/internal/game/trade.go`.
 
 ## Why not a flat price
 
@@ -146,7 +146,7 @@ price  = floor(11112 / 10) = 1111 cents ($11.11 each, $111.10 total)
 ```
 
 The round trip loses $0.10. These cases are pinned by tests in
-`internal/game/commodity_test.go`, alongside a randomized check that no sequence of
+`backend/internal/game/commodity_test.go`, alongside a randomized check that no sequence of
 buys and sells ever ends up worth more than it cost.
 
 ## What gets broadcast

@@ -1,8 +1,8 @@
 # Bot Training: Development Plan
 
 This is the plan for training a bot that plays the game, and for plugging the trained bot
-back into the server. The code lives in `../internal/bot/` (observation and policy),
-`../internal/sim/` (training environment) and `../cmd/sim/` (the sim binary).
+back into the server. The code lives in `../backend/internal/bot/` (observation and policy),
+`../backend/internal/sim/` (training environment) and `../backend/cmd/sim/` (the sim binary).
 
 ## Goal and constraints
 
@@ -16,7 +16,7 @@ The bot has to play under the same rules as a human:
 
 Both rules are enforced by how the code is organized, not by discipline:
 
-- `internal/bot` doesn't import `internal/game`, so the Observer can only learn from protos.
+- `backend/internal/bot` doesn't import `backend/internal/game`, so the Observer can only learn from protos.
 - `World.Join` and `World.EnqueueMovement` are the only way into the world, for human players,
   the training sim and the in-server bot alike, so all three join and move identically.
 
@@ -99,25 +99,25 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
       Open: a bot trained only from the centre may not generalize to mid-game starts (after
       trading at one station and heading to the next). If it doesn't, the env can start
       episodes from random positions, but through a path the server doesn't expose.
-- [x] **8. `internal/sim/env.go`.** A Gym-style environment:
+- [x] **8. `backend/internal/sim/env.go`.** A Gym-style environment:
       - `Reset(seed)`: new world, `Join` a client, random goal picked from the stations the
-        Observer received, one `Tick` + drain so the first `Encode` succeeds.
-      - `Step(vx, vy)`: `EnqueueMovement` → `Tick` → drain `Send`, `Unmarshal`, `Consume` →
+  Observer received, one `Tick` + drain so the first `Encode` succeeds.
+  - `Step(vx, vy)`: `EnqueueMovement` → `Tick` → drain `Send`, `Unmarshal`, `Consume` →
         `Encode` → reward, terminated, truncated.
-      - Reward: progress `(prevDist − dist)`, a small per-step penalty, a bonus on arrival.
-      - Takes `(vx, vy)` for now, so the env can be tested before the action table exists.
+  - Reward: progress `(prevDist − dist)`, a small per-step penalty, a bonus on arrival.
+  - Takes `(vx, vy)` for now, so the env can be tested before the action table exists.
 - [x] **9. Env tests.** `TestEnvReachesGoal`: step with `(dx, dy)` from the observation and
       assert it terminates in about `distance / (MoveSpeed × TickDuration)` steps. Plus: the
       same seed gives the same first observation.
-- [ ] **10. `cmd/sim` benchmark.** Run 1000 episodes with the one-line policy and print
-      episodes per second. That number decides whether batching is needed before the bridge.
+- [ ] **10. `backend/cmd/sim` benchmark.** Run 1000 episodes with the one-line policy and print
+  episodes per second. That number decides whether batching is needed before the bridge.
 - [ ] **11. Action table and `Policy` interface.** `type Action int`, the 9-entry direction
       table, `Policy.Act(obs) Action`, and `ScriptedPolicy` (nearest of the 8 directions, stop
       inside `TradeRange`). Test whether it can get stuck going back and forth between two
       directions near the goal. It serves as test, baseline and something to watch.
-- [ ] **12. Python bridge.** `api/proto/sim/v1/env.proto` with a batched service
-      (`Reset(seed, n_envs)`, `Step(actions[]) → obs[], reward[], terminated[], truncated[]`),
-      kept separate from the game protocol. `cmd/sim` serves it over gRPC.
+- [ ] **12. Python bridge.** `backend/api/proto/sim/v1/env.proto` with a batched service
+  (`Reset(seed, n_envs)`, `Step(actions[]) → obs[], reward[], terminated[], truncated[]`),
+  kept separate from the game protocol. `backend/cmd/sim` serves it over gRPC.
 - [ ] **13. Training.** A `gymnasium.vector.VectorEnv` wrapper, PPO from Stable-Baselines3 or
       CleanRL, a 2×64 MLP. Log success rate and `ticks taken / optimal ticks` (should approach
       1.0) to TensorBoard. Curriculum: nearby goals first, then farther ones.
@@ -167,5 +167,5 @@ evaluation world:
   (faster training, closer to human reaction time)?
 - **Observation encoding.** `[dx, dy]` gets tiny near the goal. `[dx/dist, dy/dist, dist]`
   keeps the direction at full size; worth trying if the bot is imprecise when arriving.
-- **World size.** `worldSize` in `internal/bot` duplicates `game.WorldMaxX`. The server could
+- **World size.** `worldSize` in `backend/internal/bot` duplicates `game.WorldMaxX`. The server could
   send it in `InitialGameState` instead.
