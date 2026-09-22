@@ -88,7 +88,7 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
       before any snapshot. Used by the server; the sim will use it too.
 - [x] **4. `World.EnqueueMovement`.** Non-blocking push onto the movement queue, used by
       `ReadPump`.
-- [ ] **5. Movement test.** Join, enqueue, tick 10×, read the position from the last drained
+- [x] **5. Movement test.** Join, enqueue, tick 10×, read the position from the last drained
       `WorldSnapshot`. Cases: straight `(1,0)` moves 6.0; diagonal `(1,1)` moves 6.0 total, not
       8.49; over-sized `(5,0)` is clamped to 6.0. Drain every tick so `Send` (capacity 32) never
       fills.
