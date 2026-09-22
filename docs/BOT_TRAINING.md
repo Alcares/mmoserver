@@ -92,7 +92,7 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
       `WorldSnapshot`. Cases: straight `(1,0)` moves 6.0; diagonal `(1,1)` moves 6.0 total, not
       8.49; over-sized `(5,0)` is clamped to 6.0. Drain every tick so `Send` (capacity 32) never
       fills.
-- [ ] **6. Doc comments.** `EnqueueMovement`: safe from any goroutine, no lock needed.
+- [x] **6. Doc comments.** `EnqueueMovement`: safe from any goroutine, no lock needed.
       `Join`: locks `Mu` itself, the caller must not hold it (Go mutexes aren't reentrant).
 - [x] **7. Spawn.** Every player joins at `game.SpawnPos`, the centre of the map; the player
       cap is `game.MaxPlayers`. Episodes still differ because stations are reshuffled per seed.

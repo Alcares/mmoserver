@@ -55,6 +55,7 @@ func NewWorld(gameID string, cfg WorldConfig) *World {
 	}
 }
 
+// EnqueueMovement - safe from any goroutine
 func (w *World) EnqueueMovement(mov PlayerMovementInput) {
 	select {
 	case w.movementQueue <- mov:
