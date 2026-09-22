@@ -109,7 +109,7 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
 - [x] **9. Env tests.** `TestEnvReachesGoal`: step with `(dx, dy)` from the observation and
       assert it terminates in about `distance / (MoveSpeed × TickDuration)` steps. Plus: the
       same seed gives the same first observation.
-- [ ] **10. `backend/cmd/sim` benchmark.** Run 1000 episodes with the one-line policy and print
+- [x] **10. `backend/cmd/sim` benchmark.** Run 1000 episodes with the one-line policy and print
   episodes per second. That number decides whether batching is needed before the bridge.
 - [ ] **11. Action table and `Policy` interface.** `type Action int`, the 9-entry direction
       table, `Policy.Act(obs) Action`, and `ScriptedPolicy` (nearest of the 8 directions, stop

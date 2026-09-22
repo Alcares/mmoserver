@@ -1,22 +1,5 @@
 package main
 
-import (
-	"math/rand"
-	"time"
-
-	game "github.com/alcares/mmoserver/backend/internal/game"
-)
-
-func main() {
-	world := game.NewWorld("sim", game.WorldConfig{
-		MinPlayers:     0,
-		StartCountdown: 0 * time.Second,
-		Duration:       5 * time.Minute,
-		Rng:            rand.New(rand.NewSource(time.Now().UnixNano())),
-	})
-	grid := game.NewSpatialGrid()
-
-	for {
-		world.Tick(grid)
-	}
-}
+// The sim binary. It will serve the batched env service over gRPC for the Python training
+// pipeline; throughput lives in internal/sim's benchmarks until then.
+func main() {}

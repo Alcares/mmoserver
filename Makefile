@@ -8,10 +8,14 @@ UNITY_PROJECT := $(CURDIR)/unity
 SERVER_BIN := $(BACKEND)/bin/server
 SERVER_PID := $(BACKEND)/server.pid
 SERVER_LOG := $(BACKEND)/server.log
+BENCH_CPU := $(CURDIR)/$(BACKEND)/bench-cpu.out
+BENCH ?= .
+BENCH_PKG ?= ./...
+BENCH_PROF_PKG ?= ./internal/sim
 UNITY_BATCH = LD_LIBRARY_PATH=$(HOME)/.local/lib/unity-compat:$$LD_LIBRARY_PATH $(UNITY) \
 	-batchmode -quit -projectPath $(UNITY_PROJECT) -logFile - -executeMethod
 
-.PHONY: proto clean server-start server-stop test hooks client client-linux client-mac all
+.PHONY: proto clean server-start server-stop test bench bench-profile hooks client client-linux client-mac all
 
 proto:
 	protoc \
@@ -42,6 +46,17 @@ server-stop:
 
 test:
 	go -C $(BACKEND) test ./...
+
+# BENCH picks the benchmarks by regex, BENCH_PKG the packages:
+# make bench BENCH=Step BENCH_PKG=./internal/sim
+bench:
+	go -C $(BACKEND) test $(BENCH_PKG) -run='^$$' -bench=$(BENCH) -benchmem
+
+# Profiles one package's benchmarks and prints the hottest calls. BENCH_PROF_PKG is separate
+# because -cpuprofile takes a single package; it also drops a $(BACKEND)/*.test binary.
+bench-profile:
+	go -C $(BACKEND) test $(BENCH_PROF_PKG) -run='^$$' -bench=$(BENCH) -benchtime=5s -cpuprofile=$(BENCH_CPU)
+	go tool pprof -top -nodecount=25 $(BENCH_CPU)
 
 hooks:
 	git config core.hooksPath .githooks

@@ -9,7 +9,7 @@ import (
 
 // walkToGoal runs one episode stepping straight at the goal at full speed and returns the last
 // result and the number of steps taken
-func walkToGoal(t *testing.T, e *Env, seed int64) (StepResult, int) {
+func walkToGoal(t testing.TB, e *Env, seed int64) (StepResult, int) {
 	t.Helper()
 	obs, err := e.Reset(seed)
 	if err != nil {
