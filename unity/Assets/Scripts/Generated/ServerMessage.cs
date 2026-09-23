@@ -48,27 +48,27 @@ namespace Game.V1 {
             "c2hfYmFsYW5jZV9jZW50cxgJIAEoBBIZChFuZXdfaG9sZGluZ191bml0cxgK",
             "IAEoBCJgCg5UcmFkaW5nU3RhdGlvbhIpCgljb21tb2RpdHkYASABKA4yFi5n",
             "YW1lLnYxLkNvbW1vZGl0eVR5cGUSCQoBeBgCIAEoAhIJCgF5GAMgASgCEg0K",
-            "BWxhYmVsGAQgASgJIlQKEEluaXRpYWxHYW1lU3RhdGUSLwoOc3RhdGlvbl9s",
+            "BWxhYmVsGAQgASgJImgKEEluaXRpYWxHYW1lU3RhdGUSLwoOc3RhdGlvbl9s",
             "YXlvdXQYASADKAsyFy5nYW1lLnYxLlRyYWRpbmdTdGF0aW9uEg8KB2dhbWVf",
-            "aWQYAiABKAkiNgoMSm9pblJlamVjdGVkEiYKBnJlYXNvbhgBIAEoDjIWLmdh",
-            "bWUudjEuSm9pblJlamVjdGlvbiI7CghHYW1lT3ZlchIvCglzdGFuZGluZ3MY",
-            "ASADKAsyHC5nYW1lLnYxLlBsYXllckZpbmFsU3RhbmRpbmcicAoKR2FtZVN0",
-            "YXR1cxIhCgVwaGFzZRgBIAEoDjISLmdhbWUudjEuR2FtZVBoYXNlEhQKDHBs",
-            "YXllcl9jb3VudBgCIAEoBRITCgttaW5fcGxheWVycxgDIAEoBRIUCgxyZW1h",
-            "aW5pbmdfbXMYBCABKAUi+gMKDVNlcnZlck1lc3NhZ2USMAoOd29ybGRfc25h",
-            "cHNob3QYASABKAsyFi5nYW1lLnYxLldvcmxkU25hcHNob3RIABIsCgxtYXJr",
-            "ZXRfc3RhdGUYAiABKAsyFC5nYW1lLnYxLk1hcmtldFN0YXRlSAASMwoQcG93",
-            "ZXJfdXBfc3Bhd25lZBgDIAEoCzIXLmdhbWUudjEuUG93ZXJVcFNwYXduZWRI",
-            "ABI3ChJwb3dlcl91cF9kZXNwYXduZWQYBCABKAsyGS5nYW1lLnYxLlBvd2Vy",
-            "VXBEZXNwYXduZWRIABIqCgtnYW1lX3N0YXR1cxgKIAEoCzITLmdhbWUudjEu",
-            "R2FtZVN0YXR1c0gAEjIKDWluaXRpYWxfc3RhdGUYBSABKAsyGS5nYW1lLnYx",
-            "LkluaXRpYWxHYW1lU3RhdGVIABIuCg1qb2luX3JlamVjdGVkGAggASgLMhUu",
-            "Z2FtZS52MS5Kb2luUmVqZWN0ZWRIABImCgV0cmFkZRgGIAEoCzIVLmdhbWUu",
-            "djEuVHJhZGVSZWNlaXB0SAASNAoQcGxheWVyX2ludmVudG9yeRgHIAEoCzIY",
-            "LmdhbWUudjEuUGxheWVySW52ZW50b3J5SAASJgoJZ2FtZV9vdmVyGAkgASgL",
-            "MhEuZ2FtZS52MS5HYW1lT3ZlckgAQgUKA21zZ0JGWjpnaXRodWIuY29tL2Fs",
-            "Y2FyZXMvbW1vc2VydmVyL2JhY2tlbmQvZ2VuL2dvL2dhbWUvdjE7Z2FtZXYx",
-            "qgIHR2FtZS5WMWIGcHJvdG8z"));
+            "aWQYAiABKAkSEgoKd29ybGRfc2l6ZRgDIAEoAiI2CgxKb2luUmVqZWN0ZWQS",
+            "JgoGcmVhc29uGAEgASgOMhYuZ2FtZS52MS5Kb2luUmVqZWN0aW9uIjsKCEdh",
+            "bWVPdmVyEi8KCXN0YW5kaW5ncxgBIAMoCzIcLmdhbWUudjEuUGxheWVyRmlu",
+            "YWxTdGFuZGluZyJwCgpHYW1lU3RhdHVzEiEKBXBoYXNlGAEgASgOMhIuZ2Ft",
+            "ZS52MS5HYW1lUGhhc2USFAoMcGxheWVyX2NvdW50GAIgASgFEhMKC21pbl9w",
+            "bGF5ZXJzGAMgASgFEhQKDHJlbWFpbmluZ19tcxgEIAEoBSL6AwoNU2VydmVy",
+            "TWVzc2FnZRIwCg53b3JsZF9zbmFwc2hvdBgBIAEoCzIWLmdhbWUudjEuV29y",
+            "bGRTbmFwc2hvdEgAEiwKDG1hcmtldF9zdGF0ZRgCIAEoCzIULmdhbWUudjEu",
+            "TWFya2V0U3RhdGVIABIzChBwb3dlcl91cF9zcGF3bmVkGAMgASgLMhcuZ2Ft",
+            "ZS52MS5Qb3dlclVwU3Bhd25lZEgAEjcKEnBvd2VyX3VwX2Rlc3Bhd25lZBgE",
+            "IAEoCzIZLmdhbWUudjEuUG93ZXJVcERlc3Bhd25lZEgAEioKC2dhbWVfc3Rh",
+            "dHVzGAogASgLMhMuZ2FtZS52MS5HYW1lU3RhdHVzSAASMgoNaW5pdGlhbF9z",
+            "dGF0ZRgFIAEoCzIZLmdhbWUudjEuSW5pdGlhbEdhbWVTdGF0ZUgAEi4KDWpv",
+            "aW5fcmVqZWN0ZWQYCCABKAsyFS5nYW1lLnYxLkpvaW5SZWplY3RlZEgAEiYK",
+            "BXRyYWRlGAYgASgLMhUuZ2FtZS52MS5UcmFkZVJlY2VpcHRIABI0ChBwbGF5",
+            "ZXJfaW52ZW50b3J5GAcgASgLMhguZ2FtZS52MS5QbGF5ZXJJbnZlbnRvcnlI",
+            "ABImCglnYW1lX292ZXIYCSABKAsyES5nYW1lLnYxLkdhbWVPdmVySABCBQoD",
+            "bXNnQkZaOmdpdGh1Yi5jb20vYWxjYXJlcy9tbW9zZXJ2ZXIvYmFja2VuZC9n",
+            "ZW4vZ28vZ2FtZS92MTtnYW1ldjGqAgdHYW1lLlYxYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, global::Game.V1.PlayerReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -81,7 +81,7 @@ namespace Game.V1 {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.OrderQuote), global::Game.V1.OrderQuote.Parser, new[]{ "Units", "BuyPriceCents", "SellPriceCents" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeReceipt), global::Game.V1.TradeReceipt.Parser, new[]{ "SequenceId", "Success", "Rejection", "Intent", "Commodity", "TotalBalanceChange", "UnitsTransacted", "PriceCents", "NewCashBalanceCents", "NewHoldingUnits" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradingStation), global::Game.V1.TradingStation.Parser, new[]{ "Commodity", "X", "Y", "Label" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.InitialGameState), global::Game.V1.InitialGameState.Parser, new[]{ "StationLayout", "GameId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.InitialGameState), global::Game.V1.InitialGameState.Parser, new[]{ "StationLayout", "GameId", "WorldSize" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.JoinRejected), global::Game.V1.JoinRejected.Parser, new[]{ "Reason" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.GameOver), global::Game.V1.GameOver.Parser, new[]{ "Standings" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.GameStatus), global::Game.V1.GameStatus.Parser, new[]{ "Phase", "PlayerCount", "MinPlayers", "RemainingMs" }, null, null, null, null),
@@ -2835,6 +2835,7 @@ namespace Game.V1 {
     public InitialGameState(InitialGameState other) : this() {
       stationLayout_ = other.stationLayout_.Clone();
       gameId_ = other.gameId_;
+      worldSize_ = other.worldSize_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2867,6 +2868,18 @@ namespace Game.V1 {
       }
     }
 
+    /// <summary>Field number for the "world_size" field.</summary>
+    public const int WorldSizeFieldNumber = 3;
+    private float worldSize_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float WorldSize {
+      get { return worldSize_; }
+      set {
+        worldSize_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -2884,6 +2897,7 @@ namespace Game.V1 {
       }
       if(!stationLayout_.Equals(other.stationLayout_)) return false;
       if (GameId != other.GameId) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(WorldSize, other.WorldSize)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2893,6 +2907,7 @@ namespace Game.V1 {
       int hash = 1;
       hash ^= stationLayout_.GetHashCode();
       if (GameId.Length != 0) hash ^= GameId.GetHashCode();
+      if (WorldSize != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(WorldSize);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2916,6 +2931,10 @@ namespace Game.V1 {
         output.WriteRawTag(18);
         output.WriteString(GameId);
       }
+      if (WorldSize != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(WorldSize);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2931,6 +2950,10 @@ namespace Game.V1 {
         output.WriteRawTag(18);
         output.WriteString(GameId);
       }
+      if (WorldSize != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(WorldSize);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2944,6 +2967,9 @@ namespace Game.V1 {
       size += stationLayout_.CalculateSize(_repeated_stationLayout_codec);
       if (GameId.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(GameId);
+      }
+      if (WorldSize != 0F) {
+        size += 1 + 4;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2960,6 +2986,9 @@ namespace Game.V1 {
       stationLayout_.Add(other.stationLayout_);
       if (other.GameId.Length != 0) {
         GameId = other.GameId;
+      }
+      if (other.WorldSize != 0F) {
+        WorldSize = other.WorldSize;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2988,6 +3017,10 @@ namespace Game.V1 {
             GameId = input.ReadString();
             break;
           }
+          case 29: {
+            WorldSize = input.ReadFloat();
+            break;
+          }
         }
       }
     #endif
@@ -3013,6 +3046,10 @@ namespace Game.V1 {
           }
           case 18: {
             GameId = input.ReadString();
+            break;
+          }
+          case 29: {
+            WorldSize = input.ReadFloat();
             break;
           }
         }

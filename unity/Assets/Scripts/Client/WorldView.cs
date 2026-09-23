@@ -13,8 +13,6 @@ namespace Game.Client
     [RequireComponent(typeof(GameClient), typeof(GameInput), typeof(GameState))]
     public class WorldView : MonoBehaviour
     {
-        // Mirrors backend/internal/game/world.go WorldMaxX/WorldMaxY.
-        private const float WorldSize = 500f;
         private const float CrewmateSize = 1.3f;
         private const float StationRadius = 0.9f;
         private const int BackgroundOrder = -100;
@@ -51,6 +49,7 @@ namespace Game.Client
         private GameState _state;
         private Camera _camera;
         private Transform _cameraFollow;
+        private SpriteRenderer _floor;
 
         private readonly Dictionary<uint, PlayerView> _players = new();
         private readonly HashSet<uint> _seen = new();
@@ -123,7 +122,8 @@ namespace Game.Client
             _camera.orthographicSize = cameraSize;
             _camera.clearFlags = CameraClearFlags.SolidColor;
             _camera.backgroundColor = new Color32(0xcb, 0xd5, 0xe1, 0xff);
-            _camera.transform.position = new Vector3(WorldSize / 2f, -WorldSize / 2f, -10f);
+            // Framed on the world by ApplyWorldSize once the server says how big it is
+            _camera.transform.position = new Vector3(0f, 0f, -10f);
         }
 
         // 8x8 cells of 2x2 tiles (marble squares), tiled across the world.
@@ -161,18 +161,33 @@ namespace Game.Client
 
             var go = new GameObject("Floor");
             go.transform.SetParent(transform, false);
-            go.transform.position = new Vector3(WorldSize / 2f, -WorldSize / 2f, 0f);
 
-            var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = sprite;
-            sr.drawMode = SpriteDrawMode.Tiled;
-            sr.tileMode = SpriteTileMode.Continuous;
-            sr.size = new Vector2(WorldSize, WorldSize);
-            sr.sortingOrder = BackgroundOrder;
+            // The tile sprite is built once here; it stays zero-sized until ApplyWorldSize
+            _floor = go.AddComponent<SpriteRenderer>();
+            _floor.sprite = sprite;
+            _floor.drawMode = SpriteDrawMode.Tiled;
+            _floor.tileMode = SpriteTileMode.Continuous;
+            _floor.sortingOrder = BackgroundOrder;
+        }
+
+        /// <summary>
+        /// Sizes the floor to the world the server described, instead of hardcoding the
+        /// backend's bounds. Runs again on every InitialGameState, so a resend can resize it.
+        /// </summary>
+        private void ApplyWorldSize(float size)
+        {
+            _floor.transform.position = new Vector3(size / 2f, -size / 2f, 0f);
+            _floor.size = new Vector2(size, size);
+
+            // Frame the whole map until a snapshot gives LateUpdate someone to follow
+            if (_cameraFollow == null)
+                _camera.transform.position = new Vector3(size / 2f, -size / 2f, -10f);
         }
 
         private void HandleInitialState(InitialGameState state)
         {
+            if (state.WorldSize > 0f) ApplyWorldSize(state.WorldSize);
+
             foreach (var s in _stations) Destroy(s.Go);
             _stations.Clear();
 

@@ -87,6 +87,7 @@ message TradingStation {
 message InitialGameState {
   repeated TradingStation station_layout = 1;
   string game_id = 2;
+  float world_size = 3;
 }
 
 message JoinRejected {

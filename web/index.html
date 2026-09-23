@@ -152,11 +152,12 @@
 
   // Server physics coordinate unit
   const TILE_SIZE = 22;
-  const WORLD_TILES = 500;
+  // The server sends the world size in InitialGameState; nothing is drawn before it arrives
+  let worldTiles = 0;
 
   // 4x surface area = 2x linear size (44px x 44px) -> 4x fewer tiles total
   const VISUAL_TILE_SIZE = TILE_SIZE * 2;
-  const WORLD_PIXEL_WIDTH = WORLD_TILES * TILE_SIZE;
+  let worldPixelWidth = 0;
 
   let players = [];
   let stations = [];
@@ -331,6 +332,8 @@
           // The server's join confirmation: we are in a game, and it carries its code.
           stations = message.initialState.stationLayout || [];
           gameId = message.initialState.gameId || "";
+          worldTiles = message.initialState.worldSize || 0;
+          worldPixelWidth = worldTiles * TILE_SIZE;
           joined = true;
           myPlayerId = null;
           standings = null;
@@ -525,9 +528,9 @@
       ctx.translate(-cameraX, -cameraY);
 
       const startCol = Math.max(0, Math.floor(cameraX / VISUAL_TILE_SIZE));
-      const endCol = Math.min(Math.ceil(WORLD_PIXEL_WIDTH / VISUAL_TILE_SIZE), Math.ceil((cameraX + canvas.width) / VISUAL_TILE_SIZE));
+      const endCol = Math.min(Math.ceil(worldPixelWidth / VISUAL_TILE_SIZE), Math.ceil((cameraX + canvas.width) / VISUAL_TILE_SIZE));
       const startRow = Math.max(0, Math.floor(cameraY / VISUAL_TILE_SIZE));
-      const endRow = Math.min(Math.ceil(WORLD_PIXEL_WIDTH / VISUAL_TILE_SIZE), Math.ceil((cameraY + canvas.height) / VISUAL_TILE_SIZE));
+      const endRow = Math.min(Math.ceil(worldPixelWidth / VISUAL_TILE_SIZE), Math.ceil((cameraY + canvas.height) / VISUAL_TILE_SIZE));
 
       // 1. Draw Marble Tiles (44px each)
       for (let row = startRow; row < endRow; row++) {
