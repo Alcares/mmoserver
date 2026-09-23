@@ -7,9 +7,14 @@ import (
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 )
 
-func initial(stations ...*pb.TradingStation) *pb.ServerMessage {
+// testWorldSize is what the server sends; the expected vectors below are scaled by it
+const testWorldSize = 500.0
+
+// initial is the server's join message. The Observer takes only the world size from it: the
+// goal is the task its caller sets, not something the station layout decides.
+func initial(worldSize float32) *pb.ServerMessage {
 	return &pb.ServerMessage{Msg: &pb.ServerMessage_InitialState{
-		InitialState: &pb.InitialGameState{StationLayout: stations},
+		InitialState: &pb.InitialGameState{WorldSize: worldSize},
 	}}
 }
 
@@ -20,16 +25,12 @@ func snapshot(x, y float32) *pb.ServerMessage {
 	}}
 }
 
-func gold(x, y float32) *pb.TradingStation {
-	return &pb.TradingStation{Commodity: pb.CommodityType_COMMODITY_GOLD, X: x, Y: y}
-}
-
 func TestEncodeTowardsGoal(t *testing.T) {
 	var o Observer
-	o.Consume(initial(gold(300, 250)))
+	o.Consume(initial(testWorldSize))
 	o.Consume(snapshot(250, 250))
 
-	obs, err := o.Encode(pb.CommodityType_COMMODITY_GOLD)
+	obs, err := o.Encode(Goal{X: 300, Y: 250})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,11 +46,11 @@ func TestEncodeTowardsGoal(t *testing.T) {
 
 func TestEncodeUsesLatestSnapshot(t *testing.T) {
 	var o Observer
-	o.Consume(initial(gold(300, 250)))
+	o.Consume(initial(testWorldSize))
 	o.Consume(snapshot(250, 250))
 	o.Consume(snapshot(300, 200))
 
-	obs, err := o.Encode(pb.CommodityType_COMMODITY_GOLD)
+	obs, err := o.Encode(Goal{X: 300, Y: 250})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,24 +63,24 @@ func TestEncodeUsesLatestSnapshot(t *testing.T) {
 
 func TestEncodeNotReady(t *testing.T) {
 	var o Observer
-	if _, err := o.Encode(pb.CommodityType_COMMODITY_GOLD); err == nil {
+	if _, err := o.Encode(Goal{X: 300, Y: 250}); err == nil {
 		t.Error("Encode on an empty Observer: want error")
 	}
 
-	o.Consume(initial(gold(300, 250)))
-	if _, err := o.Encode(pb.CommodityType_COMMODITY_GOLD); err == nil {
+	// Still no snapshot: Encode must report it, not dereference a nil World
+	o.Consume(initial(testWorldSize))
+	if _, err := o.Encode(Goal{X: 300, Y: 250}); err == nil {
 		t.Error("Encode before any WorldSnapshot: want error")
 	}
 }
 
-func TestEncodeMissingStation(t *testing.T) {
+// A server that never sent a world size would make Vectorise divide by zero
+func TestEncodeWithoutWorldSize(t *testing.T) {
 	var o Observer
-	o.Consume(initial(gold(300, 250)))
+	o.Consume(initial(0))
 	o.Consume(snapshot(250, 250))
 
-	for _, goal := range []pb.CommodityType{pb.CommodityType_COMMODITY_WHEAT, pb.CommodityType_COMMODITY_UNSPECIFIED} {
-		if _, err := o.Encode(goal); err == nil {
-			t.Errorf("Encode(%v) with only GOLD stations: want error", goal)
-		}
+	if _, err := o.Encode(Goal{X: 300, Y: 250}); err == nil {
+		t.Error("Encode with world size 0: want error")
 	}
 }

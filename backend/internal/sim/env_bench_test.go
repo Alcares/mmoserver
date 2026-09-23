@@ -1,9 +1,13 @@
 package sim
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/alcares/mmoserver/backend/internal/bot"
+)
 
 // BenchmarkEpisode measures whole episodes: one Reset, which builds a fresh World, plus the
-// Steps the perfect policy needs to walk to the goal. steps/s is the number that decides
+// Steps the scripted policy needs to walk to the goal. steps/s is the number that decides
 // whether the Python bridge has to batch environments.
 func BenchmarkEpisode(b *testing.B) {
 	e := NewEnv()
@@ -24,6 +28,7 @@ func BenchmarkEpisode(b *testing.B) {
 // bridge's batch size has to beat. Subtract it from BenchmarkEpisode to price a Reset.
 func BenchmarkStep(b *testing.B) {
 	e := NewEnv()
+	var policy bot.ScriptedPolicy
 	seed := int64(0)
 	obs, err := e.Reset(seed)
 	if err != nil {
@@ -31,8 +36,7 @@ func BenchmarkStep(b *testing.B) {
 	}
 
 	for b.Loop() {
-		v := obs.Vectorise()
-		res, err := e.Step(float64(v[2]/v[4]), float64(v[3]/v[4]))
+		res, err := e.Step(policy.Act(obs))
 		if err != nil {
 			b.Fatal(err)
 		}

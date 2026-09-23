@@ -2,6 +2,7 @@ package sim
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -37,7 +38,7 @@ type Env struct {
 	grid     *game.SpatialGrid
 	client   *game.Client
 	observer bot.Observer
-	goal     pb.CommodityType
+	goal     bot.Goal
 	steps    int
 	prevDist float32
 	done     bool
@@ -77,10 +78,7 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 	if err != nil {
 		return nil, err
 	}
-	e.goal, err = e.pickGoal()
-	if err != nil {
-		return nil, err
-	}
+	e.goal = e.pickGoal()
 
 	obs, err := e.observer.Encode(e.goal)
 	if err != nil {
@@ -94,13 +92,17 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 	return obs, nil
 }
 
-// Step applies one movement input for one tick. Calling Step before Reset or after the
-// episode ended returns an error.
-func (e *Env) Step(vx, vy float64) (StepResult, error) {
+// Step applies one action for one tick. Calling Step before Reset or after the episode ended
+// returns an error.
+func (e *Env) Step(a bot.Action) (StepResult, error) {
+	if !a.Valid() {
+		return StepResult{}, fmt.Errorf("sim: invalid action %d", a)
+	}
 	if e.done {
 		return StepResult{}, errors.New("sim: Env already done")
 	}
 
+	vx, vy := a.Vector()
 	e.world.EnqueueMovement(game.PlayerMovementInput{
 		PlayerID: e.client.ID,
 		Vx:       vx,
@@ -149,14 +151,15 @@ func (e *Env) drain() error {
 	}
 }
 
-// pickGoal chooses a random station from the layout the observer received, the same way a
-// player would: from what the server told it, not from World.Stations
-func (e *Env) pickGoal() (pb.CommodityType, error) {
-	stations := e.observer.Stations
-	if len(stations) == 0 {
-		return pb.CommodityType_COMMODITY_UNSPECIFIED, errors.New("sim: no stations received")
+// pickGoal chooses a uniformly random point in the world. The goal is the task the env sets,
+// not something the server sends, and a trading station is just one point among many: sampling
+// the whole map covers every bearing and distance instead of the handful the fixed layout
+// produces, which is what the policy has to generalise over.
+func (e *Env) pickGoal() bot.Goal {
+	return bot.Goal{
+		X: float32(game.WorldMinX + e.rng.Float64()*(game.WorldMaxX-game.WorldMinX)),
+		Y: float32(game.WorldMinY + e.rng.Float64()*(game.WorldMaxY-game.WorldMinY)),
 	}
-	return stations[e.rng.Intn(len(stations))].Commodity, nil
 }
 
 // reward scores one step: progress towards the goal, a small cost per step, and a bonus on arrival
