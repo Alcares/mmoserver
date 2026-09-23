@@ -7,7 +7,10 @@ authors = [
     { name = "Marcin Augustynow", email = "marcin.augustynow@gmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "grpcio>=1.84.0",
+    "grpcio-tools>=1.84.0",
+]
 
 [project.scripts]
 rl-training = "rl_training:main"

@@ -126,9 +126,18 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
       watch. It does not get stuck near the goal: one step is 0.6 units against a 5-unit stop
       radius, so it cannot hop the band and reverse, and `walkToGoal` asserts no action is ever
       the exact opposite of the one before it.
-- [ ] **12. Python bridge.** `backend/api/proto/sim/v1/env.proto` with a batched service
-  (`Reset(seed, n_envs)`, `Step(actions[]) → obs[], reward[], terminated[], truncated[]`),
-  kept separate from the game protocol. `backend/cmd/sim` serves it over gRPC.
+- [ ] **12. Python bridge.** `backend/api/proto/sim/v1/env.proto`, kept separate from the game
+      protocol and served over gRPC by `backend/cmd/sim`. The transport is a detail; the batch
+      is not. One env step is ~4.5 µs against a ~100 µs local round trip, so a call per env
+      would spend most of training in transport. One call carries the whole vector:
+      `Reset(seeds[]) → obs[]`, `Step(actions[]) → obs[], reward[], terminated[], truncated[]`.
+      Two things the schema has to pin down, because both fail silently rather than erroring:
+      - **Seeds are per env.** One seed shared across the vector makes every env run the same
+        episode, and the batch stops reducing variance.
+      - **Autoreset.** If a finished env restarts in place, `observations` holds the next
+        episode's first observation, and the one the episode ended on has to travel separately:
+        PPO bootstraps a truncated episode's value from it. Today `Env.Step` errors after the
+        episode ends, so this is a decision, not a given.
 - [ ] **13. Training.** A `gymnasium.vector.VectorEnv` wrapper, PPO from Stable-Baselines3 or
       CleanRL, a 2×64 MLP. Log success rate and `ticks taken / optimal ticks` to TensorBoard.
       1.0 is not the target: `optimal` is a straight line, and quantising to 45° costs up to

@@ -2,6 +2,8 @@ MODULE := github.com/alcares/mmoserver/backend
 BACKEND := backend
 PROTO_DIR := $(BACKEND)/api/proto
 CSHARP_OUT := unity/Assets/Scripts/Generated
+RL_DIR := rl-training
+SIM_PY_OUT := $(RL_DIR)/src/rl_training/gen
 UNITY_VERSION := 6000.6.2f1
 UNITY := $(HOME)/Unity/Hub/Editor/$(UNITY_VERSION)/Editor/Unity
 UNITY_PROJECT := $(CURDIR)/unity
@@ -15,7 +17,7 @@ BENCH_PROF_PKG ?= ./internal/sim
 UNITY_BATCH = LD_LIBRARY_PATH=$(HOME)/.local/lib/unity-compat:$$LD_LIBRARY_PATH $(UNITY) \
 	-batchmode -quit -projectPath $(UNITY_PROJECT) -logFile - -executeMethod
 
-.PHONY: proto clean server-start server-stop test bench bench-profile hooks client client-linux client-mac all
+.PHONY: proto proto-sim proto-py clean server-start server-stop test bench bench-profile hooks client client-linux client-mac all
 
 proto:
 	protoc \
@@ -29,8 +31,31 @@ proto:
 		--csharp_out=$(CSHARP_OUT) \
 		$(PROTO_DIR)/game/v1/*.proto
 
+# The sim protos are generated apart from `proto` because they need protoc-gen-go-grpc, which
+# the game protos don't: keeping them separate leaves `make proto` working without that plugin.
+# Unity never sees them — the C# step above globs game/v1 only.
+proto-sim:
+	protoc \
+		--proto_path=$(PROTO_DIR) \
+		--go_out=$(BACKEND) \
+		--go_opt=module=$(MODULE) \
+		--go-grpc_out=$(BACKEND) \
+		--go-grpc_opt=module=$(MODULE) \
+		$(PROTO_DIR)/sim/v1/*.proto
+
+# Python stubs for the training client. Needs grpcio-tools in the rl-training venv.
+proto-py:
+	mkdir -p $(SIM_PY_OUT)
+	uv run --project $(RL_DIR) python -m grpc_tools.protoc \
+		--proto_path=$(PROTO_DIR) \
+		--python_out=$(SIM_PY_OUT) \
+		--pyi_out=$(SIM_PY_OUT) \
+		--grpc_python_out=$(SIM_PY_OUT) \
+		$(PROTO_DIR)/sim/v1/*.proto
+
 clean:
 	rm -rf $(BACKEND)/gen/
+	rm -rf $(SIM_PY_OUT)
 	rm -f $(CSHARP_OUT)/*.cs
 
 # Rebuilds and (re)starts the server in the background; output goes to $(SERVER_LOG).
