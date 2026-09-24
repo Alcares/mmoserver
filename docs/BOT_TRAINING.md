@@ -126,7 +126,7 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
       watch. It does not get stuck near the goal: one step is 0.6 units against a 5-unit stop
       radius, so it cannot hop the band and reverse, and `walkToGoal` asserts no action is ever
       the exact opposite of the one before it.
-- [ ] **12. Python bridge.** `backend/api/proto/sim/v1/env.proto`, kept separate from the game
+- [x] **12. Python bridge.** `backend/api/proto/sim/v1/env.proto`, kept separate from the game
       protocol and served over gRPC by `backend/cmd/sim`. The transport is a detail; the batch
       is not. One env step is ~4.5 µs against a ~100 µs local round trip, so a call per env
       would spend most of training in transport. One call carries the whole vector:
