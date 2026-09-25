@@ -19,12 +19,14 @@ class ResetRequest(_message.Message):
     def __init__(self, seeds: _Optional[_Iterable[int]] = ...) -> None: ...
 
 class ResetResponse(_message.Message):
-    __slots__ = ("observations", "obs_size")
+    __slots__ = ("observations", "obs_size", "action_count")
     OBSERVATIONS_FIELD_NUMBER: _ClassVar[int]
     OBS_SIZE_FIELD_NUMBER: _ClassVar[int]
+    ACTION_COUNT_FIELD_NUMBER: _ClassVar[int]
     observations: _containers.RepeatedCompositeFieldContainer[Observation]
     obs_size: int
-    def __init__(self, observations: _Optional[_Iterable[_Union[Observation, _Mapping]]] = ..., obs_size: _Optional[int] = ...) -> None: ...
+    action_count: int
+    def __init__(self, observations: _Optional[_Iterable[_Union[Observation, _Mapping]]] = ..., obs_size: _Optional[int] = ..., action_count: _Optional[int] = ...) -> None: ...
 
 class StepRequest(_message.Message):
     __slots__ = ("actions",)
@@ -33,15 +35,17 @@ class StepRequest(_message.Message):
     def __init__(self, actions: _Optional[_Iterable[int]] = ...) -> None: ...
 
 class StepResponse(_message.Message):
-    __slots__ = ("observations", "rewards", "terminated", "truncated", "final_observations")
+    __slots__ = ("observations", "rewards", "terminated", "truncated", "final_observations", "optimal_steps")
     OBSERVATIONS_FIELD_NUMBER: _ClassVar[int]
     REWARDS_FIELD_NUMBER: _ClassVar[int]
     TERMINATED_FIELD_NUMBER: _ClassVar[int]
     TRUNCATED_FIELD_NUMBER: _ClassVar[int]
     FINAL_OBSERVATIONS_FIELD_NUMBER: _ClassVar[int]
+    OPTIMAL_STEPS_FIELD_NUMBER: _ClassVar[int]
     observations: _containers.RepeatedCompositeFieldContainer[Observation]
     rewards: _containers.RepeatedScalarFieldContainer[float]
     terminated: _containers.RepeatedScalarFieldContainer[bool]
     truncated: _containers.RepeatedScalarFieldContainer[bool]
     final_observations: _containers.RepeatedCompositeFieldContainer[Observation]
-    def __init__(self, observations: _Optional[_Iterable[_Union[Observation, _Mapping]]] = ..., rewards: _Optional[_Iterable[float]] = ..., terminated: _Optional[_Iterable[bool]] = ..., truncated: _Optional[_Iterable[bool]] = ..., final_observations: _Optional[_Iterable[_Union[Observation, _Mapping]]] = ...) -> None: ...
+    optimal_steps: _containers.RepeatedScalarFieldContainer[int]
+    def __init__(self, observations: _Optional[_Iterable[_Union[Observation, _Mapping]]] = ..., rewards: _Optional[_Iterable[float]] = ..., terminated: _Optional[_Iterable[bool]] = ..., truncated: _Optional[_Iterable[bool]] = ..., final_observations: _Optional[_Iterable[_Union[Observation, _Mapping]]] = ..., optimal_steps: _Optional[_Iterable[int]] = ...) -> None: ...

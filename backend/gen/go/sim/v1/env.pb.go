@@ -114,7 +114,9 @@ type ResetResponse struct {
 	state        protoimpl.MessageState `protogen:"open.v1"`
 	Observations []*Observation         `protobuf:"bytes,1,rep,name=observations,proto3" json:"observations,omitempty"`
 	// bot.ObsSize, so Python can assert the layout its policy was trained against.
-	ObsSize       uint32 `protobuf:"varint,2,opt,name=obs_size,json=obsSize,proto3" json:"obs_size,omitempty"`
+	ObsSize uint32 `protobuf:"varint,2,opt,name=obs_size,json=obsSize,proto3" json:"obs_size,omitempty"`
+	// bot.ActionCount: the width of the policy's output layer.
+	ActionCount   uint32 `protobuf:"varint,3,opt,name=action_count,json=actionCount,proto3" json:"action_count,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -159,6 +161,13 @@ func (x *ResetResponse) GetObservations() []*Observation {
 func (x *ResetResponse) GetObsSize() uint32 {
 	if x != nil {
 		return x.ObsSize
+	}
+	return 0
+}
+
+func (x *ResetResponse) GetActionCount() uint32 {
+	if x != nil {
+		return x.ActionCount
 	}
 	return 0
 }
@@ -218,8 +227,17 @@ type StepResponse struct {
 	// The observation each finished env ended on, empty elsewhere, index-aligned with the
 	// fields above. PPO bootstraps a truncated episode's value from it.
 	FinalObservations []*Observation `protobuf:"bytes,5,rep,name=final_observations,json=finalObservations,proto3" json:"final_observations,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Set only for envs that just finished, zero elsewhere: the fewest steps that episode could
+	// have taken. Training divides its own episode length by this. Go sends it because deriving
+	// it needs TradeRange and the per-tick step, which are constants Python must never learn.
+	//
+	// Scoped to the movement task, not to sim in general: "fewest ticks to reach a point" means
+	// nothing once the objective is net worth. A trading env brings its own per-episode metric
+	// rather than reusing this one, and once a trained policy is checked by a Go test instead of
+	// through this wire, the only job left here is the live training curve.
+	OptimalSteps  []uint32 `protobuf:"varint,6,rep,packed,name=optimal_steps,json=optimalSteps,proto3" json:"optimal_steps,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *StepResponse) Reset() {
@@ -287,6 +305,13 @@ func (x *StepResponse) GetFinalObservations() []*Observation {
 	return nil
 }
 
+func (x *StepResponse) GetOptimalSteps() []uint32 {
+	if x != nil {
+		return x.OptimalSteps
+	}
+	return nil
+}
+
 var File_sim_v1_env_proto protoreflect.FileDescriptor
 
 const file_sim_v1_env_proto_rawDesc = "" +
@@ -295,12 +320,13 @@ const file_sim_v1_env_proto_rawDesc = "" +
 	"\vObservation\x12 \n" +
 	"\vobservation\x18\x01 \x03(\x02R\vobservation\"$\n" +
 	"\fResetRequest\x12\x14\n" +
-	"\x05seeds\x18\x01 \x03(\x03R\x05seeds\"c\n" +
+	"\x05seeds\x18\x01 \x03(\x03R\x05seeds\"\x86\x01\n" +
 	"\rResetResponse\x127\n" +
 	"\fobservations\x18\x01 \x03(\v2\x13.sim.v1.ObservationR\fobservations\x12\x19\n" +
-	"\bobs_size\x18\x02 \x01(\rR\aobsSize\"'\n" +
+	"\bobs_size\x18\x02 \x01(\rR\aobsSize\x12!\n" +
+	"\faction_count\x18\x03 \x01(\rR\vactionCount\"'\n" +
 	"\vStepRequest\x12\x18\n" +
-	"\aactions\x18\x01 \x03(\x05R\aactions\"\xe3\x01\n" +
+	"\aactions\x18\x01 \x03(\x05R\aactions\"\x88\x02\n" +
 	"\fStepResponse\x127\n" +
 	"\fobservations\x18\x01 \x03(\v2\x13.sim.v1.ObservationR\fobservations\x12\x18\n" +
 	"\arewards\x18\x02 \x03(\x02R\arewards\x12\x1e\n" +
@@ -308,7 +334,8 @@ const file_sim_v1_env_proto_rawDesc = "" +
 	"terminated\x18\x03 \x03(\bR\n" +
 	"terminated\x12\x1c\n" +
 	"\ttruncated\x18\x04 \x03(\bR\ttruncated\x12B\n" +
-	"\x12final_observations\x18\x05 \x03(\v2\x13.sim.v1.ObservationR\x11finalObservations2n\n" +
+	"\x12final_observations\x18\x05 \x03(\v2\x13.sim.v1.ObservationR\x11finalObservations\x12#\n" +
+	"\roptimal_steps\x18\x06 \x03(\rR\foptimalSteps2n\n" +
 	"\x03Env\x124\n" +
 	"\x05Reset\x12\x14.sim.v1.ResetRequest\x1a\x15.sim.v1.ResetResponse\x121\n" +
 	"\x04Step\x12\x13.sim.v1.StepRequest\x1a\x14.sim.v1.StepResponseB:Z8github.com/alcares/mmoserver/backend/gen/go/sim/v1;simv1b\x06proto3"

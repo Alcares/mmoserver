@@ -44,6 +44,16 @@ PLAYING (real time, inside the server)
 - The **sim contains no policy**. It takes actions and returns observations; it doesn't
   matter whether those actions come from PyTorch, a script or a person.
 
+Training in Go was considered and **rejected**; the split above is settled. The bridge is not
+what costs - measured, 229k steps/s native, 152k through gRPC under a numpy policy, but 7.4k
+once PPO is training, which is PyTorch's per-op overhead on 5-wide tensors rather than
+transport. Hand-writing PPO over a 2x64 MLP is only ~250 lines on top of the forward pass step
+14 needs anyway, and it would delete step 12 and most of 14. What it would cost is experiment
+velocity while rewards and observations are still moving, and the reference implementation that
+says whether a bad run is the algorithm or the environment - which Stage 2, having no scripted
+control, needs more than Stage 1 did. So the gRPC bridge and everything in `rl-training/` are
+permanent infrastructure, not scaffolding.
+
 ## Contracts between Go and Python
 
 These must be identical on both sides. Changing any of them invalidates every trained policy.
@@ -138,14 +148,52 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
         episode's first observation, and the one the episode ended on has to travel separately:
         PPO bootstraps a truncated episode's value from it. Today `Env.Step` errors after the
         episode ends, so this is a decision, not a given.
-- [ ] **13. Training.** A `gymnasium.vector.VectorEnv` wrapper, PPO from Stable-Baselines3 or
-      CleanRL, a 2×64 MLP. Log success rate and `ticks taken / optimal ticks` to TensorBoard.
-      1.0 is not the target: `optimal` is a straight line, and quantising to 45° costs up to
+- [x] **13. Training.** `rl-training/src/rl_training/`: `env.py` wraps the sim as a
+      Stable-Baselines3 `VecEnv`, `baseline.py` measures the scripted and random policies
+      through that wrapper, `train.py` runs PPO over a 2×64 MLP and logs to TensorBoard.
+      `make baseline` and `make train`; both spawn their own sim, so no stale binary survives a
+      Go change. The run logs `bot/success_rate` and `bot/steps_over_optimal` beside SB3's own
+      curves, because the shaped reward can rise while the bot still fails to arrive.
+      1.0 is not reachable: `optimal` is a straight line, and quantising to 45° costs up to
       `1/cos(22.5°)` = 1.082, so `ScriptedPolicy` measures 1.05 mean and 1.14 worst over random
-      goals. That is the number to beat. Curriculum: nearby goals first, then farther ones.
+      goals. That is the number to match, not to beat. Progress per tick is `0.6 × cos(θ)` for
+      the angle between the action and the true bearing, so the nearest of the 8 directions is
+      the best single action, and mixing two of them does not help: alternating N and NE toward
+      a 22.5° bearing projects the same `cos(22.5°)` whatever the ratio. `ScriptedPolicy` is
+      already optimal for this action set, and the only headroom is the final step, landing just
+      inside `TradeRange` rather than overshooting into it. What this step buys is the pipeline
+      — observation contract, autoreset, reward, gradients, export — checked on the last task
+      whose answer is known in advance; Stage 2 has no scripted control to check against.
+
+      Three things the implementation pinned down:
+      - **SB3's `VecEnv`, not `gymnasium.vector.VectorEnv`.** Gymnasium 1.0 resets an env on the
+        step *after* it terminates and throws that action away. The Go server resets in place
+        and sends the terminal observation alongside, which is SB3's convention exactly, so
+        `final_observations` maps straight onto `infos[i]["terminal_observation"]` and neither
+        side needs a shim.
+      - **Go supplies the metric's denominator.** `StepResponse.optimal_steps`, filled only for
+        envs that just finished, because deriving it needs `TradeRange` and the per-tick step.
+        The numerator is the episode length the wrapper already counts, so it stays in Python.
+        `ResetResponse.action_count` joins `obs_size` for the same reason: Python invents no
+        constant the game owns. `optimal_steps` is scoped to *this* task, though - "fewest ticks
+        to reach a point" means nothing once the objective is net worth - and step 14 takes over
+        its regression-test job, leaving it only the live training curve.
+      - **No normalisation anywhere in Python.** Whatever the wrapper did to an observation,
+        Go's `MLPPolicy` would have to redo at inference, so `policy.json` stays the complete
+        description of the bot.
+
+      Measured over 2000 held-out episodes: PPO 100% success at 1.053 mean / 1.120 worst,
+      against `ScriptedPolicy`'s 1.052 / 1.120 through the same wrapper. Matched, as the
+      argument above says it must be. Uniform random is 0% at 5.16, which is the floor the
+      curve had to climb from. No curriculum was needed: the progress reward is dense from the
+      first step of the first episode, so there is no sparse-reward problem for one to solve.
 - [ ] **14. Export and Go inference.** Python writes the weights to `policy.json`. `MLPPolicy`
       in Go does the forward pass (a few matrix multiplications, no cgo). Compare against
       `ScriptedPolicy`.
+      That comparison then becomes the pipeline's regression test, and it belongs in Go: 2000
+      episodes straight through `Env`, asserting success >=99% and mean steps/optimal <=1.10, is
+      about 3 s at 229k steps/s. It supersedes `make baseline` as the guard because it needs no
+      venv, no torch and no wire - nothing that can rot independently of the code it checks.
 - [ ] **15. In-server bot.** `bot.Spawn(world, policy)`: a `Client` with a `Send` buffer and no
       websocket, joined through `World.Join`. A goroutine drains `Send`, runs the Observer and
       policy, and calls `EnqueueMovement`. Needs a removal path (today removal lives in
@@ -170,15 +218,46 @@ evaluation world:
 
 ### Stage 2: trading
 
+Trading is a **second environment**, not this one with trades bolted on. `Env` stays, because it
+keeps three jobs: the pipeline's regression test, the steering half of the split below, and the
+source of behaviour-cloning data. What is specific to reaching a point dies with it -
+`optimalSteps`, `startDist`, `pickGoal`, the progress/penalty/arrival reward, `Terminated`
+meaning "inside `TradeRange`", and the 1200-tick limit against a round that runs 6000. `World`,
+`Observer`, `ScriptedPolicy` and the action table are shared, not copied.
+
 - Observation grows to include `MarketState` quotes, `PlayerInventory` and `TradeReceipt`s
   (the fields already stubbed in `Observer`).
-- Actions add buy and sell for each order size in `OrderSizes`.
+- Actions add buy and sell for each order size in `OrderSizes`. The 9 directions stay as a
+  prefix, so `ActionCount` grows and nothing already trained is renumbered.
 - Reward becomes the change in net worth.
+- **`bot.Goal` inverts.** Today the env hands the bot a destination; a trading bot picks its
+  own, so the goal becomes a policy *output* and `Encode(goal)` is a movement-shaped signature.
 - A possible split: the policy picks a target station and a trade; scripted steering walks
   there.
-- Behaviour cloning from `ScriptedPolicy` recordings can pre-train the network, so PPO doesn't
-  start from random wandering.
-- Self-play: several bots per world, so prices respond to other traders.
+- Behaviour cloning needs a scripted *trader* to imitate - `ScriptedPolicy` only steers. Worth
+  writing early: it is both the pre-training source and the fixed reference a win rate is
+  measured against.
+
+#### Self-play
+
+Several bots per world, so prices respond to other traders. The AMM pool is finite and profit
+comes out of it and out of the other bots, so the game is near zero-sum: opponents genuinely
+reshape each other's environment rather than just sharing a map.
+
+The wire needs no change. The batch index can mean an **agent slot** rather than an env: each
+bot already has its own `Client` and its own FOV-limited `Observer`, so the server maps slot `i`
+to (world, bot), and agents sharing a world reach the round's end together - their
+`final_observations` all fire on the same step, which is what PPO already expects.
+
+Naive self-play forgets. Beating the current opponent by exploiting its particular weakness can
+cost the general ability, and strategies cycle: A beats B beats C beats A. A league (AlphaStar)
+exists to stop that, but OpenAI Five reached world-class Dota with plain self-play plus a slice
+of past opponents, so **measure whether this game cycles before building for it**: snapshot the
+policy periodically, play every snapshot against every other, and read the win-rate matrix.
+Transitive, where later always beats earlier, means self-play is converging and a league buys
+nothing. Cyclic, where generation 30 beats generation 50, means it earns its keep - and
+prioritised opponent sampling, weighting towards opponents currently beating you, is the cheap
+majority of one. Dedicated exploiter agents come last, if ever.
 
 ## Open questions
 
@@ -189,3 +268,9 @@ evaluation world:
   (faster training, closer to human reaction time)?
 - **Observation encoding.** `[dx, dy]` gets tiny near the goal. `[dx/dist, dy/dist, dist]`
   keeps the direction at full size; worth trying if the bot is imprecise when arriving.
+- **Where the league lives.** Settled that Python trains, but not which side holds the
+  opponent pool. Snapshots are PyTorch checkpoints, so they are naturally Python-side; match
+  scheduling - which bot occupies which agent slot in which world - is the sim server's job.
+  A `ResetRequest` that names an opponent policy per slot would put it in Go; keeping it in
+  Python means the pool is just a sampling step before each `Reset`. Decide when self-play
+  starts, not before.

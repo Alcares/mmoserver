@@ -15,12 +15,13 @@ SERVER_PID := $(BACKEND)/server.pid
 SERVER_LOG := $(BACKEND)/server.log
 BENCH_CPU := $(CURDIR)/$(BACKEND)/bench-cpu.out
 BENCH ?= .
+ARGS ?=
 BENCH_PKG ?= ./...
 BENCH_PROF_PKG ?= ./internal/sim
 UNITY_BATCH = LD_LIBRARY_PATH=$(HOME)/.local/lib/unity-compat:$$LD_LIBRARY_PATH $(UNITY) \
 	-batchmode -quit -projectPath $(UNITY_PROJECT) -logFile - -executeMethod
 
-.PHONY: proto proto-py clean server-start server-stop test bench bench-profile hooks client client-linux client-mac all
+.PHONY: proto proto-py clean server-start server-stop test bench bench-profile hooks client client-linux client-mac all baseline train
 
 proto:
 	protoc \
@@ -53,6 +54,17 @@ proto-py:
 		$(PROTO_DIR)/sim/v1/*.proto
 	# protoc leaves the package dirs without __init__.py, which keeps them out of the wheel
 	touch $(SIM_PY_PKG)/__init__.py $(SIM_PY_PKG)/v1/__init__.py
+
+# Baselines through the Python wrapper: scripted should reproduce the ~1.05 steps/optimal that
+# internal/sim measures in Go. If it doesn't, the wrapper is wrong, not the policy.
+# ARGS passes flags through: make baseline ARGS="--envs 32 --episodes 500"
+baseline:
+	uv run --project $(RL_DIR) python -m rl_training.baseline $(ARGS)
+
+# Trains and evaluates; both spawn their own sim, so there is no stale binary to forget about.
+# TensorBoard reads rl-training/runs.
+train:
+	uv run --project $(RL_DIR) python -m rl_training.train $(ARGS)
 
 clean:
 	rm -rf $(BACKEND)/gen/

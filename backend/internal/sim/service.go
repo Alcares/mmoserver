@@ -53,7 +53,11 @@ func (s *Server) Reset(ctx context.Context, r *simv1.ResetRequest) (*simv1.Reset
 		observations[i] = observation(obs)
 	}
 
-	return &simv1.ResetResponse{Observations: observations, ObsSize: bot.ObsSize}, nil
+	return &simv1.ResetResponse{
+		Observations: observations,
+		ObsSize:      bot.ObsSize,
+		ActionCount:  uint32(bot.ActionCount),
+	}, nil
 }
 
 func (s *Server) Step(ctx context.Context, r *simv1.StepRequest) (*simv1.StepResponse, error) {
@@ -73,6 +77,7 @@ func (s *Server) Step(ctx context.Context, r *simv1.StepRequest) (*simv1.StepRes
 	rewards := make([]float32, len(r.Actions))
 	terminated := make([]bool, len(r.Actions))
 	truncated := make([]bool, len(r.Actions))
+	optimalSteps := make([]uint32, len(r.Actions))
 
 	for i, action := range r.Actions {
 		res, err := s.environments[i].Step(bot.Action(action))
@@ -93,6 +98,7 @@ func (s *Server) Step(ctx context.Context, r *simv1.StepRequest) (*simv1.StepRes
 		// observations carries the next episode's first observation; the one this episode ended on travels in
 		// finalObservations, because PPO bootstraps a truncated episode's value from it.
 		finalObservations[i] = observation(res.Obs)
+		optimalSteps[i] = uint32(res.OptimalSteps)
 
 		next, err := s.environments[i].Reset(s.seedStreams[i].Int63())
 		if err != nil {
@@ -107,5 +113,6 @@ func (s *Server) Step(ctx context.Context, r *simv1.StepRequest) (*simv1.StepRes
 		Terminated:        terminated,
 		Truncated:         truncated,
 		FinalObservations: finalObservations,
+		OptimalSteps:      optimalSteps,
 	}, nil
 }

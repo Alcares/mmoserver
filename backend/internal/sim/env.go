@@ -3,6 +3,7 @@ package sim
 import (
 	"errors"
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 
@@ -23,10 +24,11 @@ const (
 )
 
 type StepResult struct {
-	Obs        *bot.Observation
-	Reward     float32
-	Terminated bool // Reached the goal: a real ending
-	Truncated  bool // Ran out of steps: stopped watching, not a failure
+	Obs          *bot.Observation
+	Reward       float32
+	Terminated   bool // Reached the goal: a real ending
+	Truncated    bool // Ran out of steps: stopped watching, not a failure
+	OptimalSteps int  // Set only on the step that ends an episode: the fewest steps it could have taken.
 }
 
 // Env is one headless world with one bot, stepped as fast as the CPU allows.
@@ -41,7 +43,9 @@ type Env struct {
 	goal     bot.Goal
 	steps    int
 	prevDist float32
-	done     bool
+	// Distance to the goal at Reset, kept so a finished episode can report how close to optimal it was
+	startDist float32
+	done      bool
 }
 
 // NewEnv returns an Env that must be Reset before the first Step
@@ -86,6 +90,7 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 	}
 
 	e.prevDist = obs.GoalDist
+	e.startDist = obs.GoalDist
 	e.steps = 0
 	e.done = false
 
@@ -127,6 +132,9 @@ func (e *Env) Step(a bot.Action) (StepResult, error) {
 		Terminated: arrived,
 		Truncated:  truncated,
 	}
+	if arrived || truncated {
+		stepResult.OptimalSteps = optimalSteps(e.startDist)
+	}
 
 	e.prevDist = obs.GoalDist
 	e.done = truncated || arrived
@@ -160,6 +168,15 @@ func (e *Env) pickGoal() bot.Goal {
 		X: float32(game.WorldMinX + e.rng.Float64()*(game.WorldMaxX-game.WorldMinX)),
 		Y: float32(game.WorldMinY + e.rng.Float64()*(game.WorldMaxY-game.WorldMinY)),
 	}
+}
+
+// optimalSteps is the fewest steps an episode starting dist away could end in. Every action
+// moves exactly MoveSpeed*TickDuration, diagonals included, because tick.go normalizes any input
+// longer than unit length. A goal that spawns inside TradeRange still costs the one
+// step that notices it, hence the floor of 1.
+func optimalSteps(dist float32) int {
+	reach := float64(dist - game.TradeRange)
+	return max(1, int(math.Ceil(reach/(game.MoveSpeed*game.TickDuration))))
 }
 
 // reward scores one step: progress towards the goal, a small cost per step, and a bonus on arrival

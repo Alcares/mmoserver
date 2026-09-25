@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10sim/v1/env.proto\x12\x06sim.v1\"\"\n\x0bObservation\x12\x13\n\x0bobservation\x18\x01 \x03(\x02\"\x1d\n\x0cResetRequest\x12\r\n\x05seeds\x18\x01 \x03(\x03\"L\n\rResetResponse\x12)\n\x0cobservations\x18\x01 \x03(\x0b\x32\x13.sim.v1.Observation\x12\x10\n\x08obs_size\x18\x02 \x01(\r\"\x1e\n\x0bStepRequest\x12\x0f\n\x07\x61\x63tions\x18\x01 \x03(\x05\"\xa2\x01\n\x0cStepResponse\x12)\n\x0cobservations\x18\x01 \x03(\x0b\x32\x13.sim.v1.Observation\x12\x0f\n\x07rewards\x18\x02 \x03(\x02\x12\x12\n\nterminated\x18\x03 \x03(\x08\x12\x11\n\ttruncated\x18\x04 \x03(\x08\x12/\n\x12\x66inal_observations\x18\x05 \x03(\x0b\x32\x13.sim.v1.Observation2n\n\x03\x45nv\x12\x34\n\x05Reset\x12\x14.sim.v1.ResetRequest\x1a\x15.sim.v1.ResetResponse\x12\x31\n\x04Step\x12\x13.sim.v1.StepRequest\x1a\x14.sim.v1.StepResponseB:Z8github.com/alcares/mmoserver/backend/gen/go/sim/v1;simv1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10sim/v1/env.proto\x12\x06sim.v1\"\"\n\x0bObservation\x12\x13\n\x0bobservation\x18\x01 \x03(\x02\"\x1d\n\x0cResetRequest\x12\r\n\x05seeds\x18\x01 \x03(\x03\"b\n\rResetResponse\x12)\n\x0cobservations\x18\x01 \x03(\x0b\x32\x13.sim.v1.Observation\x12\x10\n\x08obs_size\x18\x02 \x01(\r\x12\x14\n\x0c\x61\x63tion_count\x18\x03 \x01(\r\"\x1e\n\x0bStepRequest\x12\x0f\n\x07\x61\x63tions\x18\x01 \x03(\x05\"\xb9\x01\n\x0cStepResponse\x12)\n\x0cobservations\x18\x01 \x03(\x0b\x32\x13.sim.v1.Observation\x12\x0f\n\x07rewards\x18\x02 \x03(\x02\x12\x12\n\nterminated\x18\x03 \x03(\x08\x12\x11\n\ttruncated\x18\x04 \x03(\x08\x12/\n\x12\x66inal_observations\x18\x05 \x03(\x0b\x32\x13.sim.v1.Observation\x12\x15\n\roptimal_steps\x18\x06 \x03(\r2n\n\x03\x45nv\x12\x34\n\x05Reset\x12\x14.sim.v1.ResetRequest\x1a\x15.sim.v1.ResetResponse\x12\x31\n\x04Step\x12\x13.sim.v1.StepRequest\x1a\x14.sim.v1.StepResponseB:Z8github.com/alcares/mmoserver/backend/gen/go/sim/v1;simv1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -37,11 +37,11 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_RESETREQUEST']._serialized_start=64
   _globals['_RESETREQUEST']._serialized_end=93
   _globals['_RESETRESPONSE']._serialized_start=95
-  _globals['_RESETRESPONSE']._serialized_end=171
-  _globals['_STEPREQUEST']._serialized_start=173
-  _globals['_STEPREQUEST']._serialized_end=203
-  _globals['_STEPRESPONSE']._serialized_start=206
-  _globals['_STEPRESPONSE']._serialized_end=368
-  _globals['_ENV']._serialized_start=370
-  _globals['_ENV']._serialized_end=480
+  _globals['_RESETRESPONSE']._serialized_end=193
+  _globals['_STEPREQUEST']._serialized_start=195
+  _globals['_STEPREQUEST']._serialized_end=225
+  _globals['_STEPRESPONSE']._serialized_start=228
+  _globals['_STEPRESPONSE']._serialized_end=413
+  _globals['_ENV']._serialized_start=415
+  _globals['_ENV']._serialized_end=525
 # @@protoc_insertion_point(module_scope)

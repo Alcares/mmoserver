@@ -65,6 +65,9 @@ var actionVectors = [...][2]float64{
 	ActionNW:   {-1, -1},
 }
 
+// ActionCount is how many actions the table defines, and so the width of a policy network's output layer
+const ActionCount = len(actionVectors)
+
 // Valid reports whether a indexes the table. The integers are the contract with Python, so a
 // caller taking them from outside Go checks here rather than letting Vector panic.
 func (a Action) Valid() bool {

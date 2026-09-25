@@ -63,11 +63,8 @@ func TestEnvReachesGoal(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		// Every action moves exactly MoveSpeed*TickDuration, diagonals included, so covering
-		// GoalDist-TradeRange cannot take fewer ticks than this. It is the optimum for the 9
-		// actions, not a continuous ideal they can only approach. A goal that spawns inside
-		// TradeRange still costs the one step that notices it.
-		optimal := max(1, int(math.Ceil(float64(start.GoalDist-game.TradeRange)/(game.MoveSpeed*game.TickDuration))))
+		// The same floor the env reports to training
+		optimal := optimalSteps(start.GoalDist)
 
 		res, steps := walkToGoal(t, e, seed)
 		if !res.Terminated {

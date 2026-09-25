@@ -10,6 +10,9 @@ requires-python = ">=3.14"
 dependencies = [
     "grpcio>=1.84.0",
     "grpcio-tools>=1.84.0",
+    "stable-baselines3>=2.9.0",
+    "tensorboard>=2.21.0",
+    "torch>=2.10.0",
 ]
 
 [project.scripts]
@@ -21,3 +24,20 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-name = ["rl_training", "sim"]
+
+# PyPI's default torch wheel is the CUDA build, which is dead weight on an AMD card, and the
+# policy network here is a 2x64 MLP that runs faster on the CPU than it would on any GPU.
+#
+# To train on the Radeon instead, point the index at rocm7.1 and add triton-rocm to
+# [project.dependencies] as `triton-rocm>=3.7.1 ; sys_platform == 'linux'`. It has to be a
+# direct dependency: uv applies [tool.uv.sources] only to those, so as a transitive dependency
+# of torch it gets looked up on PyPI, where it does not exist, and resolution fails with
+# "there is no version of triton-rocm". The wheel is 5.9 GB, as it carries the whole ROCm
+# runtime rather than splitting it out the way the CUDA build does.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
