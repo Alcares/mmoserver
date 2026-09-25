@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Game.Networking;
 using Game.V1;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Game.Client
 {
@@ -19,11 +20,21 @@ namespace Game.Client
         private const int StationOrder = -50;
         private const int LabelOrder = 10000;
 
+        [Tooltip("Orthographic half-height the camera starts at, in tiles.")]
         [SerializeField] private float cameraSize = 12f;
+        [Tooltip("Zoom limits, in tiles of orthographic half-height.")]
+        [SerializeField] private float minZoom = 4f;
+        [SerializeField] private float maxZoom = 60f;
+        [Tooltip("Multiplier applied per wheel notch, so a notch covers the same proportion at any zoom.")]
+        [SerializeField] private float zoomFactor = 1.15f;
+        [Tooltip("Higher = snappier zoom. 0 snaps instantly.")]
+        [SerializeField] private float zoomSmoothing = 12f;
         [Tooltip("Higher = snappier follow of the 20Hz server snapshots.")]
         [SerializeField] private float smoothing = 20f;
         [Tooltip("Optional 8-direction player art. Leave empty to use the built-in procedural crewmate.")]
         [SerializeField] private DirectionalAnimationSet playerArt;
+        [Tooltip("Optional 8-direction art for server-run bots (PlayerState.is_bot). Falls back to playerArt.")]
+        [SerializeField] private DirectionalAnimationSet botArt;
         [Tooltip("Optional station icons. A commodity without an icon is drawn as a plain disc.")]
         [SerializeField] private CommodityIcons commodityIcons;
 
@@ -49,6 +60,7 @@ namespace Game.Client
         private GameState _state;
         private Camera _camera;
         private Transform _cameraFollow;
+        private float _zoomTarget;
         private SpriteRenderer _floor;
 
         private readonly Dictionary<uint, PlayerView> _players = new();
@@ -104,9 +116,40 @@ namespace Game.Client
 
         private void LateUpdate()
         {
+            // Before the follow guard: zooming works in the lobby too, where the camera is
+            // framed on the whole map and there is nobody to follow yet.
+            ApplyZoom();
+
             if (_cameraFollow == null) return;
             var p = _cameraFollow.position;
             _camera.transform.position = new Vector3(p.x, p.y, -10f);
+        }
+
+        /// <summary>
+        /// Wheel zoom. Purely local, so it lives here rather than in GameInput, which exists to
+        /// turn keys into messages for the server.
+        ///
+        /// One step per frame off the sign rather than the raw delta: a notch reads as 120 on
+        /// Windows and as 1 elsewhere, and nothing normalizes that for us.
+        ///
+        /// Note the server culls snapshots to DefaultFOVRadius around each player, so zooming
+        /// past that shows empty floor where players actually are until that radius grows.
+        /// </summary>
+        private void ApplyZoom()
+        {
+            if (_camera == null) return;
+
+            var mouse = Mouse.current;
+            float scroll = mouse != null ? mouse.scroll.ReadValue().y : 0f;
+            if (scroll != 0f)
+            {
+                float step = Mathf.Pow(zoomFactor, -Mathf.Sign(scroll));
+                _zoomTarget = Mathf.Clamp(_zoomTarget * step, minZoom, maxZoom);
+            }
+
+            _camera.orthographicSize = zoomSmoothing > 0f
+                ? Mathf.Lerp(_camera.orthographicSize, _zoomTarget, 1f - Mathf.Exp(-zoomSmoothing * Time.deltaTime))
+                : _zoomTarget;
         }
 
         private void SetupCamera()
@@ -119,7 +162,8 @@ namespace Game.Client
             }
 
             _camera.orthographic = true;
-            _camera.orthographicSize = cameraSize;
+            _zoomTarget = Mathf.Clamp(cameraSize, minZoom, maxZoom);
+            _camera.orthographicSize = _zoomTarget;
             _camera.clearFlags = CameraClearFlags.SolidColor;
             _camera.backgroundColor = new Color32(0xcb, 0xd5, 0xe1, 0xff);
             // Framed on the world by ApplyWorldSize once the server says how big it is
@@ -280,11 +324,15 @@ namespace Game.Client
             var go = new GameObject($"Player {state.Id}");
             go.transform.SetParent(transform, false);
 
+            // Bots get their own sheets so they read as server-run at a glance; the animation
+            // and direction handling is identical, only the art differs.
+            var art = state.IsBot && botArt != null ? botArt : playerArt;
+
             PlayerAvatar avatar;
-            if (playerArt != null)
+            if (art != null)
             {
                 var sprites = go.AddComponent<DirectionalSpriteView>();
-                sprites.Build(playerArt);
+                sprites.Build(art);
                 avatar = sprites;
             }
             else

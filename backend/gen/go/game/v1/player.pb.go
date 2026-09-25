@@ -134,6 +134,7 @@ type PlayerState struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	X             float32                `protobuf:"fixed32,3,opt,name=x,proto3" json:"x,omitempty"`
 	Y             float32                `protobuf:"fixed32,4,opt,name=y,proto3" json:"y,omitempty"`
+	IsBot         bool                   `protobuf:"varint,5,opt,name=is_bot,json=isBot,proto3" json:"is_bot,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -194,6 +195,13 @@ func (x *PlayerState) GetY() float32 {
 		return x.Y
 	}
 	return 0
+}
+
+func (x *PlayerState) GetIsBot() bool {
+	if x != nil {
+		return x.IsBot
+	}
+	return false
 }
 
 // Server -> Client: Private inventory sent only to the owning player (on connect and on change)
@@ -344,12 +352,13 @@ const file_game_v1_player_proto_rawDesc = "" +
 	"\x13duration_ticks_left\x18\x02 \x01(\rR\x11durationTicksLeft\"T\n" +
 	"\x0eOwnedCommodity\x12*\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\x04type\x12\x16\n" +
-	"\x06amount\x18\x02 \x01(\x04R\x06amount\"M\n" +
+	"\x06amount\x18\x02 \x01(\x04R\x06amount\"d\n" +
 	"\vPlayerState\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\f\n" +
 	"\x01x\x18\x03 \x01(\x02R\x01x\x12\f\n" +
-	"\x01y\x18\x04 \x01(\x02R\x01y\"\xa4\x01\n" +
+	"\x01y\x18\x04 \x01(\x02R\x01y\x12\x15\n" +
+	"\x06is_bot\x18\x05 \x01(\bR\x05isBot\"\xa4\x01\n" +
 	"\x0fPlayerInventory\x12\x18\n" +
 	"\abalance\x18\x01 \x01(\x04R\abalance\x129\n" +
 	"\vcommodities\x18\x02 \x03(\v2\x17.game.v1.OwnedCommodityR\vcommodities\x12<\n" +

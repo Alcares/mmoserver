@@ -9,7 +9,7 @@ list is short and why some obvious-looking tests are deliberately absent.
 Current coverage, for contrast: `internal/game` (world, trading, pricing), `internal/bot`
 (`Observer.Encode`, `ScriptedPolicy`, `Action.Valid`), `internal/sim` (`Env` lifecycle, reward,
 the scripted walk in `TestEnvReachesGoal`). Untested today: **`sim.Server`**, **`bot.MLPPolicy`**,
-and **all of `rl-training/`**.
+and **all of `rl-training/`**, plus the client-side copies of shared constants (section 5).
 
 ---
 
@@ -198,6 +198,40 @@ export step rather than in Go, which is a much shorter path to the cause.
 
 ---
 
+## 5. Shared constants - the copies no test spans
+
+`TradeRange` exists four times, in three languages:
+
+| file | |
+|---|---|
+| `backend/internal/game/config.go:20` | the authority |
+| `backend/internal/bot/policy.go:16` | `stopRange`, because `internal/bot` must not import `internal/game` |
+| `unity/Assets/Scripts/Client/GameState.cs:19` | gates the nearby-station highlight and E/Q |
+| `web/index.html:427` | the same, in the browser client |
+
+This is not hypothetical. When the range moved from 5 to 3, the first two were updated and the
+last two were not, and both clients spent that window offering trades from 3-5 units out that
+the server then rejected.
+
+**What already catches half of it.** `sim/env_test.go:47` asserts that a state the env calls
+arrived is a state where `ScriptedPolicy` returns `ActionStop`. That is a real two-sided check
+and it fired on the 5-to-3 change. It covers the Go pair only.
+
+**What catches the other half: nothing, and probably nothing should.** A Go test cannot read a
+C# `const` or a JS `const` without scraping source, which is a test that asserts two spellings
+of a number match - the `optimalSteps` mistake again, in a worse form.
+
+The fix is to delete the copies rather than test them. `InitialGameState` already carries
+`world_size` for exactly this reason, and `unity/CLAUDE.md` already says order-size multipliers
+come from `PriceQuote.orders` and are "never hard-coded". A `trade_range` field alongside
+`world_size` would put both clients on the server's number and leave one constant to keep in
+step instead of three.
+
+Until then, the two client comments are also wrong about where the authority lives: both say
+`world.go`, and it is `config.go`.
+
+---
+
 ## Suggested order
 
 By "silent and expensive" first, not by convenience:
@@ -209,6 +243,8 @@ By "silent and expensive" first, not by convenience:
 5. **2.2, 4.2, 4.3** - the checks that keep the other checks honest.
 6. **3.1** - the end-to-end guard, once the pieces beneath it are pinned.
 7. **1.4, 1.5, 1.6, 2.3** - cheap rows once each fixture exists.
+
+Section 5 is not in this list on purpose: it asks for a proto field, not a test.
 
 ## What not to write
 

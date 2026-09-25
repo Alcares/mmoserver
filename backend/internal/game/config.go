@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"math/rand"
 	"time"
+
+	"github.com/alcares/mmoserver/backend/internal/bot"
 )
 
 const (
@@ -15,7 +17,7 @@ const (
 	WorldMinY        = 0.0
 	WorldMaxY        = 500.0
 	TickDuration     = 0.05 // 50ms = 20Hz
-	TradeRange       = 5.0  // Max distance to a station a player can trade from
+	TradeRange       = 3.0  // Max distance to a station a player can trade from
 	MaxPlayers       = 50
 )
 
@@ -48,6 +50,8 @@ type WorldConfig struct {
 	// Logger receives game events. sanitize defaults it to a discarding logger, so the
 	// training sim and the tests stay silent without every call site checking.
 	Logger *slog.Logger
+
+	BotPolicy bot.Policy
 }
 
 // sanitize forces cfg into the supported range, filling in defaults for unset fields.
@@ -71,6 +75,9 @@ func (cfg *WorldConfig) sanitize() {
 	}
 	if cfg.Logger == nil {
 		cfg.Logger = slog.New(slog.DiscardHandler)
+	}
+	if cfg.BotPolicy == nil {
+		cfg.BotPolicy = bot.ScriptedPolicy{}
 	}
 }
 

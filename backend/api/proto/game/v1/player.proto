@@ -24,6 +24,7 @@ message PlayerState {
   string name = 2;
   float x = 3;
   float y = 4;
+  bool is_bot = 5;
 }
 
 // Server -> Client: Private inventory sent only to the owning player (on connect and on change)

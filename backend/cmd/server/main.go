@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/alcares/mmoserver/backend/internal/bot"
 	"github.com/alcares/mmoserver/backend/internal/game"
 	"github.com/gorilla/websocket"
 )
@@ -28,11 +29,7 @@ func handleWS(master *game.Master, defaults game.WorldConfig, w http.ResponseWri
 		log.Printf("Upgrade failed: %v", err)
 		return
 	}
-
-	client := &game.Client{
-		Conn: conn,
-		Send: make(chan []byte, game.SendBufferSize),
-	}
+	client := game.NewWebsocketClient(conn)
 
 	go client.WritePump()
 	go client.ReadPump(master, defaults)
@@ -48,11 +45,18 @@ func main() {
 	// Defaults for every game created on this server; a client's CreateGame may
 	// override them, within the bounds WorldConfig.sanitize enforces.
 	defaults := game.WorldConfig{
-		MinPlayers:     2,
-		StartCountdown: 10 * time.Second,
+		MinPlayers:     5,
+		StartCountdown: 3 * time.Second,
 		Duration:       5 * time.Minute,
 		LobbyTTL:       game.DefaultLobbyTTL,
 		Logger:         slog.New(slog.NewJSONHandler(tradeLog, nil)),
+	}
+
+	// One instance serves every bot: Act only reads the weights and allocates its own scratch.
+	if policy, err := bot.LoadMLPPolicy("rl-training/policy.pb"); err != nil {
+		log.Printf("No trained policy (%v); bots run the scripted baseline", err)
+	} else {
+		defaults.BotPolicy = policy
 	}
 
 	gameMaster := game.NewMaster(rand.New(rand.NewSource(time.Now().UnixNano())))

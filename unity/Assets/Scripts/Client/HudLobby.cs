@@ -116,12 +116,22 @@ namespace Game.Client
             _lobbyText.normal.textColor = _state.Phase == GamePhase.Running ? Color.white : LabelGold;
             GUI.Label(rect, line, _lobbyText);
 
+            float nextY = rect.yMax + 4f;
             if (!string.IsNullOrEmpty(_state.GameId) && _state.Phase != GamePhase.Running)
             {
-                var codeRect = new Rect(rect.x, rect.yMax + 4f, rect.width, 26f);
+                var codeRect = new Rect(rect.x, nextY, rect.width, 26f);
                 GUI.DrawTexture(codeRect, _panel);
                 _lobbyText.normal.textColor = Color.white;
                 GUI.Label(codeRect, $"CODE  {_state.GameId}", _lobbyText);
+                nextY = codeRect.yMax + 4f;
+            }
+
+            if (_state.Phase == GamePhase.Waiting)
+            {
+                var hintRect = new Rect(rect.x, nextY, rect.width, 22f);
+                GUI.DrawTexture(hintRect, _panel);
+                _lobbyText.normal.textColor = Color.gray;
+                GUI.Label(hintRect, "B ADDS A BOT", _lobbyText);
             }
         }
 
@@ -131,7 +141,7 @@ namespace Game.Client
             if (_title == null) CreateLobbyStyles();
 
             var standings = _state.Standings.Standings;
-            float height = 80f + standings.Count * 26f;
+            float height = 80f + standings.Count * 26f + LobbyRowHeight + 12f;
             var rect = new Rect((screenW - StandingsWidth) / 2f, (screenH - height) / 2f, StandingsWidth, height);
 
             GUI.color = Color.white;
@@ -159,6 +169,12 @@ namespace Game.Client
                     s.UnitsTraded.ToString(CultureInfo.InvariantCulture),
                     i == 0 ? LabelGold : Color.white,
                     MoneyGreen);
+            }
+
+            var again = new Rect(x, rect.y + 78f + standings.Count * 26f, width, LobbyRowHeight);
+            if (GUI.Button(again, "Play again", _button))
+            {
+                _input.Restart();
             }
         }
 

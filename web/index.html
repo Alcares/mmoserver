@@ -105,6 +105,7 @@
       z-index: 10;
     }
     #banner .code { color: #d9c48a; font-weight: bold; }
+    #banner .hint { color: #94a3b8; font-size: 11px; }
     [hidden] { display: none !important; }
   </style>
 </head>
@@ -169,6 +170,7 @@
   let orderSizeIndex = 0;
   let lastReceipt = null; // { text, ok, until } for the latest TradeReceipt
   let tradeSequenceId = 0;
+  let botsRequested = 0; // numbers the bots this client asks for; the server ignores the name today
   let ClientMessage = null;
   let ServerMessage = null;
   let socket = null;
@@ -269,7 +271,7 @@
 
     const left = secondsLeft();
     let text = null;
-    if (phase === "GAME_PHASE_WAITING") text = `WAITING FOR PLAYERS ${playerCount}/${minPlayers}`;
+    if (phase === "GAME_PHASE_WAITING") text = `WAITING FOR PLAYERS ${playerCount}/${minPlayers}<br><span class="hint">B ADDS A BOT</span>`;
     else if (phase === "GAME_PHASE_COUNTDOWN") text = `STARTING IN ${left ?? 0}`;
     else if (phase === "GAME_PHASE_RUNNING") text = `TIME LEFT ${clock(left ?? 0)}`;
 
@@ -422,7 +424,7 @@
   // Trading: E buys and Q sells exactly the selected order size at the nearby station, sending
   // the per-unit price shown on its label. The server fills the whole order at one price or
   // rejects it (not enough cash or units, or the price moved against us) with a TradeReceipt.
-  const TRADE_RANGE = 5; // world.go TradeRange
+  const TRADE_RANGE = 3; // world.go TradeRange
   const INTENT_BUY = 1;
   const INTENT_SELL = 2;
   const RECEIPT_MS = 2500;
@@ -471,6 +473,13 @@
     socket.send(payload);
   }
 
+  // Asks the server to add a policy-driven player to this game. Join only accepts players
+  // while the phase is WAITING or COUNTDOWN, so this does nothing once the round is running.
+  function spawnBot() {
+    botsRequested += 1;
+    send({ spawnBot: { name: `BOT ${botsRequested}` } });
+  }
+
   function handleTradeReceipt(r) {
     const text = r.success
       ? `${r.intent === "INTENT_BUY" ? "Bought" : "Sold"} ${r.unitsTransacted} ${commodityLabel(r.commodity)} @ ${money(r.priceCents)} = ${money(r.totalBalanceChange)}`
@@ -488,6 +497,11 @@
     if (e.key === "q" || e.key === "Q") {
       e.preventDefault();
       sendTrade(INTENT_SELL);
+      return;
+    }
+    if (e.key === "b" || e.key === "B") {
+      e.preventDefault();
+      spawnBot();
       return;
     }
     if (e.key === "t" || e.key === "T") {

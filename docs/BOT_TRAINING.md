@@ -81,7 +81,7 @@ mapping action index → `(vx, vy)` is defined **once, in Go**. Python only ever
 
 ### Episode end
 
-- **Terminated:** the bot is within `TradeRange` (5 units) of the goal.
+- **Terminated:** the bot is within `TradeRange` (3 units) of the goal.
 - **Truncated:** the step limit ran out (`MaxSteps`, 1200 ticks = 60 s).
 
 These are reported separately: PPO treats a real ending and a timeout differently.
@@ -209,7 +209,7 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
       during a run so a spectator can watch training improve; that is the moment to add a
       periodic export, and it should ride on SB3's CheckpointCallback so the .zip and .pb
       cannot drift apart.
-- [ ] **15. In-server bot.** `bot.Spawn(world, policy)`: a `Client` with a `Send` buffer and no
+- [x] **15. In-server bot.** `bot.Spawn(world, policy)`: a `Client` with a `Send` buffer and no
       websocket, joined through `World.Join`. A goroutine drains `Send`, runs the Observer and
       policy, and calls `EnqueueMovement`. Needs a removal path (today removal lives in
       `ReadPump`'s defer) and `Client.Conn` must be optional.

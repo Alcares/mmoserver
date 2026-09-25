@@ -98,8 +98,8 @@ func (w *World) replicate(grid *SpatialGrid) {
 		grid.Insert(player.ID, player.Pos)
 	}
 
-	for _, c := range w.clients {
-		player, exists := w.players[c.ID]
+	for id := range w.clients {
+		player, exists := w.players[id]
 		if !exists {
 			continue
 		}
@@ -136,7 +136,7 @@ func (w *World) replicate(grid *SpatialGrid) {
 			},
 		}
 
-		w.sendTo(c.ID, msg)
+		w.sendTo(id, msg)
 	}
 }
 

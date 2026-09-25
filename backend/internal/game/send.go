@@ -20,11 +20,7 @@ func (w *World) sendTo(playerID uint32, msg *pb.ServerMessage) {
 		return
 	}
 
-	select {
-	case client.Send <- payload:
-	default:
-		// Client buffer is full; drop this frame to keep tick rate steady
-	}
+	client.Enqueue(payload)
 }
 
 func (w *World) sendToAll(msg *pb.ServerMessage) {
@@ -35,10 +31,6 @@ func (w *World) sendToAll(msg *pb.ServerMessage) {
 	}
 
 	for _, c := range w.clients {
-		select {
-		case c.Send <- payload:
-		default:
-			// Client buffer is full; drop this frame to keep tick rate steady
-		}
+		c.Enqueue(payload)
 	}
 }

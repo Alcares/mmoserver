@@ -14,15 +14,41 @@ import (
 const SendBufferSize = 32
 const LobbyHandshakeTimeout = 30 * time.Second
 
-// Client represents an active WebSocket connection
-type Client struct {
+// Client is all the world needs from a participant: somewhere to put outgoing frames.
+type Client interface {
+	Enqueue(payload []byte)
+}
+
+type SendQueue struct {
+	Send chan []byte
+}
+
+func NewSendQueue() *SendQueue {
+	return &SendQueue{Send: make(chan []byte, SendBufferSize)}
+}
+
+func (q *SendQueue) Enqueue(payload []byte) {
+	select {
+	case q.Send <- payload:
+	default:
+		// Client buffer is full; drop this frame to keep tick rate steady
+	}
+}
+
+// WebsocketClient represents an active WebSocket connection
+type WebsocketClient struct {
+	*SendQueue
 	ID    uint32
 	Conn  *websocket.Conn
-	Send  chan []byte // Outgoing message buffer (prevents blocking the main game loop)
 	World *World
 }
 
-func (c *Client) WritePump() {
+// NewWebsocketClient takes no ID: the world assigns one on join, and JoinWorld records it.
+func NewWebsocketClient(conn *websocket.Conn) *WebsocketClient {
+	return &WebsocketClient{SendQueue: NewSendQueue(), Conn: conn}
+}
+
+func (c *WebsocketClient) WritePump() {
 	defer func(Conn *websocket.Conn) {
 		if err := Conn.Close(); err != nil {
 		}
@@ -36,7 +62,7 @@ func (c *Client) WritePump() {
 }
 
 // TODO: I dont like that readpump has this dual identity, we should split it
-func (c *Client) ReadPump(m *Master, cfg WorldConfig) {
+func (c *WebsocketClient) ReadPump(m *Master, cfg WorldConfig) {
 	defer func() {
 		if c.World != nil {
 			c.World.Mu.Lock()
@@ -113,6 +139,11 @@ func (c *Client) ReadPump(m *Master, cfg WorldConfig) {
 			default:
 				// Buffer full
 			}
+		case *pb.ClientMessage_SpawnBot:
+			if _, err := c.World.SpawnBot(); err != nil {
+				log.Printf("Spawn bot: %v", err)
+				//c.rejectJoin(joinRejection(err))
+			}
 		}
 
 	}
@@ -134,7 +165,7 @@ func joinRejection(err error) pb.JoinRejection {
 
 // rejectJoin tells the client why it isn't in a game; the connection stays open in the
 // lobby so it can retry, for instance after a mistyped code
-func (c *Client) rejectJoin(reason pb.JoinRejection) {
+func (c *WebsocketClient) rejectJoin(reason pb.JoinRejection) {
 	payload, err := proto.Marshal(&pb.ServerMessage{
 		Msg: &pb.ServerMessage_JoinRejected{JoinRejected: &pb.JoinRejected{Reason: reason}},
 	})
@@ -159,7 +190,7 @@ func createConfig(defaults WorldConfig, req *pb.CreateGame) WorldConfig {
 	return cfg
 }
 
-func (c *Client) joinWorld(world *World) error {
+func (c *WebsocketClient) joinWorld(world *World) error {
 	player, err := world.Join(c)
 	if err != nil {
 		log.Printf("Rejected client: %v", err)
@@ -171,6 +202,7 @@ func (c *Client) joinWorld(world *World) error {
 		return err
 	}
 
+	c.ID = player.ID
 	c.World = world
 	log.Printf("Player %d (%s) joined at (%.1f, %.1f)", player.ID, player.Name, player.Pos.X, player.Pos.Y)
 

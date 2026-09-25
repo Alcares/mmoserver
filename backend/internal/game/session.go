@@ -2,7 +2,7 @@ package game
 
 import pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 
-func (w *World) addPlayer(client *Client) (*Player, error) {
+func (w *World) addPlayer(client Client) (*Player, error) {
 	if len(w.players) >= MaxPlayers {
 		return nil, ErrGameFull
 	}
@@ -10,8 +10,9 @@ func (w *World) addPlayer(client *Client) (*Player, error) {
 	playerID := w.nextPlayerID
 	w.nextPlayerID++
 	player := NewPlayer(playerID, SpawnPos)
+	// Which client drives it is the only thing that makes a player a bot, and it is decided here.
+	_, player.IsBot = client.(*BotClient)
 
-	client.ID = playerID
 	w.players[playerID] = player
 	w.clients[playerID] = client
 
@@ -21,7 +22,7 @@ func (w *World) addPlayer(client *Client) (*Player, error) {
 }
 
 // Join adds a player for c and queues its InitialGameState and PlayerInventory ahead of any WorldSnapshot
-func (w *World) Join(c *Client) (*Player, error) {
+func (w *World) Join(c Client) (*Player, error) {
 	w.Mu.Lock()
 	defer w.Mu.Unlock()
 

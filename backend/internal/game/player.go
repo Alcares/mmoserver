@@ -13,6 +13,7 @@ const (
 type Player struct {
 	ID        uint32
 	Name      string
+	IsBot     bool
 	Pos       Vec2f
 	TargetDir Vec2f // Current intended movement heading (-1 to 1)
 	Speed     float64
@@ -44,10 +45,11 @@ func NewPlayer(id uint32, pos Vec2f) *Player {
 // ToProtoState maps internal domain state to wire DTO
 func (p *Player) ToProtoState() *pb.PlayerState {
 	return &pb.PlayerState{
-		Id:   p.ID,
-		Name: p.Name,
-		X:    float32(p.Pos.X),
-		Y:    float32(p.Pos.Y),
+		Id:    p.ID,
+		Name:  p.Name,
+		X:     float32(p.Pos.X),
+		Y:     float32(p.Pos.Y),
+		IsBot: p.IsBot,
 	}
 }
 

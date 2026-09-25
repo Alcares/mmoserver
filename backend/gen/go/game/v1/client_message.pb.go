@@ -155,6 +155,50 @@ func (x *JoinGame) GetId() string {
 	return ""
 }
 
+type SpawnBot struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SpawnBot) Reset() {
+	*x = SpawnBot{}
+	mi := &file_game_v1_client_message_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SpawnBot) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SpawnBot) ProtoMessage() {}
+
+func (x *SpawnBot) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_client_message_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SpawnBot.ProtoReflect.Descriptor instead.
+func (*SpawnBot) Descriptor() ([]byte, []int) {
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *SpawnBot) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 // Sent when the player presses buy/sell at a station. The server trades
 // against the station the player is standing at, for the whole order or nothing.
 type TradeRequest struct {
@@ -171,7 +215,7 @@ type TradeRequest struct {
 
 func (x *TradeRequest) Reset() {
 	*x = TradeRequest{}
-	mi := &file_game_v1_client_message_proto_msgTypes[3]
+	mi := &file_game_v1_client_message_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -183,7 +227,7 @@ func (x *TradeRequest) String() string {
 func (*TradeRequest) ProtoMessage() {}
 
 func (x *TradeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_client_message_proto_msgTypes[3]
+	mi := &file_game_v1_client_message_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -196,7 +240,7 @@ func (x *TradeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TradeRequest.ProtoReflect.Descriptor instead.
 func (*TradeRequest) Descriptor() ([]byte, []int) {
-	return file_game_v1_client_message_proto_rawDescGZIP(), []int{3}
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *TradeRequest) GetSequenceId() uint32 {
@@ -236,6 +280,7 @@ type ClientMessage struct {
 	//	*ClientMessage_Trade
 	//	*ClientMessage_CreateGame
 	//	*ClientMessage_JoinGame
+	//	*ClientMessage_SpawnBot
 	Cmd           isClientMessage_Cmd `protobuf_oneof:"cmd"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -243,7 +288,7 @@ type ClientMessage struct {
 
 func (x *ClientMessage) Reset() {
 	*x = ClientMessage{}
-	mi := &file_game_v1_client_message_proto_msgTypes[4]
+	mi := &file_game_v1_client_message_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -255,7 +300,7 @@ func (x *ClientMessage) String() string {
 func (*ClientMessage) ProtoMessage() {}
 
 func (x *ClientMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_client_message_proto_msgTypes[4]
+	mi := &file_game_v1_client_message_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -268,7 +313,7 @@ func (x *ClientMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientMessage.ProtoReflect.Descriptor instead.
 func (*ClientMessage) Descriptor() ([]byte, []int) {
-	return file_game_v1_client_message_proto_rawDescGZIP(), []int{4}
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ClientMessage) GetCmd() isClientMessage_Cmd {
@@ -314,6 +359,15 @@ func (x *ClientMessage) GetJoinGame() *JoinGame {
 	return nil
 }
 
+func (x *ClientMessage) GetSpawnBot() *SpawnBot {
+	if x != nil {
+		if x, ok := x.Cmd.(*ClientMessage_SpawnBot); ok {
+			return x.SpawnBot
+		}
+	}
+	return nil
+}
+
 type isClientMessage_Cmd interface {
 	isClientMessage_Cmd()
 }
@@ -334,6 +388,10 @@ type ClientMessage_JoinGame struct {
 	JoinGame *JoinGame `protobuf:"bytes,4,opt,name=join_game,json=joinGame,proto3,oneof"`
 }
 
+type ClientMessage_SpawnBot struct {
+	SpawnBot *SpawnBot `protobuf:"bytes,5,opt,name=spawn_bot,json=spawnBot,proto3,oneof"`
+}
+
 func (*ClientMessage_Input) isClientMessage_Cmd() {}
 
 func (*ClientMessage_Trade) isClientMessage_Cmd() {}
@@ -341,6 +399,8 @@ func (*ClientMessage_Trade) isClientMessage_Cmd() {}
 func (*ClientMessage_CreateGame) isClientMessage_Cmd() {}
 
 func (*ClientMessage_JoinGame) isClientMessage_Cmd() {}
+
+func (*ClientMessage_SpawnBot) isClientMessage_Cmd() {}
 
 var File_game_v1_client_message_proto protoreflect.FileDescriptor
 
@@ -353,20 +413,23 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\n" +
 	"CreateGame\"\x1a\n" +
 	"\bJoinGame\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x94\x01\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x1e\n" +
+	"\bSpawnBot\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\"\x94\x01\n" +
 	"\fTradeRequest\x12\x1f\n" +
 	"\vsequence_id\x18\x01 \x01(\rR\n" +
 	"sequenceId\x12,\n" +
 	"\x06intent\x18\x02 \x01(\x0e2\x14.game.v1.OrderIntentR\x06intent\x12\x14\n" +
 	"\x05units\x18\x03 \x01(\rR\x05units\x12\x1f\n" +
 	"\vprice_cents\x18\x04 \x01(\x04R\n" +
-	"priceCents\"\xe1\x01\n" +
+	"priceCents\"\x93\x02\n" +
 	"\rClientMessage\x120\n" +
 	"\x05input\x18\x01 \x01(\v2\x18.game.v1.MovementCommandH\x00R\x05input\x12-\n" +
 	"\x05trade\x18\x02 \x01(\v2\x15.game.v1.TradeRequestH\x00R\x05trade\x126\n" +
 	"\vcreate_game\x18\x03 \x01(\v2\x13.game.v1.CreateGameH\x00R\n" +
 	"createGame\x120\n" +
-	"\tjoin_game\x18\x04 \x01(\v2\x11.game.v1.JoinGameH\x00R\bjoinGameB\x05\n" +
+	"\tjoin_game\x18\x04 \x01(\v2\x11.game.v1.JoinGameH\x00R\bjoinGame\x120\n" +
+	"\tspawn_bot\x18\x05 \x01(\v2\x11.game.v1.SpawnBotH\x00R\bspawnBotB\x05\n" +
 	"\x03cmdBFZ:github.com/alcares/mmoserver/backend/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
@@ -381,26 +444,28 @@ func file_game_v1_client_message_proto_rawDescGZIP() []byte {
 	return file_game_v1_client_message_proto_rawDescData
 }
 
-var file_game_v1_client_message_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_game_v1_client_message_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_game_v1_client_message_proto_goTypes = []any{
 	(*MovementCommand)(nil), // 0: game.v1.MovementCommand
 	(*CreateGame)(nil),      // 1: game.v1.CreateGame
 	(*JoinGame)(nil),        // 2: game.v1.JoinGame
-	(*TradeRequest)(nil),    // 3: game.v1.TradeRequest
-	(*ClientMessage)(nil),   // 4: game.v1.ClientMessage
-	(OrderIntent)(0),        // 5: game.v1.OrderIntent
+	(*SpawnBot)(nil),        // 3: game.v1.SpawnBot
+	(*TradeRequest)(nil),    // 4: game.v1.TradeRequest
+	(*ClientMessage)(nil),   // 5: game.v1.ClientMessage
+	(OrderIntent)(0),        // 6: game.v1.OrderIntent
 }
 var file_game_v1_client_message_proto_depIdxs = []int32{
-	5, // 0: game.v1.TradeRequest.intent:type_name -> game.v1.OrderIntent
+	6, // 0: game.v1.TradeRequest.intent:type_name -> game.v1.OrderIntent
 	0, // 1: game.v1.ClientMessage.input:type_name -> game.v1.MovementCommand
-	3, // 2: game.v1.ClientMessage.trade:type_name -> game.v1.TradeRequest
+	4, // 2: game.v1.ClientMessage.trade:type_name -> game.v1.TradeRequest
 	1, // 3: game.v1.ClientMessage.create_game:type_name -> game.v1.CreateGame
 	2, // 4: game.v1.ClientMessage.join_game:type_name -> game.v1.JoinGame
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	3, // 5: game.v1.ClientMessage.spawn_bot:type_name -> game.v1.SpawnBot
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_client_message_proto_init() }
@@ -409,11 +474,12 @@ func file_game_v1_client_message_proto_init() {
 		return
 	}
 	file_game_v1_common_proto_init()
-	file_game_v1_client_message_proto_msgTypes[4].OneofWrappers = []any{
+	file_game_v1_client_message_proto_msgTypes[5].OneofWrappers = []any{
 		(*ClientMessage_Input)(nil),
 		(*ClientMessage_Trade)(nil),
 		(*ClientMessage_CreateGame)(nil),
 		(*ClientMessage_JoinGame)(nil),
+		(*ClientMessage_SpawnBot)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -421,7 +487,7 @@ func file_game_v1_client_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_client_message_proto_rawDesc), len(file_game_v1_client_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

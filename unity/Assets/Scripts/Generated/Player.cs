@@ -28,22 +28,22 @@ namespace Game.V1 {
             "b24ucHJvdG8iTwoMQWN0aXZlRWZmZWN0EiIKBHR5cGUYASABKA4yFC5nYW1l",
             "LnYxLlBvd2VyVXBUeXBlEhsKE2R1cmF0aW9uX3RpY2tzX2xlZnQYAiABKA0i",
             "RgoOT3duZWRDb21tb2RpdHkSJAoEdHlwZRgBIAEoDjIWLmdhbWUudjEuQ29t",
-            "bW9kaXR5VHlwZRIOCgZhbW91bnQYAiABKAQiPQoLUGxheWVyU3RhdGUSCgoC",
-            "aWQYASABKA0SDAoEbmFtZRgCIAEoCRIJCgF4GAMgASgCEgkKAXkYBCABKAIi",
-            "fwoPUGxheWVySW52ZW50b3J5Eg8KB2JhbGFuY2UYASABKAQSLAoLY29tbW9k",
-            "aXRpZXMYAiADKAsyFy5nYW1lLnYxLk93bmVkQ29tbW9kaXR5Ei0KDmFjdGl2",
-            "ZV9lZmZlY3RzGAMgAygLMhUuZ2FtZS52MS5BY3RpdmVFZmZlY3QidAoTUGxh",
-            "eWVyRmluYWxTdGFuZGluZxIKCgJpZBgBIAEoDRIMCgRuYW1lGAIgASgJEhEK",
-            "CW5ldF93b3J0aBgDIAEoBBIaChJ0cmFkZV92b2x1bWVfY2VudHMYBCABKAQS",
-            "FAoMdW5pdHNfdHJhZGVkGAUgASgEQkZaOmdpdGh1Yi5jb20vYWxjYXJlcy9t",
-            "bW9zZXJ2ZXIvYmFja2VuZC9nZW4vZ28vZ2FtZS92MTtnYW1ldjGqAgdHYW1l",
-            "LlYxYgZwcm90bzM="));
+            "bW9kaXR5VHlwZRIOCgZhbW91bnQYAiABKAQiTQoLUGxheWVyU3RhdGUSCgoC",
+            "aWQYASABKA0SDAoEbmFtZRgCIAEoCRIJCgF4GAMgASgCEgkKAXkYBCABKAIS",
+            "DgoGaXNfYm90GAUgASgIIn8KD1BsYXllckludmVudG9yeRIPCgdiYWxhbmNl",
+            "GAEgASgEEiwKC2NvbW1vZGl0aWVzGAIgAygLMhcuZ2FtZS52MS5Pd25lZENv",
+            "bW1vZGl0eRItCg5hY3RpdmVfZWZmZWN0cxgDIAMoCzIVLmdhbWUudjEuQWN0",
+            "aXZlRWZmZWN0InQKE1BsYXllckZpbmFsU3RhbmRpbmcSCgoCaWQYASABKA0S",
+            "DAoEbmFtZRgCIAEoCRIRCgluZXRfd29ydGgYAyABKAQSGgoSdHJhZGVfdm9s",
+            "dW1lX2NlbnRzGAQgASgEEhQKDHVuaXRzX3RyYWRlZBgFIAEoBEJGWjpnaXRo",
+            "dWIuY29tL2FsY2FyZXMvbW1vc2VydmVyL2JhY2tlbmQvZ2VuL2dvL2dhbWUv",
+            "djE7Z2FtZXYxqgIHR2FtZS5WMWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ActiveEffect), global::Game.V1.ActiveEffect.Parser, new[]{ "Type", "DurationTicksLeft" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.OwnedCommodity), global::Game.V1.OwnedCommodity.Parser, new[]{ "Type", "Amount" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PlayerState), global::Game.V1.PlayerState.Parser, new[]{ "Id", "Name", "X", "Y" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PlayerState), global::Game.V1.PlayerState.Parser, new[]{ "Id", "Name", "X", "Y", "IsBot" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PlayerInventory), global::Game.V1.PlayerInventory.Parser, new[]{ "Balance", "Commodities", "ActiveEffects" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PlayerFinalStanding), global::Game.V1.PlayerFinalStanding.Parser, new[]{ "Id", "Name", "NetWorth", "TradeVolumeCents", "UnitsTraded" }, null, null, null, null)
           }));
@@ -573,6 +573,7 @@ namespace Game.V1 {
       name_ = other.name_;
       x_ = other.x_;
       y_ = other.y_;
+      isBot_ = other.isBot_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -630,6 +631,18 @@ namespace Game.V1 {
       }
     }
 
+    /// <summary>Field number for the "is_bot" field.</summary>
+    public const int IsBotFieldNumber = 5;
+    private bool isBot_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool IsBot {
+      get { return isBot_; }
+      set {
+        isBot_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -649,6 +662,7 @@ namespace Game.V1 {
       if (Name != other.Name) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
+      if (IsBot != other.IsBot) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -660,6 +674,7 @@ namespace Game.V1 {
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
       if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
+      if (IsBot != false) hash ^= IsBot.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -694,6 +709,10 @@ namespace Game.V1 {
         output.WriteRawTag(37);
         output.WriteFloat(Y);
       }
+      if (IsBot != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(IsBot);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -720,6 +739,10 @@ namespace Game.V1 {
         output.WriteRawTag(37);
         output.WriteFloat(Y);
       }
+      if (IsBot != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(IsBot);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -741,6 +764,9 @@ namespace Game.V1 {
       }
       if (Y != 0F) {
         size += 1 + 4;
+      }
+      if (IsBot != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -765,6 +791,9 @@ namespace Game.V1 {
       }
       if (other.Y != 0F) {
         Y = other.Y;
+      }
+      if (other.IsBot != false) {
+        IsBot = other.IsBot;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -801,6 +830,10 @@ namespace Game.V1 {
             Y = input.ReadFloat();
             break;
           }
+          case 40: {
+            IsBot = input.ReadBool();
+            break;
+          }
         }
       }
     #endif
@@ -834,6 +867,10 @@ namespace Game.V1 {
           }
           case 37: {
             Y = input.ReadFloat();
+            break;
+          }
+          case 40: {
+            IsBot = input.ReadBool();
             break;
           }
         }

@@ -15,7 +15,7 @@ func testWorld(t *testing.T) *World {
 }
 
 // drain decodes every message queued on c.Send without blocking
-func drain(t *testing.T, c *Client) []*pb.ServerMessage {
+func drain(t *testing.T, c *SendQueue) []*pb.ServerMessage {
 	t.Helper()
 	var msgs []*pb.ServerMessage
 	for {
@@ -34,7 +34,7 @@ func drain(t *testing.T, c *Client) []*pb.ServerMessage {
 
 func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 	w := testWorld(t)
-	c := &Client{Send: make(chan []byte, SendBufferSize)}
+	c := NewSendQueue()
 
 	if _, err := w.Join(c); err != nil {
 		t.Fatal(err)
@@ -64,7 +64,7 @@ func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 func TestJoinSpawnsAtCentre(t *testing.T) {
 	w := testWorld(t)
 	for range 3 {
-		player, err := w.Join(&Client{Send: make(chan []byte, SendBufferSize)})
+		player, err := w.Join(NewSendQueue())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -77,12 +77,12 @@ func TestJoinSpawnsAtCentre(t *testing.T) {
 func TestJoinRejectsWhenFull(t *testing.T) {
 	w := testWorld(t)
 	for range MaxPlayers {
-		if _, err := w.Join(&Client{Send: make(chan []byte, SendBufferSize)}); err != nil {
+		if _, err := w.Join(NewSendQueue()); err != nil {
 			t.Fatal(err)
 		}
 	}
 
-	c := &Client{Send: make(chan []byte, SendBufferSize)}
+	c := NewSendQueue()
 	if _, err := w.Join(c); err == nil {
 		t.Fatal("Join with MaxPlayers already in: want error")
 	}
@@ -94,7 +94,7 @@ func TestJoinRejectsWhenFull(t *testing.T) {
 func TestMovementDistanceTraveled(t *testing.T) {
 	w := testWorld(t)
 
-	c := &Client{Send: make(chan []byte, SendBufferSize)}
+	c := NewSendQueue()
 	player, err := w.Join(c)
 	if err != nil {
 		t.Fatal(err)

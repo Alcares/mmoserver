@@ -71,8 +71,8 @@ func (Activation) EnumDescriptor() ([]byte, []int) {
 // The Stable-Baselines3 checkpoint it comes from also carries the critic and the optimizer's
 // state, which are several times larger and are only used to keep training.
 //
-// This schema is the single source of truth for policy.json. Python writes it through
-// json_format, Go reads it through protojson; neither hand-rolls the encoding.
+// This schema is the single source of truth for policy.pb. Python serialises it and Go
+// unmarshals it, both through generated code.
 type Policy struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Checked against bot.ObsSize and bot.ActionCount when the policy loads. Changing the
@@ -152,10 +152,7 @@ type Layer struct {
 	InFeatures  uint32                 `protobuf:"varint,1,opt,name=in_features,json=inFeatures,proto3" json:"in_features,omitempty"`
 	OutFeatures uint32                 `protobuf:"varint,2,opt,name=out_features,json=outFeatures,proto3" json:"out_features,omitempty"`
 	// Row-major: out_features rows of in_features each, which is torch.nn.Linear's [out, in]
-	// layout carried over unchanged. Flat rather than nested because proto3 has no repeated of
-	// repeated - and that is the useful accident here, because it makes the dimensions
-	// mandatory. A transposed export then fails the len(weight) == in*out check at load instead
-	// of silently computing nonsense on a square hidden layer, where the shapes still agree.
+	// layout carried over unchanged.
 	Weight        []float32 `protobuf:"fixed32,3,rep,packed,name=weight,proto3" json:"weight,omitempty"`
 	Bias          []float32 `protobuf:"fixed32,4,rep,packed,name=bias,proto3" json:"bias,omitempty"`
 	unknownFields protoimpl.UnknownFields

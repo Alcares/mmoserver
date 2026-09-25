@@ -38,7 +38,8 @@ type Env struct {
 	rng      *rand.Rand
 	world    *game.World
 	grid     *game.SpatialGrid
-	client   *game.Client
+	client   *game.SendQueue
+	playerID uint32
 	observer bot.Observer
 	goal     bot.Goal
 	steps    int
@@ -66,15 +67,14 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 		Duration:       5 * time.Minute,
 		Rng:            e.rng,
 	})
-	e.client = &game.Client{
-		Send: make(chan []byte, game.SendBufferSize),
-	}
+	e.client = game.NewSendQueue()
 	e.observer = bot.Observer{}
 
-	_, err := e.world.Join(e.client)
+	player, err := e.world.Join(e.client)
 	if err != nil {
 		return nil, err
 	}
+	e.playerID = player.ID
 
 	e.world.Tick(e.grid)
 
@@ -109,7 +109,7 @@ func (e *Env) Step(a bot.Action) (StepResult, error) {
 
 	vx, vy := a.Vector()
 	e.world.EnqueueMovement(game.PlayerMovementInput{
-		PlayerID: e.client.ID,
+		PlayerID: e.playerID,
 		Vx:       vx,
 		Vy:       vy,
 	})

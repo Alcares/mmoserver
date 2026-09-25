@@ -9,8 +9,9 @@ namespace Game.Client
 {
     /// <summary>
     /// Keyboard input: WASD/arrows move, E buys and Q sells at the nearby station, T cycles the
-    /// order size. Movement is only sent when the vector changes (including back to zero on
-    /// release), since the server keeps moving the player along the last direction it received.
+    /// order size, B asks the server for a bot, Ctrl+R leaves for the create/join screen.
+    /// Movement is only sent when the vector changes (including back to zero on release), since
+    /// the server keeps moving the player along the last direction it received.
     /// </summary>
     [RequireComponent(typeof(GameClient), typeof(GameState))]
     public class GameInput : MonoBehaviour
@@ -29,6 +30,7 @@ namespace Game.Client
         private GameState _state;
         private Vector2 _sent;
         private uint _tradeSequenceId;
+        private uint _botsRequested;
 
         private void Awake()
         {
@@ -44,6 +46,12 @@ namespace Game.Client
             // While the lobby panel is up the keyboard belongs to it: typing a join code
             // must not walk the player around or fire trades.
             if (!_state.Joined) return;
+
+            if (kb.rKey.wasPressedThisFrame && (kb.leftCtrlKey.isPressed || kb.rightCtrlKey.isPressed))
+            {
+                Restart();
+                return;
+            }
 
             var move = new Vector2(
                 Axis(kb.dKey, kb.rightArrowKey) - Axis(kb.aKey, kb.leftArrowKey),
@@ -66,6 +74,22 @@ namespace Game.Client
 
             if (kb.eKey.wasPressedThisFrame) TryTrade(OrderIntent.IntentBuy);
             if (kb.qKey.wasPressedThisFrame) TryTrade(OrderIntent.IntentSell);
+            if (kb.bKey.wasPressedThisFrame) _client.SendSpawnBot($"BOT {++_botsRequested}");
+        }
+
+        /// <summary>Leaves the current game for the create/join screen. The socket goes too:
+        /// GameClient.Reconnect has the reason the server cannot put this connection back in the
+        /// lobby. Shared with the Play again button on the standings panel.</summary>
+        public void Restart()
+        {
+            _state.LeaveGame();
+            _client.Reconnect();
+
+            // Forget what was last sent, so a direction still held when the new player spawns is
+            // sent again rather than mistaken for a vector the server already has.
+            Move = Vector2.zero;
+            _sent = Vector2.zero;
+            MultiplierIndex = 0;
         }
 
         // Buys or sells exactly the selected number of units, sending the per-unit price shown at

@@ -16,7 +16,7 @@ namespace Game.Client
     public class GameState : MonoBehaviour
     {
         /// <summary>Mirrors backend/internal/game/world.go TradeRange; the server is authoritative.</summary>
-        public const float TradeRange = 5f;
+        public const float TradeRange = 3f;
 
         private GameClient _client;
         private readonly Dictionary<CommodityType, PriceQuote> _prices = new();
@@ -147,6 +147,29 @@ namespace Game.Client
         {
             Standings = o;
             SessionChanged?.Invoke();
+        }
+
+        /// <summary>Forgets everything tied to one game, which drops the HUD back to the lobby
+        /// panel. The socket is separate and has to go too; see GameClient.Reconnect.</summary>
+        public void LeaveGame()
+        {
+            Joined = false;
+            GameId = null;
+            Phase = GamePhase.Unspecified;
+            PlayerCount = 0;
+            MinPlayers = 0;
+            Standings = null;
+            LastRejection = null;
+            Position = null;
+            Balance = null;
+            _phaseEndsAt = null;
+            _stations.Clear();
+            _holdings.Clear();
+            _prices.Clear();
+            _orderSizes.Clear();
+
+            SessionChanged?.Invoke();
+            PricesChanged?.Invoke();
         }
 
         private bool SameSizes(PriceQuote q)

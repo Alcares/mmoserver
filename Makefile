@@ -119,8 +119,13 @@ client-mac:
 all:
 	$(MAKE) proto
 	$(MAKE) test
-	$(MAKE) client
+	$(MAKE) client-linux
 
 run:
 	$(MAKE) server-start
 	$(UNITY_PROJECT)/Builds/Linux/MMOClient.x86_64
+
+everything:
+	$(MAKE) train
+	$(MAKE) all
+	$(MAKE) run

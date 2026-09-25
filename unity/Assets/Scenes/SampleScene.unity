@@ -305,6 +305,7 @@ MonoBehaviour:
   cameraSize: 12
   smoothing: 20
   playerArt: {fileID: 11400000, guid: 16c02b54c437996d684b680312701b10, type: 2}
+  botArt: {fileID: 11400000, guid: 544f8895209c4233a10dd98177ac7fe3, type: 2}
   commodityIcons: {fileID: 11400000, guid: 59cb42ce0bacb2bad808c9124292515b, type: 2}
 --- !u!114 &536996323
 MonoBehaviour:

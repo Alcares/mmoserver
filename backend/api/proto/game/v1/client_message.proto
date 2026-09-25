@@ -19,6 +19,10 @@ message JoinGame {
   string id = 1;
 }
 
+message SpawnBot {
+  string name = 1;
+}
+
 // Sent when the player presses buy/sell at a station. The server trades
 // against the station the player is standing at, for the whole order or nothing.
 message TradeRequest {
@@ -37,5 +41,6 @@ message ClientMessage {
     TradeRequest trade = 2;
     CreateGame create_game = 3;
     JoinGame join_game = 4;
+    SpawnBot spawn_bot = 5;
   }
 }

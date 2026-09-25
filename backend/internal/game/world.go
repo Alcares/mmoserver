@@ -20,7 +20,7 @@ type World struct {
 	phaseEndTick uint64 // tick at which the current phase ends; 0 = open-ended
 	statusDirty  bool   // broadcast GameStatus on the next tick
 	players      map[uint32]*Player
-	clients      map[uint32]*Client
+	clients      map[uint32]Client
 	Stations     []*TradingStation
 	Commodities  map[pb.CommodityType]*CommodityState
 
@@ -45,7 +45,7 @@ func NewWorld(gameID string, cfg WorldConfig) *World {
 		tick:          0,
 		phase:         pb.GamePhase_GAME_PHASE_WAITING,
 		players:       make(map[uint32]*Player),
-		clients:       make(map[uint32]*Client),
+		clients:       make(map[uint32]Client),
 		Stations:      NewTradingStations(cfg.Rng),
 		Commodities:   NewCommodities(),
 		movementQueue: make(chan PlayerMovementInput, 1024), // Buffered to handle bursts
