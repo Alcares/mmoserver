@@ -26,6 +26,8 @@ from rl_training.export import export
 
 RL_DIR = REPO_ROOT / "rl-training"
 
+EXPORTS_PER_RUN = 50  # export is a model snapshot mid-training
+
 
 class EpisodeMetrics(BaseCallback):
     """Logs what the roadmap asks for: success rate and steps taken over steps needed.
@@ -57,6 +59,57 @@ class EpisodeMetrics(BaseCallback):
         self._successes.clear()
 
 
+class ExportSnapshots(BaseCallback):
+    """Writes `policy.pb` every `every` rollouts, so a spectator can watch training improve.
+
+    The unit is rollouts because that is the only rate that means anything: PPO mutates the
+    policy once per rollout and then runs its gradient epochs, so two exports inside one rollout
+    are byte-identical files. A 2M run at the defaults is 128*128 = 16,384 timesteps per rollout,
+    so 122 rollouts total - which is why EXPORTS_PER_RUN of 100 rounds to every rollout here and
+    only starts thinning out on longer runs.
+
+    `_on_rollout_start`, not `_on_step`: `_on_step` fires once per *vectorised* step, so any
+    frequency set there is silently multiplied by the env count, and both it and
+    `_on_rollout_end` run before `train()` - they would export the weights the update is about
+    to replace. `_on_rollout_start` runs after it.
+
+    Each firing writes three files from one set of weights, so none of them can drift: a
+    numbered `.pb` into the archive, the fixed `policy.pb` a live spectator watches, and a
+    numbered `.zip`. The `.zip` is not for Go at all - it is the opponent pool self-play will
+    want later (BOT_TRAINING.md "Self-play"), which is why the archive is kept rather than
+    overwritten.
+    """
+
+    def __init__(self, every: int, policy_path: Path, archive: Path) -> None:
+        super().__init__()
+        self.every = every
+        self.policy_path = policy_path
+        self.archive = archive
+        self._rollouts = 0
+
+    def _on_rollout_start(self) -> None:
+        # Fires before the first rollout too, when no update has happened yet and the weights
+        # are still the initialisation.
+        if self.model.num_timesteps == 0:
+            return
+
+        self._rollouts += 1
+        if self._rollouts % self.every:
+            return
+
+        self.archive.mkdir(parents=True, exist_ok=True)
+        steps = self.model.num_timesteps
+        self.model.save(self.archive / f"policy_{steps}.zip")
+        # Both the numbered .pb and the fixed one, from the same weights: the archive is what
+        # bot.SnapshotPolicy plays through in order, the fixed path what bot.ReloadingPolicy
+        # watches for the newest. Which a spectator uses is the server's choice, not ours.
+        export(self.model, self.archive / f"policy_{steps}.pb")
+        export(self.model, self.policy_path)
+
+    def _on_step(self) -> bool:
+        return True
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--envs", type=int, default=128)
@@ -70,8 +123,15 @@ def main() -> None:
     parser.add_argument("--out", type=Path, default=RL_DIR / "policy.zip")
     # The SB3 checkpoint above resumes training; this is what Go loads. See export.py.
     parser.add_argument("--policy", type=Path, default=RL_DIR / "policy.pb")
+    parser.add_argument("--snapshots", type=Path, default=RL_DIR / "snapshots",
+                        help="where the numbered checkpoints behind each export land")
     parser.add_argument("--eval-episodes", type=int, default=2000)
     args = parser.parse_args()
+
+    # Rounded to whole rollouts because a fraction of one exports the same bytes twice.
+    rollouts = args.timesteps // (args.envs * args.n_steps)
+    every = max(1, round(rollouts / EXPORTS_PER_RUN))
+    print(f"{rollouts} rollouts, exporting every {every} -> ~{rollouts // every} snapshots")
 
     with tempfile.TemporaryDirectory() as tmp:
         socket = Path(tmp) / "sim.sock"
@@ -90,7 +150,10 @@ def main() -> None:
                 tensorboard_log=str(args.logdir),
                 verbose=1,
             )
-            model.learn(total_timesteps=args.timesteps, callback=EpisodeMetrics())
+            model.learn(
+                total_timesteps=args.timesteps,
+                callback=[EpisodeMetrics(), ExportSnapshots(every, args.policy, args.snapshots)],
+            )
             model.save(args.out)
             export(model, args.policy)
             print(f"saved {args.out} and {args.policy}")
