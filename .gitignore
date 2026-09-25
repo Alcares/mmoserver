@@ -12,7 +12,7 @@
 /backend/*.test
 # Python bytecode
 __pycache__/
-# Training runs: TensorBoard logs and SB3 checkpoints. Step 14 exports policy.json, which is
-# what the Go side loads and what gets committed.
+# Training runs: TensorBoard logs and SB3 checkpoints. The export Go loads is policy.pb, which
+# is not ignored - it is a build product of training that the server needs.
 /rl-training/runs/
 /rl-training/policy*.zip

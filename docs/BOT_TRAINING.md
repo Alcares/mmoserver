@@ -35,7 +35,7 @@ TRAINING (fast, headless, many worlds)
 PLAYING (real time, inside the server)
   World.Run ──ServerMessage──► Observer ──obs──► Go Policy (scripted or MLP) ──► EnqueueMovement
                                                         ▲
-                                             policy.json exported from Python
+                                             policy.pb exported from Python
 ```
 
 - **Training** needs gradients and PPO, so it runs in Python (PyTorch).
@@ -153,7 +153,9 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
       through that wrapper, `train.py` runs PPO over a 2×64 MLP and logs to TensorBoard.
       `make baseline` and `make train`; both spawn their own sim, so no stale binary survives a
       Go change. The run logs `bot/success_rate` and `bot/steps_over_optimal` beside SB3's own
-      curves, because the shaped reward can rise while the bot still fails to arrive.
+      curves, because the shaped reward can rise while the bot still fails to arrive. A run
+      saves `rl-training/policy.zip`, which is SB3's checkpoint - pickled tensors plus Adam's
+      state, larger than the weights themselves - so it is for resuming training, not for Go.
       1.0 is not reachable: `optimal` is a straight line, and quantising to 45° costs up to
       `1/cos(22.5°)` = 1.082, so `ScriptedPolicy` measures 1.05 mean and 1.14 worst over random
       goals. That is the number to match, not to beat. Progress per tick is `0.6 × cos(θ)` for
@@ -179,7 +181,7 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
         to reach a point" means nothing once the objective is net worth - and step 14 takes over
         its regression-test job, leaving it only the live training curve.
       - **No normalisation anywhere in Python.** Whatever the wrapper did to an observation,
-        Go's `MLPPolicy` would have to redo at inference, so `policy.json` stays the complete
+        Go's `MLPPolicy` would have to redo at inference, so `policy.pb` stays the complete
         description of the bot.
 
       Measured over 2000 held-out episodes: PPO 100% success at 1.053 mean / 1.120 worst,
@@ -187,13 +189,26 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
       argument above says it must be. Uniform random is 0% at 5.16, which is the floor the
       curve had to climb from. No curriculum was needed: the progress reward is dense from the
       first step of the first episode, so there is no sparse-reward problem for one to solve.
-- [ ] **14. Export and Go inference.** Python writes the weights to `policy.json`. `MLPPolicy`
-      in Go does the forward pass (a few matrix multiplications, no cgo). Compare against
-      `ScriptedPolicy`.
-      That comparison then becomes the pipeline's regression test, and it belongs in Go: 2000
-      episodes straight through `Env`, asserting success >=99% and mean steps/optimal <=1.10, is
-      about 3 s at 229k steps/s. It supersedes `make baseline` as the guard because it needs no
-      venv, no torch and no wire - nothing that can rot independently of the code it checks.
+- [x] **14. Export and Go inference.** Python reads `policy.zip` and writes `policy.pb`.
+      These are two artifacts, not one renamed: the zip is SB3's checkpoint, unreadable from Go
+      without reimplementing Python's pickle format, and it carries optimizer state and
+      hyperparameters the bot never uses. Its schema is `api/proto/bot/v1/policy.proto`, so
+      both sides use generated code and a field rename breaks the build instead of reading
+      zero; binary rather than JSON, since 5k floats are unreadable either way and this needs
+      no agreement on field-name casing. The export keeps only what a forward pass needs -
+      the policy head's weights and biases - and drops the value function, which exists to
+      train the policy and is dead weight at inference.
+      `MLPPolicy` in Go does that forward pass (a few matrix multiplications, no cgo; `INFERENCE.md`
+      measures why the CPU is the right place for it, and where that stops holding). Compare
+      against `ScriptedPolicy`; that comparison then becomes the pipeline's regression test, and
+      it belongs in Go: 2000 episodes straight through `Env`, asserting success >=99% and mean
+      steps/optimal <=1.10, is about 3 s at 229k steps/s. It supersedes `make baseline` as the
+      guard because it needs no venv, no torch and no wire - nothing that can rot independently
+      of the code it checks.
+      The export runs once, after the checkpoint is saved. Step 16 will want a fresh one
+      during a run so a spectator can watch training improve; that is the moment to add a
+      periodic export, and it should ride on SB3's CheckpointCallback so the .zip and .pb
+      cannot drift apart.
 - [ ] **15. In-server bot.** `bot.Spawn(world, policy)`: a `Client` with a `Send` buffer and no
       websocket, joined through `World.Join`. A goroutine drains `Send`, runs the Observer and
       policy, and calls `EnqueueMovement`. Needs a removal path (today removal lives in
@@ -205,7 +220,8 @@ Training envs run far faster than 20 Hz, so they can't be streamed directly. Ins
 evaluation world:
 
 - [ ] **16. Spectator server.** A 20 Hz world (optionally 2–4× speed) running the in-server bot,
-      reloading `policy.json` whenever Python writes a new checkpoint.
+      reloading `policy.pb` whenever training exports a new one (see step 14: the checkpoint
+      Python saves is `policy.zip`, which Go never reads).
 - [ ] **17. Spectate endpoint.** `/ws?spectate=<botID>` copies the bot's `Send` stream to the
       websocket instead of adding a player. The bot stays `players[0]`, so the Unity camera
       follows it and shows exactly its FOV. Spectator input is ignored.

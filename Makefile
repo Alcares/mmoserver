@@ -7,6 +7,7 @@ RL_DIR := rl-training
 # stubs' own `from sim.v1 import env_pb2` resolves without anyone touching sys.path.
 SIM_PY_ROOT := $(RL_DIR)/src
 SIM_PY_PKG := $(SIM_PY_ROOT)/sim
+BOT_PY_PKG := $(SIM_PY_ROOT)/bot
 UNITY_VERSION := 6000.6.2f1
 UNITY := $(HOME)/Unity/Hub/Editor/$(UNITY_VERSION)/Editor/Unity
 UNITY_PROJECT := $(CURDIR)/unity
@@ -35,25 +36,29 @@ proto:
 		--csharp_out=$(CSHARP_OUT) \
 		$(PROTO_DIR)/game/v1/*.proto
 	# The sim service needs protoc-gen-go-grpc; Unity never sees it, the C# step above
-	# globs game/v1 only.
+	# globs game/v1 only. bot/v1 defines no service, for which the grpc plugin emits nothing.
 	protoc \
 		--proto_path=$(PROTO_DIR) \
 		--go_out=$(BACKEND) \
 		--go_opt=module=$(MODULE) \
 		--go-grpc_out=$(BACKEND) \
 		--go-grpc_opt=module=$(MODULE) \
-		$(PROTO_DIR)/sim/v1/*.proto
+		$(PROTO_DIR)/sim/v1/*.proto $(PROTO_DIR)/bot/v1/*.proto
 
 # Python stubs for the training client. Needs grpcio-tools in the rl-training venv.
 proto-py:
+	# Before protoc, not after: protoc leaves the package dirs without __init__.py, which keeps
+	# them out of the wheel, and uv builds the project before it runs anything - so a package
+	# named in module-name that does not exist yet fails the build.
+	mkdir -p $(SIM_PY_PKG)/v1 $(BOT_PY_PKG)/v1
+	touch $(SIM_PY_PKG)/__init__.py $(SIM_PY_PKG)/v1/__init__.py
+	touch $(BOT_PY_PKG)/__init__.py $(BOT_PY_PKG)/v1/__init__.py
 	uv run --project $(RL_DIR) python -m grpc_tools.protoc \
 		--proto_path=$(PROTO_DIR) \
 		--python_out=$(SIM_PY_ROOT) \
 		--pyi_out=$(SIM_PY_ROOT) \
 		--grpc_python_out=$(SIM_PY_ROOT) \
-		$(PROTO_DIR)/sim/v1/*.proto
-	# protoc leaves the package dirs without __init__.py, which keeps them out of the wheel
-	touch $(SIM_PY_PKG)/__init__.py $(SIM_PY_PKG)/v1/__init__.py
+		$(PROTO_DIR)/sim/v1/*.proto $(PROTO_DIR)/bot/v1/*.proto
 
 # Baselines through the Python wrapper: scripted should reproduce the ~1.05 steps/optimal that
 # internal/sim measures in Go. If it doesn't, the wrapper is wrong, not the policy.
@@ -68,7 +73,7 @@ train:
 
 clean:
 	rm -rf $(BACKEND)/gen/
-	rm -rf $(SIM_PY_PKG)
+	rm -rf $(SIM_PY_PKG) $(BOT_PY_PKG)
 	rm -f $(CSHARP_OUT)/*.cs
 
 # Rebuilds and (re)starts the server in the background; output goes to $(SERVER_LOG).

@@ -11,7 +11,7 @@ convention. Matching SB3 needs no shim, matching Gymnasium would mean rewriting 
     truncated and not terminated        ->  infos[i]["TimeLimit.truncated"]
 
 Nothing here scales, clips or normalises anything. Whatever this file did to an observation,
-Go's MLPPolicy would have to reproduce at inference, so policy.json stays the complete
+Go's MLPPolicy would have to reproduce at inference, so policy.pb stays the complete
 description of the bot by keeping this layer arithmetic-free.
 """
 

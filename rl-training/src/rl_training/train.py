@@ -22,6 +22,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 from rl_training.baseline import measure, scripted
 from rl_training.env import REPO_ROOT, SimVecEnv, launch_sim
+from rl_training.export import export
 
 RL_DIR = REPO_ROOT / "rl-training"
 
@@ -67,6 +68,8 @@ def main() -> None:
     # relative default would drop runs/ and policy.zip wherever make happened to be invoked.
     parser.add_argument("--logdir", type=Path, default=RL_DIR / "runs")
     parser.add_argument("--out", type=Path, default=RL_DIR / "policy.zip")
+    # The SB3 checkpoint above resumes training; this is what Go loads. See export.py.
+    parser.add_argument("--policy", type=Path, default=RL_DIR / "policy.pb")
     parser.add_argument("--eval-episodes", type=int, default=2000)
     args = parser.parse_args()
 
@@ -89,7 +92,8 @@ def main() -> None:
             )
             model.learn(total_timesteps=args.timesteps, callback=EpisodeMetrics())
             model.save(args.out)
-            print(f"saved {args.out}")
+            export(model, args.policy)
+            print(f"saved {args.out} and {args.policy}")
 
             # Held-out seeds and argmax actions: a sampling policy fumbles the last step near
             # the goal, and the reported number should be the one the exported policy will hit.

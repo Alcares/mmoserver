@@ -21,3 +21,6 @@ Rules both the server and every client have to hold up:
 - Cash is whole cents everywhere; only clients format it as dollars
 - Commodity quantities are whole units everywhere, never fractional
 - AMM rounding must always favour the pool (buys round up, sells round down, `k` never shrinks); see `docs/PRICING.md`
+
+## Git Operations
+- Keep commit messages brief - keep them around half a dozen sentences.

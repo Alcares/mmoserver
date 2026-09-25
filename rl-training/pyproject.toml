@@ -23,7 +23,7 @@ requires = ["uv_build>=0.12.5,<0.13.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-module-name = ["rl_training", "sim"]
+module-name = ["rl_training", "sim", "bot"]
 
 # PyPI's default torch wheel is the CUDA build, which is dead weight on an AMD card, and the
 # policy network here is a 2x64 MLP that runs faster on the CPU than it would on any GPU.
