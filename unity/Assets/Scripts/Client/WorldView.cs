@@ -18,6 +18,7 @@ namespace Game.Client
         private const float StationRadius = 0.9f;
         private const int BackgroundOrder = -100;
         private const int StationOrder = -50;
+        private const int GoalOrder = -49;
         private const int LabelOrder = 10000;
 
         [Tooltip("Orthographic half-height the camera starts at, in tiles.")]
@@ -69,6 +70,7 @@ namespace Game.Client
         private readonly HashSet<uint> _seen = new();
         private readonly List<uint> _stale = new();
         private readonly List<StationView> _stations = new();
+        private GameObject _goal;
 
         private void Awake()
         {
@@ -85,6 +87,7 @@ namespace Game.Client
         {
             _client.OnWorldSnapshot += HandleSnapshot;
             _client.OnInitialState += HandleInitialState;
+            _client.OnGoalMarker += HandleGoalMarker;
             _state.PricesChanged += RefreshStationLabels;
         }
 
@@ -92,6 +95,7 @@ namespace Game.Client
         {
             _client.OnWorldSnapshot -= HandleSnapshot;
             _client.OnInitialState -= HandleInitialState;
+            _client.OnGoalMarker -= HandleGoalMarker;
             _state.PricesChanged -= RefreshStationLabels;
         }
 
@@ -240,6 +244,14 @@ namespace Game.Client
             foreach (var s in _stations) Destroy(s.Go);
             _stations.Clear();
 
+            // The old world's goal; the spectator sends the new one right after.
+            if (_goal != null) _goal.SetActive(false);
+
+            // A new initial state means a new world whose IDs restart at 1; keeping the old views
+            // would glide them from where the last world ended to the new spawn.
+            foreach (var p in _players.Values) Destroy(p.Go);
+            _players.Clear();
+
             foreach (var st in state.StationLayout)
             {
                 var go = new GameObject($"Station {st.Label}");
@@ -271,6 +283,36 @@ namespace Game.Client
             }
 
             RefreshStationLabels();
+        }
+
+        // The spectated bot's goal: a translucent disc the size of the arrival radius, so you can
+        // see how close counts, with a solid dot on the exact point.
+        private void HandleGoalMarker(GoalMarker goal)
+        {
+            if (_goal == null)
+            {
+                _goal = new GameObject("Goal");
+                _goal.transform.SetParent(transform, false);
+
+                var zone = new GameObject("Zone").AddComponent<SpriteRenderer>();
+                zone.transform.SetParent(_goal.transform, false);
+                zone.transform.localScale = Vector3.one * GameState.TradeRange * 2f;
+                zone.sprite = Shapes.Circle;
+                zone.color = new Color32(0x22, 0xc5, 0x5e, 0x40);
+                zone.sortingOrder = GoalOrder;
+
+                var dot = new GameObject("Dot").AddComponent<SpriteRenderer>();
+                dot.transform.SetParent(_goal.transform, false);
+                dot.transform.localScale = Vector3.one * 0.5f;
+                dot.sprite = Shapes.Circle;
+                dot.color = new Color32(0x16, 0xa3, 0x4a, 0xff);
+                dot.sortingOrder = GoalOrder;
+
+                OutlinedLabel.Create(_goal.transform, new Vector2(0f, GameState.TradeRange + 0.4f), Color.white, LabelOrder).Text = "GOAL";
+            }
+
+            _goal.transform.position = new Vector3(goal.X, -goal.Y, 0f);
+            _goal.SetActive(true);
         }
 
         private void RefreshStationLabels()

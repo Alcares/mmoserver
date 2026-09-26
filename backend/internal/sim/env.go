@@ -47,6 +47,11 @@ type Env struct {
 	// Distance to the goal at Reset, kept so a finished episode can report how close to optimal it was
 	startDist float32
 	done      bool
+
+	// OnMessage, when set, receives every marshalled ServerMessage the env drains, before the
+	// Observer consumes it. Training leaves it nil; cmd/spectator sets it to forward the bot's
+	// own stream to a websocket.
+	OnMessage func(payload []byte)
 }
 
 // NewEnv returns an Env that must be Reset before the first Step
@@ -75,6 +80,7 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 		return nil, err
 	}
 	e.playerID = player.ID
+	player.IsBot = true
 
 	e.world.Tick(e.grid)
 
@@ -96,6 +102,9 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 
 	return obs, nil
 }
+
+// Goal is where the current episode wants the bot to go.
+func (e *Env) Goal() bot.Goal { return e.goal }
 
 // Step applies one action for one tick. Calling Step before Reset or after the episode ended
 // returns an error.
@@ -147,6 +156,9 @@ func (e *Env) drain() error {
 	for {
 		select {
 		case payload := <-e.client.Send:
+			if e.OnMessage != nil {
+				e.OnMessage(payload)
+			}
 			var msg pb.ServerMessage
 			err := proto.Unmarshal(payload, &msg)
 			if err != nil {
