@@ -73,17 +73,11 @@ func main() {
 	gameMaster := game.NewMaster(rand.New(rand.NewSource(time.Now().UnixNano())))
 	slog.Info("server initialized")
 
-	// Static file delivery
-	http.Handle("/", http.FileServer(http.Dir("./web")))
-	// Serve the proto sources under the same relative paths used by their
-	// `import "game/v1/...proto"` statements, so protobufjs can resolve them.
-	http.Handle("/game/", http.StripPrefix("/game/", http.FileServer(http.Dir("./backend/api/proto/game"))))
-
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		handleWS(gameMaster, defaults, w, r)
 	})
 
-	slog.Info("listening", "url", "http://localhost:8080")
+	slog.Info("listening", "url", "ws://localhost:8080/ws")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		slog.Error("server failed", "err", err)
 		os.Exit(1)

@@ -5,9 +5,8 @@ using UnityEngine.Rendering;
 namespace Game.Client
 {
     /// <summary>
-    /// Port of web/crewmate.js: an animated suited trader assembled from tinted
-    /// sprite parts. Parts are authored in the JS canvas's 32-unit design space
-    /// (y down); Y() flips into Unity's y-up local space and the root scale maps
+    /// An animated suited trader assembled from tinted sprite parts. Parts are
+    /// authored in a 32-unit design space (y down); Y() flips into Unity's y-up local space and the root scale maps
     /// design units to world units.
     /// </summary>
     public class CrewmateView : PlayerAvatar
@@ -28,7 +27,7 @@ namespace Game.Client
 
         public static readonly Palette Emerald = new("#065f46", "#064e3b", "#f59e0b", "#a5694f", "#171717");
 
-        // Same palettes as the web client, minus emerald, which marks the local player.
+        // Every palette but emerald, which marks the local player.
         private static readonly Palette[] OtherPalettes =
         {
             new("#1e3a8a", "#172554", "#dc2626", "#ffd8c4", "#3a2010"),
@@ -134,7 +133,7 @@ namespace Game.Client
             _frontArm.localPosition = new Vector3(3f + arm, -3f, 0f);
         }
 
-        // Points below are written in canvas coordinates (y down), matching crewmate.js.
+        // Points below are written in design coordinates (y down).
         private static Vector2 P(float x, float y) => new(x, -y);
 
         private static Vector2[] HairOutline()

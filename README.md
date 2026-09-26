@@ -4,7 +4,6 @@ multiplayer trading game. you walk around a map between trading stations and buy
 
 - `backend/` - go server. authoritative, 20 ticks/s, protobuf over websockets
 - `unity/` - the actual client (unity 6)
-- `web/` - crappy browser client, server hosts it
 - `rl-training/` - python/PPO stuff that trains the bots against a go sim of the game
 - `docs/` - design notes, read them if you care
 
@@ -38,7 +37,7 @@ make client-linux   # or make client for linux + mac
 ends up in `unity/Builds/`. `make run` = start the server + open the linux build. or just press play in the editor, whatever
 
 ### play
-open the client (or http://localhost:8080 for the browser one). someone hits "create a new game" and gets a code, everyone else joins with the code. needs 5 players to start, press B in the lobby to add bots if you have no friends. WASD to move, E buy, Q sell, T changes order size. ctrl+R to go back to the menu
+open the client. someone hits "create a new game" and gets a code, everyone else joins with the code. needs 5 players to start, press B in the lobby to add bots if you have no friends. WASD to move, E buy, Q sell, T changes order size. ctrl+R to go back to the menu
 
 ### spectate a finished training
 watch the snapshots in order and see the bot go from useless to not useless

@@ -57,5 +57,5 @@ The package is ~1500 lines with one transport. A package boundary would buy noth
 the file boundaries above do not already buy, and it costs the cycle break plus churn in
 `../backend/cmd`, `../backend/internal/sim` and the tests, which use unexported fields.
 
-Revisit when a second transport appears. The browser and Unity clients share the one
-WebSocket path today, so that has not happened yet.
+Revisit when a second transport appears. Every client uses the one WebSocket path today,
+so that has not happened yet.

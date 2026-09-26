@@ -202,45 +202,18 @@ export step rather than in Go, which is a much shorter path to the cause.
 
 `TradeRange` used to exist four times, in three languages: the authority in `game/config.go`,
 `stopRange` in `bot/policy.go` (`internal/bot` must not import `internal/game`), and a constant
-each in Unity and the web client. When the range moved from 5 to 3, the Go pair was updated and
-the clients were not, and both spent that window offering trades from 3-5 units out that the
-server then rejected.
+each in the Unity client and in a browser client since removed. When the range moved from 5 to
+3, the Go pair was updated and the clients were not, and both spent that window offering trades
+from 3-5 units out that the server then rejected.
 
 No test could have spanned them: a Go test can't read a C# or JS `const` without scraping
 source, which only asserts that two spellings of a number match. So the copies were deleted
 instead. `InitialGameState` now carries `trade_range`, `player_radius` and `station_radius`,
-and Unity, the web client and `bot.Observer` all read them from there; see
-`SHARED_CONSTANTS.md`. What remains is checked in Go:
+and the Unity client and `bot.Observer` read them from there; see `SHARED_CONSTANTS.md`. What
+remains is checked in Go:
 `TestJoinSendsStationsBeforeSnapshots` that the values go out, and `sim/env_test.go` that a
 state the env calls arrived is one where `ScriptedPolicy`, stopping at the range it received,
 returns `ActionStop`.
-
----|---|
-| `backend/internal/game/config.go:20` | the authority |
-| `backend/internal/bot/policy.go:16` | `stopRange`, because `internal/bot` must not import `internal/game` |
-| `unity/Assets/Scripts/Client/GameState.cs:19` | gates the nearby-station highlight and E/Q |
-| `web/index.html:427` | the same, in the browser client |
-
-This is not hypothetical. When the range moved from 5 to 3, the first two were updated and the
-last two were not, and both clients spent that window offering trades from 3-5 units out that
-the server then rejected.
-
-**What already catches half of it.** `sim/env_test.go:47` asserts that a state the env calls
-arrived is a state where `ScriptedPolicy` returns `ActionStop`. That is a real two-sided check
-and it fired on the 5-to-3 change. It covers the Go pair only.
-
-**What catches the other half: nothing, and probably nothing should.** A Go test cannot read a
-C# `const` or a JS `const` without scraping source, which is a test that asserts two spellings
-of a number match - the `optimalSteps` mistake again, in a worse form.
-
-The fix is to delete the copies rather than test them. `InitialGameState` already carries
-`world_size` for exactly this reason, and `unity/CLAUDE.md` already says order-size multipliers
-come from `PriceQuote.orders` and are "never hard-coded". A `trade_range` field alongside
-`world_size` would put both clients on the server's number and leave one constant to keep in
-step instead of three.
-
-Until then, the two client comments are also wrong about where the authority lives: both say
-`world.go`, and it is `config.go`.
 
 ---
 

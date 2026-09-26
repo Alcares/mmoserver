@@ -6,7 +6,6 @@
 ## Layout
 - `backend/` — Go server and the protobuf schemas.
 - `unity/` — Unity 6 desktop client.
-- `web/` — browser client, plain JS, loads the `.proto` at runtime with protobufjs (no JS codegen)
 - `docs/` — past and future design decision
 
 ## Wire protocol

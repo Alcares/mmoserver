@@ -289,7 +289,7 @@ Settled before the steps:
       could change. `TestContactWithinTradeRange` holds `PlayerRadius + StationRadius <
       TradeRange`: otherwise the closest a player can stand is outside trading range and no
       station can be used. `InitialGameState` carries `trade_range`, `player_radius` and
-      `station_radius`, and nothing else defines them: Unity and the web client read all three,
+      `station_radius`, and nothing else defines them: the Unity client reads all three,
       and `bot.Observer` reads `trade_range`, so `ScriptedPolicy` stops where the server says
       arrival is and the hand-kept `stopRange` is gone. The Observer picks up the radii with the
       rays in step 26. `SHARED_CONSTANTS.md` has the full list of readers.

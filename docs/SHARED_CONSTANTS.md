@@ -1,6 +1,6 @@
 # Shared Constants: Where a Value Lives When Several Languages Need It
 
-This records how a constant that Go, Python, Unity and the web client all depend on is kept in
+This records how a constant that Go, Python and Unity all depend on is kept in
 one place, and which values are sent to clients instead of hardcoded in each.
 
 ## The question
@@ -9,8 +9,8 @@ Some values are already sent over the wire (`world_size` in `InitialGameState`, 
 sim's reset response). Others are copied by hand and have to be kept in sync. A root `.env`
 read by every sub-project was considered and rejected:
 
-- A Unity build in `unity/Builds/` and the browser client can't read the repo at runtime, so
-  the file would have to be baked in at build time, which makes it codegen with extra steps.
+- A Unity build in `unity/Builds/` can't read the repo at runtime, so the file would have to be
+  baked in at build time, which makes it codegen with extra steps.
 - A client built against one `.env` and a server started with another drift apart exactly as
   hardcoded copies do, only less visibly.
 - `.env` is for deployment settings (ports, paths). Game rules don't belong next to them, and
@@ -42,7 +42,6 @@ defines them:
 |---|---|
 | Unity `GameState.TradeRange` | the nearby-station check behind E/Q, and the spectator's goal disc |
 | Unity `WorldView` | stations and players drawn at the collision radii |
-| web `index.html` | the same: nearest-station lookup and drawing |
 | Go `bot.Observer` | `ScriptedPolicy` stops within `trade_range`; it can't import `game` |
 
 The sim decides arrival with `game.TradeRange` directly, since it is server-side code.
