@@ -1,6 +1,10 @@
 package game
 
-import pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+import (
+	"slices"
+
+	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+)
 
 // Cash is whole cents everywhere: balances, prices and the pool's cash reserve.
 // Commodity quantities are whole units everywhere: pools, inventories and orders.
@@ -114,6 +118,7 @@ func (c *CommodityState) toProtoQuote(cType pb.CommodityType, deltaBasisPoints i
 	}
 }
 
+// GetCommodityTypes returns every tradeable commodity, ascending by enum value.
 func GetCommodityTypes() []pb.CommodityType {
 	commodityTypes := make([]pb.CommodityType, 0, len(pb.CommodityType_value))
 
@@ -123,6 +128,7 @@ func GetCommodityTypes() []pb.CommodityType {
 		}
 		commodityTypes = append(commodityTypes, pb.CommodityType(v))
 	}
+	slices.Sort(commodityTypes) // source is a map and Go randomizes map iteration on every pass and that fucks with seeding
 
 	return commodityTypes
 }
