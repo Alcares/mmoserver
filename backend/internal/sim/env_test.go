@@ -90,6 +90,29 @@ func TestEnvReachesGoal(t *testing.T) {
 	}
 }
 
+// Training must not see the game's fixed layout, or a policy could learn where stations are
+// instead of sensing them.
+func TestEnvLayoutChangesPerSeed(t *testing.T) {
+	e := NewEnv()
+	if _, err := e.Reset(1); err != nil {
+		t.Fatal(err)
+	}
+	// Compared as sets: the game's layout reshuffles commodities between the same spots
+	spots := make(map[game.Vec2f]bool)
+	for _, s := range e.world.Stations {
+		spots[s.Pos] = true
+	}
+	if _, err := e.Reset(2); err != nil {
+		t.Fatal(err)
+	}
+	for _, s := range e.world.Stations {
+		if !spots[s.Pos] {
+			return
+		}
+	}
+	t.Error("seeds 1 and 2 used the same station spots")
+}
+
 func TestEnvSameSeedSameStart(t *testing.T) {
 	a, err := NewEnv().Reset(42)
 	if err != nil {

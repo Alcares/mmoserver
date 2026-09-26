@@ -53,7 +53,8 @@ type Env struct {
 	// own stream to a websocket.
 	OnMessage func(payload []byte)
 
-	// Layout, when set, places each episode's stations instead of the game's own layout.
+	// Layout places each episode's stations. Nil means random positions around spawn, so a policy
+	// has to sense stations rather than learn where they are.
 	Layout func(*rand.Rand) []*game.TradingStation
 }
 
@@ -62,11 +63,16 @@ func NewEnv() *Env {
 	return &Env{grid: game.NewSpatialGrid(), done: true}
 }
 
-// Reset starts a new episode from seed: new world (reshuffled stations), bot joined through
+// Reset starts a new episode from seed: new world with its own station layout, bot joined through
 // World.Join, random goal, and one Tick so the first Encode succeeds.
 // The same seed always gives the same first observation.
 func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 	e.done = true
+
+	layout := e.Layout
+	if layout == nil {
+		layout = game.RandomTradingStations
+	}
 
 	e.rng = rand.New(rand.NewSource(seed))
 	e.world = game.NewWorld("sim", game.WorldConfig{
@@ -74,7 +80,7 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 		StartCountdown: 0 * time.Second,
 		Duration:       5 * time.Minute,
 		Rng:            e.rng,
-		Layout:         e.Layout,
+		Layout:         layout,
 	})
 	e.client = game.NewSendQueue()
 	e.observer = bot.Observer{}

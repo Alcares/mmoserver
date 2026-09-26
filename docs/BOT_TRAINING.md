@@ -309,12 +309,18 @@ Settled before the steps:
       is exactly what the rays have to win back. It stays the blind control from here on.
       `optimalSteps` is still a straight line, so it now slightly flatters the optimum around a
       station.
-- [ ] **25. Random layouts in `Env`.** Stations at random positions, kept apart from each other
-      and from `SpawnPos`, instead of the fixed ellipse, through a layout hook on `WorldConfig`;
-      the game server keeps its ellipse. Without this, rays are optional: the bot could still
-      learn the six fixed spots from the goal offset alone. The count stays at one per
-      commodity until the game supports more stations. Goals stay uniform over the map; one
-      that lands inside a station is still reachable because of step 21's margin.
+- [x] **25. Random layouts in `Env`.** `game.RandomTradingStations` places one station per
+      commodity anywhere within 40 units of `SpawnPos`, at least `PlayerRadius + StationRadius +
+      2` from spawn and far enough from each other for a player to pass between. It is `Env`'s
+      default through the `WorldConfig.Layout` hook; the game server keeps its ellipse. The disc
+      rather than the whole map because a straight path across 500×500 crosses one of six small
+      stations about 4% of the time, too rarely to learn avoidance from, while every episode
+      starts at spawn, where the real layout also keeps its stations. Without this, rays are
+      optional: the bot could still learn the six fixed spots from the goal offset alone. Tests
+      compare layouts as sets of positions, since the ellipse already shuffles commodities
+      between the same spots. Goals stay uniform over the map; one that lands inside a station
+      is still reachable because of step 21's margin. The spectator runs `Env`, so it now shows
+      random layouts too. Env throughput is unchanged at ~213k steps/s.
 - [ ] **26. Observation v2.** `[dx, dy, dist, ray₀…ray₇]`, `ObsSize` 5 → 11. Ray `i` points
       along action `i + 1` and gives the distance to the first station, inflated by
       `PlayerRadius` so the ray shows where the player's centre stops, or to the map edge.

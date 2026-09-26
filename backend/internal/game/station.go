@@ -1,6 +1,7 @@
 package game
 
 import (
+	"math"
 	"math/rand"
 	"strings"
 
@@ -31,6 +32,48 @@ func NewTradingStations(rand *rand.Rand) []*TradingStation {
 		positions[i], positions[j] = positions[j], positions[i]
 	})
 
+	return stationsAt(types, positions)
+}
+
+const (
+	// Random stations land within this distance of spawn, the area the bot always crosses first.
+	randomLayoutRadius = 40.0
+	// Room between spawn and a station, so no player joins touching one.
+	spawnClearance = PlayerRadius + StationRadius + 2
+	// Centre-to-centre distance that leaves a player room to pass between two stations.
+	stationSpacing = 2*(PlayerRadius+StationRadius) + 1
+)
+
+// RandomTradingStations places one station per commodity at random around spawn, apart from each
+// other and from spawn itself. The same rng state always gives the same layout.
+func RandomTradingStations(rng *rand.Rand) []*TradingStation {
+	types := GetCommodityTypes()
+	positions := make([]Vec2f, 0, len(types))
+	for len(positions) < len(types) {
+		// sqrt keeps the density uniform over the disc instead of bunching at the centre
+		r := randomLayoutRadius * math.Sqrt(rng.Float64())
+		theta := 2 * math.Pi * rng.Float64()
+		p := Vec2f{X: SpawnPos.X + r*math.Cos(theta), Y: SpawnPos.Y + r*math.Sin(theta)}
+
+		if EuclideanDistance(p, SpawnPos) < spawnClearance {
+			continue
+		}
+		clear := true
+		for _, q := range positions {
+			if EuclideanDistance(p, q) < stationSpacing {
+				clear = false
+				break
+			}
+		}
+		if clear {
+			positions = append(positions, p)
+		}
+	}
+	return stationsAt(types, positions)
+}
+
+// stationsAt pairs each commodity with the position at the same index.
+func stationsAt(types []pb.CommodityType, positions []Vec2f) []*TradingStation {
 	stations := make([]*TradingStation, len(types))
 	for i, cType := range types {
 		stations[i] = &TradingStation{
