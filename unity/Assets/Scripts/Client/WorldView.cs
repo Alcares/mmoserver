@@ -45,6 +45,8 @@ namespace Game.Client
             public Vector2 Target;
             public Vector2 Velocity;
             public bool IsMe;
+            /// <summary>Server-run. Animates from velocity and wears the bot art even as players[0].</summary>
+            public bool IsBot;
         }
 
         private sealed class StationView
@@ -103,9 +105,12 @@ namespace Game.Client
                 view.Go.transform.position = pos;
 
                 // The local player animates from raw input so it reacts before the server echoes.
+                // A bot never does, even as players[0] - which is what a spectator stream makes
+                // it - because this keyboard is not what moves it.
                 // Input is in server axes (+y down); avatars take a world direction (+y up).
-                bool moving = view.IsMe ? _input.Move != Vector2.zero : view.Velocity.magnitude > 0.01f;
-                Vector2 direction = view.IsMe ? new Vector2(_input.Move.x, -_input.Move.y) : view.Velocity;
+                bool driven = view.IsMe && !view.IsBot;
+                bool moving = driven ? _input.Move != Vector2.zero : view.Velocity.magnitude > 0.01f;
+                Vector2 direction = driven ? new Vector2(_input.Move.x, -_input.Move.y) : view.Velocity;
 
                 view.Avatar.Animate(direction, moving);
                 view.Avatar.SetSortingOrder(-Mathf.RoundToInt(pos.y * 10f));
@@ -343,9 +348,10 @@ namespace Game.Client
             }
 
             var label = OutlinedLabel.Create(go.transform, new Vector2(0f, avatar.LabelHeight), Color.white, LabelOrder);
-            label.Text = isMe ? "You" : string.IsNullOrEmpty(state.Name) ? $"P{state.Id}" : state.Name;
+            label.Text = isMe && !state.IsBot ? "You"
+                : string.IsNullOrEmpty(state.Name) ? $"P{state.Id}" : state.Name;
 
-            return new PlayerView { Go = go, Avatar = avatar, IsMe = isMe };
+            return new PlayerView { Go = go, Avatar = avatar, IsMe = isMe, IsBot = state.IsBot };
         }
     }
 }
