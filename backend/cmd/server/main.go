@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"log/slog"
 	"math/rand"
 	"net/http"
@@ -11,6 +9,7 @@ import (
 
 	"github.com/alcares/mmoserver/backend/internal/bot"
 	"github.com/alcares/mmoserver/backend/internal/game"
+	"github.com/alcares/mmoserver/backend/internal/logging"
 	"github.com/gorilla/websocket"
 )
 
@@ -26,7 +25,7 @@ var upgrader = websocket.Upgrader{
 func handleWS(master *game.Master, defaults game.WorldConfig, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("Upgrade failed: %v", err)
+		slog.Error("upgrade failed", "err", err)
 		return
 	}
 	client := game.NewWebsocketClient(conn)
@@ -35,11 +34,23 @@ func handleWS(master *game.Master, defaults game.WorldConfig, w http.ResponseWri
 	go client.ReadPump(master, defaults)
 }
 
+// logPath is relative to the repo root the binary runs from.
+const logPath = "backend/server.log"
+
 func main() {
+	logger, logFile, err := logging.New(logPath)
+	if err != nil {
+		slog.Error("open log", "path", logPath, "err", err)
+		os.Exit(1)
+	}
+	defer logFile.Close()
+	slog.SetDefault(logger)
+
 	// One JSON object per line, appended across runs: the durable record of every order
 	tradeLog, err := os.OpenFile("backend/events.jsonl", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
-		log.Fatalf("Trade log: %v", err)
+		slog.Error("open trade log", "err", err)
+		os.Exit(1)
 	}
 
 	// Defaults for every game created on this server; a client's CreateGame may
@@ -54,13 +65,13 @@ func main() {
 
 	// One instance serves every bot: Act only reads the weights and allocates its own scratch.
 	if policy, err := bot.LoadMLPPolicy("rl-training/policy.pb"); err != nil {
-		log.Printf("No trained policy (%v); bots run the scripted baseline", err)
+		slog.Warn("no trained policy; bots run the scripted baseline", "err", err)
 	} else {
 		defaults.BotPolicy = policy
 	}
 
 	gameMaster := game.NewMaster(rand.New(rand.NewSource(time.Now().UnixNano())))
-	fmt.Println("Server initialized")
+	slog.Info("server initialized")
 
 	// Static file delivery
 	http.Handle("/", http.FileServer(http.Dir("./web")))
@@ -72,8 +83,9 @@ func main() {
 		handleWS(gameMaster, defaults, w, r)
 	})
 
-	log.Println("Listening on http://localhost:8080")
+	slog.Info("listening", "url", "http://localhost:8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatalf("Server failed: %v", err)
+		slog.Error("server failed", "err", err)
+		os.Exit(1)
 	}
 }

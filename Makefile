@@ -76,10 +76,10 @@ clean:
 	rm -rf $(SIM_PY_PKG) $(BOT_PY_PKG)
 	rm -f $(CSHARP_OUT)/*.cs
 
-# Rebuilds and (re)starts the server in the background; output goes to $(SERVER_LOG).
+# Rebuilds and (re)starts the server in the background; the server writes $(SERVER_LOG) itself.
 server-start: server-stop
 	go -C $(BACKEND) build -o bin/server ./cmd/server
-	nohup ./$(SERVER_BIN) > $(SERVER_LOG) 2>&1 & echo $$! > $(SERVER_PID)
+	nohup ./$(SERVER_BIN) > /dev/null 2>&1 & echo $$! > $(SERVER_PID)
 	@sleep 1; kill -0 $$(cat $(SERVER_PID)) 2>/dev/null \
 		&& echo "server running, pid $$(cat $(SERVER_PID))" \
 		|| { echo "server exited, see $(SERVER_LOG)"; tail -n 20 $(SERVER_LOG); rm -f $(SERVER_PID); exit 1; }
