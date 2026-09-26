@@ -52,6 +52,9 @@ type Env struct {
 	// Observer consumes it. Training leaves it nil; cmd/spectator sets it to forward the bot's
 	// own stream to a websocket.
 	OnMessage func(payload []byte)
+
+	// Layout, when set, places each episode's stations instead of the game's own layout.
+	Layout func(*rand.Rand) []*game.TradingStation
 }
 
 // NewEnv returns an Env that must be Reset before the first Step
@@ -71,6 +74,7 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 		StartCountdown: 0 * time.Second,
 		Duration:       5 * time.Minute,
 		Rng:            e.rng,
+		Layout:         e.Layout,
 	})
 	e.client = game.NewSendQueue()
 	e.observer = bot.Observer{}

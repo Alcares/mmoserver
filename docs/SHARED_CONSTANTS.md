@@ -40,9 +40,9 @@ aren't read by either client, so they stay server-only until one needs them.
 
 Current copies:
 
-- `unity/Assets/Scripts/Client/GameState.cs:19` - `public const float TradeRange = 3f;`, used by
-  `TryGetNearbyStation`. Its comment points at `world.go`, but the value is in `config.go`.
-- `web/index.html:427` - `const TRADE_RANGE = 3;`, used by the nearest-station lookup.
+- `unity/Assets/Scripts/Client/GameState.cs:19` - `public const float TradeRange = 4f;`, used by
+  `TryGetNearbyStation`.
+- `web/index.html:427` - `const TRADE_RANGE = 4;`, used by the nearest-station lookup.
 
 Steps:
 

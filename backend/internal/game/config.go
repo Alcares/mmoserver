@@ -17,7 +17,9 @@ const (
 	WorldMinY        = 0.0
 	WorldMaxY        = 500.0
 	TickDuration     = 0.05 // 50ms = 20Hz
-	TradeRange       = 3.0  // Max distance to a station a player can trade from
+	TradeRange       = 4.0  // Max distance to a station a player can trade from. Have to be kept in sync with its mirrors
+	PlayerRadius     = 1.0
+	StationRadius    = 2.0
 	MaxPlayers       = 50
 )
 
@@ -50,6 +52,9 @@ type WorldConfig struct {
 	// Logger receives game events. sanitize defaults it to a discarding logger, so the
 	// training sim and the tests stay silent without every call site checking.
 	Logger *slog.Logger
+	// Layout places the stations. sanitize defaults it to NewTradingStations, the ellipse every
+	// real game uses; the sim swaps it to control what stands in a bot's way.
+	Layout func(*rand.Rand) []*TradingStation
 
 	BotPolicy bot.Policy
 }
@@ -78,6 +83,9 @@ func (cfg *WorldConfig) sanitize() {
 	}
 	if cfg.BotPolicy == nil {
 		cfg.BotPolicy = bot.ScriptedPolicy{}
+	}
+	if cfg.Layout == nil {
+		cfg.Layout = NewTradingStations
 	}
 }
 

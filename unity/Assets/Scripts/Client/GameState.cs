@@ -15,8 +15,8 @@ namespace Game.Client
     [RequireComponent(typeof(GameClient))]
     public class GameState : MonoBehaviour
     {
-        /// <summary>Mirrors backend/internal/game/world.go TradeRange; the server is authoritative.</summary>
-        public const float TradeRange = 3f;
+        /// <summary>Mirrors backend/internal/game/config.go TradeRange; the server is authoritative.</summary>
+        public const float TradeRange = 4f;
 
         private GameClient _client;
         private readonly Dictionary<CommodityType, PriceQuote> _prices = new();

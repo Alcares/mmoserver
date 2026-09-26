@@ -46,7 +46,7 @@ func NewWorld(gameID string, cfg WorldConfig) *World {
 		phase:         pb.GamePhase_GAME_PHASE_WAITING,
 		players:       make(map[uint32]*Player),
 		clients:       make(map[uint32]Client),
-		Stations:      NewTradingStations(cfg.Rng),
+		Stations:      cfg.Layout(cfg.Rng),
 		Commodities:   NewCommodities(),
 		movementQueue: make(chan PlayerMovementInput, 1024), // Buffered to handle bursts
 		tradeQueue:    make(chan TradeOrder, 64),

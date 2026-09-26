@@ -74,6 +74,8 @@ func (w *World) stepMovement() {
 		player.Pos.X += player.TargetDir.X * player.Speed * TickDuration
 		player.Pos.Y += player.TargetDir.Y * player.Speed * TickDuration
 
+		w.pushOutOfStations(player)
+
 		// Keep within map boundaries
 		if player.Pos.X < WorldMinX {
 			player.Pos.X = WorldMinX
@@ -86,6 +88,17 @@ func (w *World) stepMovement() {
 		}
 		if player.Pos.Y > WorldMaxY {
 			player.Pos.Y = WorldMaxY
+		}
+	}
+}
+
+// pushOutOfStations moves a player that ended its step inside a station back onto the station's
+// edge, along the line from its centre.
+func (w *World) pushOutOfStations(player *Player) {
+	const minDist = PlayerRadius + StationRadius
+	for _, station := range w.Stations {
+		if EuclideanDistance(player.Pos, station.Pos) < minDist {
+			player.Pos = projectOntoCircle(station.Pos, player.Pos, minDist)
 		}
 	}
 }

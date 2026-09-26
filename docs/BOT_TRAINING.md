@@ -81,7 +81,7 @@ mapping action index → `(vx, vy)` is defined **once, in Go**. Python only ever
 
 ### Episode end
 
-- **Terminated:** the bot is within `TradeRange` (3 units) of the goal.
+- **Terminated:** the bot is within `TradeRange` (4 units) of the goal.
 - **Truncated:** the step limit ran out (`MaxSteps`, 1200 ticks = 60 s).
 
 These are reported separately: PPO treats a real ending and a timeout differently.
@@ -256,6 +256,88 @@ learned.
       and animate them from velocity even as `players[0]`.
 
 Not done: watching a run while it trains, and per-step debug (last action, reward) on screen.
+
+### Stage 1b: moving around stations
+
+Stations become solid. Stage 1's bot walks a straight line and sees nothing but its goal, so
+this stage teaches it to sense obstacles, in a form that still works when there are many more
+stations or they start moving.
+
+Settled before the steps:
+
+- **Only stations collide.** Players, bots included, pass through each other. Hard player
+  collisions would feel laggy (Unity draws remote players slightly behind their real position)
+  and invite body-blocking, and a same-speed blocker can shadow a bot indefinitely whatever its
+  policy, so no observation could fix that. Soft separation between players can come later as a
+  feel change; it never blocks, so it needs nothing from the bot.
+- **Circles, move then push out.** A player that ends a tick inside a station is pushed out
+  along the line between the centres. Pressing into a station at an angle slides around it; only
+  a dead-centre push stops. Rejecting the move outright would freeze a greedy bot on first
+  contact.
+- **The bot senses locally, not a list of stations.** Eight rays, one per movement direction,
+  fixed size whatever the station count, recomputed each tick so moving stations just work.
+  Absolute `x, y` leaves the observation: every layout today uses the same ellipse points, so a
+  bot that sees its position can memorise where stations are instead of looking.
+- **Every trained policy is thrown away.** Collisions make them wrong anyway, so the observation
+  change costs nothing extra now and would cost a second retrain later.
+
+- [ ] **20. Baseline.** Record the Stage 1 numbers from the Go regression test on the current
+      code (success, mean and worst steps/optimal, truncation rate) for `ScriptedPolicy` and the
+      current `policy.pb`, so every later step has something to compare against.
+- [ ] **21. Radii on the wire.** `PlayerRadius` and `StationRadius` in
+      `game/config.go`, with a test that `PlayerRadius + StationRadius < TradeRange`: otherwise
+      the closest a player can stand is outside trading range and no station can be used. Send
+      `trade_range`, `player_radius` and `station_radius` in `InitialGameState`. The Observer
+      needs them to cast rays and `bot` cannot import `game`, which settles the mirrored-constant
+      problem `docs/TESTING.md` describes; Unity and the web client read them instead of keeping
+      their own copies of `TradeRange`.
+- [ ] **22. Collisions in `stepMovement`.** After moving, push the player out of any station
+      closer than `PlayerRadius + StationRadius`, then clamp to the map. Stations are static and
+      players don't touch each other, so the order players are processed in doesn't matter.
+      A player exactly on a station's centre has no direction to be pushed in; push along a
+      fixed axis. Six stations are checked directly; a grid comes with many stations. Tests: a
+      dead-centre push stops at contact, a glancing one slides past, `TradeRange` of every
+      station is reachable from every side, and a long random walk never ends a tick inside a
+      station. `sim.Env` runs the same `stepMovement`, so training gets collisions with no
+      change of its own.
+- [ ] **23. Clients.** Unity and the web client draw stations at `station_radius`. The server
+      stays authoritative and neither client predicts, so a blocked player simply stops.
+- [ ] **24. Measure blind.** Re-run step 20 with collisions and the unchanged observation.
+      `ScriptedPolicy` can't see stations, so the drop in success and the rise in truncations
+      is exactly what the rays have to win back. It stays the blind control from here on.
+      `optimalSteps` is still a straight line, so it now slightly flatters the optimum around a
+      station.
+- [ ] **25. Random layouts in `Env`.** Stations at random positions, kept apart from each other
+      and from `SpawnPos`, instead of the fixed ellipse, through a layout hook on `WorldConfig`;
+      the game server keeps its ellipse. Without this, rays are optional: the bot could still
+      learn the six fixed spots from the goal offset alone. The count stays at one per
+      commodity until the game supports more stations. Goals stay uniform over the map; one
+      that lands inside a station is still reachable because of step 21's margin.
+- [ ] **26. Observation v2.** `[dx, dy, dist, ray₀…ray₇]`, `ObsSize` 5 → 11. Ray `i` points
+      along action `i + 1` and gives the distance to the first station, inflated by
+      `PlayerRadius` so the ray shows where the player's centre stops, or to the map edge.
+      It is capped at `RayRange` (10 units, about 17 ticks) and divided by it, so 1 means clear.
+      The Observer builds the rays from the station layout and radii in `InitialGameState`.
+      Moving stations would need their positions in the per-tick stream, which is out of scope
+      here. Tests: known layouts give known ray values, and a ray shorter than one step (0.6)
+      agrees with `stepMovement` that the action is blocked. Update the Observation contract
+      table above. `ScriptedPolicy` ignores the rays. `LoadMLPPolicy` already rejects a policy
+      whose `obs_size` isn't `ObsSize`, so v1 files fail loudly rather than misbehave; that
+      also means `SnapshotPolicy.Reload` would skip the old snapshots one by one, so clear
+      `rl-training/snapshots/` before the first v2 run. Re-check the Env benchmark (~223k steps/s); 8 rays against six
+      circles should barely move it.
+- [ ] **27. Retrain and compare.** PPO on random layouts, evaluated on random layouts and on the
+      server's own ellipse, against the blind `ScriptedPolicy` from step 24. The rays earned
+      their place if PPO's truncations fall below the blind control's. If PPO only matches it,
+      the stations weren't in the way often enough to matter; the rays stay anyway, for many
+      and moving stations. Re-set step 14's regression-test thresholds to the new measured
+      numbers.
+- [ ] **28. Ship.** New `policy.pb` to the server, then a spectator recap of the v2 snapshots.
+      The spectator runs `Env`, so it shows the random layouts; the in-server bot shows the
+      real one.
+
+Open for this stage: whether 10 units is enough ray range at 12 u/s, 8 rays versus 16, and
+per-tick station positions once stations move.
 
 ### Stage 2: trading
 

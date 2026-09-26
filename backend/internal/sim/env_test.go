@@ -2,6 +2,7 @@ package sim
 
 import (
 	"math"
+	"math/rand"
 	"testing"
 
 	"github.com/alcares/mmoserver/backend/internal/bot"
@@ -56,8 +57,15 @@ func walkToGoal(t testing.TB, e *Env, seed int64) (StepResult, int) {
 	}
 }
 
+// noStations leaves the map empty. Stations are solid, and ScriptedPolicy can't see them, so
+// on the real layout a goal lined up behind one leaves it pushing into it for good. That is
+// the blind baseline doing its job, not the env failing, so the env's own contract is tested
+// where nothing stands in the way.
+func noStations(*rand.Rand) []*game.TradingStation { return nil }
+
 func TestEnvReachesGoal(t *testing.T) {
 	e := NewEnv()
+	e.Layout = noStations
 	for seed := range int64(20) {
 		start, err := e.Reset(seed)
 		if err != nil {
