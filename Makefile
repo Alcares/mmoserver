@@ -14,6 +14,7 @@ UNITY_PROJECT := $(CURDIR)/unity
 SERVER_BIN := $(BACKEND)/bin/server
 SERVER_PID := $(BACKEND)/server.pid
 SERVER_LOG := $(BACKEND)/server.log
+SPECTATOR_BIN := $(BACKEND)/bin/spectator
 BENCH_CPU := $(CURDIR)/$(BACKEND)/bench-cpu.out
 BENCH ?= .
 ARGS ?=
@@ -22,7 +23,7 @@ BENCH_PROF_PKG ?= ./internal/sim
 UNITY_BATCH = LD_LIBRARY_PATH=$(HOME)/.local/lib/unity-compat:$$LD_LIBRARY_PATH $(UNITY) \
 	-batchmode -quit -projectPath $(UNITY_PROJECT) -logFile - -executeMethod
 
-.PHONY: proto proto-py clean server-start server-stop test bench bench-profile hooks client client-linux client-mac all baseline train
+.PHONY: proto proto-py clean server-start server-stop spectator test bench bench-profile hooks client client-linux client-mac all baseline train
 
 proto:
 	protoc \
@@ -86,6 +87,10 @@ server-start: server-stop
 
 server-stop:
 	@if [ -f $(SERVER_PID) ]; then kill $$(cat $(SERVER_PID)) 2>/dev/null && echo "server stopped"; rm -f $(SERVER_PID); fi
+
+# Builds the snapshot spectator; run ./$(SPECTATOR_BIN) from the repo root.
+spectator:
+	go -C $(BACKEND) build -o bin/spectator ./cmd/spectator
 
 test:
 	go -C $(BACKEND) test ./...
