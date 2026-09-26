@@ -198,12 +198,24 @@ export step rather than in Go, which is a much shorter path to the cause.
 
 ---
 
-## 5. Shared constants - the copies no test spans
+## 5. Shared constants - resolved by deleting the copies
 
-`TradeRange` exists four times, in three languages:
+`TradeRange` used to exist four times, in three languages: the authority in `game/config.go`,
+`stopRange` in `bot/policy.go` (`internal/bot` must not import `internal/game`), and a constant
+each in Unity and the web client. When the range moved from 5 to 3, the Go pair was updated and
+the clients were not, and both spent that window offering trades from 3-5 units out that the
+server then rejected.
 
-| file | |
-|---|---|
+No test could have spanned them: a Go test can't read a C# or JS `const` without scraping
+source, which only asserts that two spellings of a number match. So the copies were deleted
+instead. `InitialGameState` now carries `trade_range`, `player_radius` and `station_radius`,
+and Unity, the web client and `bot.Observer` all read them from there; see
+`SHARED_CONSTANTS.md`. What remains is checked in Go:
+`TestJoinSendsStationsBeforeSnapshots` that the values go out, and `sim/env_test.go` that a
+state the env calls arrived is one where `ScriptedPolicy`, stopping at the range it received,
+returns `ActionStop`.
+
+---|---|
 | `backend/internal/game/config.go:20` | the authority |
 | `backend/internal/bot/policy.go:16` | `stopRange`, because `internal/bot` must not import `internal/game` |
 | `unity/Assets/Scripts/Client/GameState.cs:19` | gates the nearby-station highlight and E/Q |
@@ -244,7 +256,7 @@ By "silent and expensive" first, not by convenience:
 6. **3.1** - the end-to-end guard, once the pieces beneath it are pinned.
 7. **1.4, 1.5, 1.6, 2.3** - cheap rows once each fixture exists.
 
-Section 5 is not in this list on purpose: it asks for a proto field, not a test.
+Section 5 is not in this list: it was fixed by a proto field, not a test.
 
 ## What not to write
 

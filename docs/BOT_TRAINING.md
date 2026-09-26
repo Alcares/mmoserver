@@ -133,7 +133,7 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
 - [x] **11. Action table and `Policy` interface.** `type Action int`, the 9-entry direction
       table, `Policy.Act(*Observation) Action`, and `ScriptedPolicy` (nearest of the 8
       directions, stop inside `TradeRange`). It serves as test, baseline and something to
-      watch. It does not get stuck near the goal: one step is 0.6 units against a 5-unit stop
+      watch. It does not get stuck near the goal: one step is 0.6 units against a 4-unit stop
       radius, so it cannot hop the band and reverse, and `walkToGoal` asserts no action is ever
       the exact opposite of the one before it.
 - [x] **12. Python bridge.** `backend/api/proto/sim/v1/env.proto`, kept separate from the game
@@ -286,12 +286,13 @@ Settled before the steps:
       current `policy.pb`, so every later step has something to compare against.
 - [x] **21. Radii on the wire.** `PlayerRadius` and `StationRadius` are package constants in
       `game`, beside `TradeRange`: the same for every world, not `WorldConfig` fields a game
-      could change. A test holds `PlayerRadius + StationRadius < TradeRange`: otherwise
-      the closest a player can stand is outside trading range and no station can be used. Send
-      `trade_range`, `player_radius` and `station_radius` in `InitialGameState`. The Observer
-      needs them to cast rays and `bot` cannot import `game`, which settles the mirrored-constant
-      problem `docs/TESTING.md` describes; Unity and the web client read them instead of keeping
-      their own copies of `TradeRange`.
+      could change. `TestContactWithinTradeRange` holds `PlayerRadius + StationRadius <
+      TradeRange`: otherwise the closest a player can stand is outside trading range and no
+      station can be used. `InitialGameState` carries `trade_range`, `player_radius` and
+      `station_radius`, and nothing else defines them: Unity and the web client read all three,
+      and `bot.Observer` reads `trade_range`, so `ScriptedPolicy` stops where the server says
+      arrival is and the hand-kept `stopRange` is gone. The Observer picks up the radii with the
+      rays in step 26. `SHARED_CONSTANTS.md` has the full list of readers.
 - [x] **22. Collisions in `stepMovement`.** After moving, push the player out of any station
       closer than `PlayerRadius + StationRadius`, then clamp to the map. Stations are static and
       players don't touch each other, so the order players are processed in doesn't matter.

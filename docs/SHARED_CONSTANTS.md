@@ -1,8 +1,7 @@
 # Shared Constants: Where a Value Lives When Several Languages Need It
 
 This records how a constant that Go, Python, Unity and the web client all depend on is kept in
-one place, and plans the one change that follows from it: sending `TradeRange` to clients
-instead of hardcoding it in each.
+one place, and which values are sent to clients instead of hardcoded in each.
 
 ## The question
 
@@ -33,29 +32,23 @@ If category 2 grows to around a dozen values, generate them: one `constants.json
 `make proto` turns into a Go, C# and Python file. Proto3 has no constants, so they can't live
 in the `.proto` files themselves.
 
-## The change: send `TradeRange`
+## Sent: trade range and collision radii
 
-`TradeRange` is the only category 1 value clients currently copy. `MoveSpeed` and the tick rate
-aren't read by either client, so they stay server-only until one needs them.
+`InitialGameState` carries `trade_range`, `player_radius` and `station_radius` beside
+`world_size`, filled from the constants in `backend/internal/game/config.go`. Nothing else
+defines them:
 
-Current copies:
+| reader | uses |
+|---|---|
+| Unity `GameState.TradeRange` | the nearby-station check behind E/Q, and the spectator's goal disc |
+| Unity `WorldView` | stations and players drawn at the collision radii |
+| web `index.html` | the same: nearest-station lookup and drawing |
+| Go `bot.Observer` | `ScriptedPolicy` stops within `trade_range`; it can't import `game` |
 
-- `unity/Assets/Scripts/Client/GameState.cs:19` - `public const float TradeRange = 4f;`, used by
-  `TryGetNearbyStation`.
-- `web/index.html:427` - `const TRADE_RANGE = 4;`, used by the nearest-station lookup.
+The sim decides arrival with `game.TradeRange` directly, since it is server-side code.
+`TestJoinSendsStationsBeforeSnapshots` checks the three values go out, and
+`sim/env_test.go` checks the bot stops exactly where the env says it arrived, so a wrong value
+on the wire shows up as a failing Go test rather than as trades the server rejects.
 
-Steps:
-
-1. **Proto.** Add `float trade_range = 4;` to `InitialGameState` in
-   `backend/api/proto/game/v1/server_message.proto`, then run `make proto`.
-2. **Server.** Set `TradeRange: TradeRange` where `backend/internal/game/session.go:55` builds
-   the `InitialGameState`. Add a test that the initial state carries it.
-3. **Unity.** Replace the `const` in `GameState` with a field set from `InitialGameState`.
-   Until it arrives, or if it is `0`, `TryGetNearbyStation` finds nothing, so a client never
-   offers a trade the server would reject.
-4. **Web.** Same in `web/index.html`: read `message.initialState.tradeRange` beside
-   `worldSize`, and replace `TRADE_RANGE` with it.
-5. **Check.** Run `make test`, build the Unity client, and trade at a station from both clients.
-
-The bot and the sim keep using `game.TradeRange` directly: they're in the same Go module as
-the server, so they already share the one definition.
+`MoveSpeed` and the tick rate aren't read by any client, so they stay server-only until one
+needs them.

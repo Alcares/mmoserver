@@ -7,14 +7,17 @@ import (
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 )
 
-// testWorldSize is what the server sends; the expected vectors below are scaled by it
-const testWorldSize = 500.0
+// What the server sends; the expected vectors below are scaled by testWorldSize
+const (
+	testWorldSize  = 500.0
+	testTradeRange = 4.0
+)
 
-// initial is the server's join message. The Observer takes only the world size from it: the
-// goal is the task its caller sets, not something the station layout decides.
+// initial is the server's join message. The Observer takes the world size and trade range from
+// it: the goal is the task its caller sets, not something the station layout decides.
 func initial(worldSize float32) *pb.ServerMessage {
 	return &pb.ServerMessage{Msg: &pb.ServerMessage_InitialState{
-		InitialState: &pb.InitialGameState{WorldSize: worldSize},
+		InitialState: &pb.InitialGameState{WorldSize: worldSize, TradeRange: testTradeRange},
 	}}
 }
 
@@ -82,5 +85,32 @@ func TestEncodeWithoutWorldSize(t *testing.T) {
 
 	if _, err := o.Encode(Goal{X: 300, Y: 250}); err == nil {
 		t.Error("Encode with world size 0: want error")
+	}
+}
+
+// Without a trade range a policy could never tell it had arrived, and would walk through the goal
+func TestEncodeWithoutTradeRange(t *testing.T) {
+	var o Observer
+	o.Consume(&pb.ServerMessage{Msg: &pb.ServerMessage_InitialState{
+		InitialState: &pb.InitialGameState{WorldSize: testWorldSize},
+	}})
+	o.Consume(snapshot(250, 250))
+
+	if _, err := o.Encode(Goal{X: 300, Y: 250}); err == nil {
+		t.Error("Encode with trade range 0: want error")
+	}
+}
+
+func TestEncodeCarriesTradeRange(t *testing.T) {
+	var o Observer
+	o.Consume(initial(testWorldSize))
+	o.Consume(snapshot(250, 250))
+
+	obs, err := o.Encode(Goal{X: 300, Y: 250})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if obs.tradeRange != testTradeRange {
+		t.Errorf("observation trade range = %v, want the %v the server sent", obs.tradeRange, testTradeRange)
 	}
 }

@@ -11,8 +11,9 @@ const ObsSize = 5
 
 // Observer is the contract between the game and the bot, and everything else (sim, training, spectator) depends on it.
 type Observer struct {
-	WorldSize float32
-	World     *pb.WorldSnapshot
+	WorldSize  float32
+	TradeRange float32
+	World      *pb.WorldSnapshot
 	// for later
 	//inventory *pb.PlayerInventory
 	//market    *pb.MarketState
@@ -31,6 +32,8 @@ type Observation struct {
 	goalDY    float32
 	GoalDist  float32
 	worldSize float32 // The divisor Vectorise scales by, copied from the Observer
+	// How close counts as arrived, copied from the Observer. Not part of Vectorise.
+	tradeRange float32
 }
 
 // Vectorise returns [x, y, dx, dy, dist], all ÷ the world size. Changing the order or length
@@ -49,6 +52,7 @@ func (o *Observer) Consume(msg *pb.ServerMessage) { // fed from Client.Send, not
 	switch msg.Msg.(type) {
 	case *pb.ServerMessage_InitialState:
 		o.WorldSize = msg.GetInitialState().WorldSize
+		o.TradeRange = msg.GetInitialState().TradeRange
 	case *pb.ServerMessage_WorldSnapshot:
 		o.World = msg.GetWorldSnapshot()
 	}
@@ -58,12 +62,15 @@ func (o *Observer) Encode(goal Goal) (*Observation, error) {
 	if o.WorldSize <= 0 {
 		return nil, fmt.Errorf("observer: world size %v - cannot encode goal", o.WorldSize)
 	}
+	if o.TradeRange <= 0 {
+		return nil, fmt.Errorf("observer: trade range %v - cannot tell when the goal is reached", o.TradeRange)
+	}
 	// GetPlayers is nil-safe: Encode can run before the first WorldSnapshot arrives
 	if len(o.World.GetPlayers()) == 0 {
 		return nil, fmt.Errorf("observer: no snapshot with players yet - cannot encode goal")
 	}
 
-	observation := &Observation{worldSize: o.WorldSize}
+	observation := &Observation{worldSize: o.WorldSize, tradeRange: o.TradeRange}
 	observation.botX = o.World.Players[0].X
 	observation.botY = o.World.Players[0].Y
 

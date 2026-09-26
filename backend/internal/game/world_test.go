@@ -53,6 +53,11 @@ func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 	if len(initial.StationLayout) != len(w.Stations) {
 		t.Errorf("station layout has %d stations, want %d", len(initial.StationLayout), len(w.Stations))
 	}
+	// Clients and the bot use these instead of keeping their own copies
+	if initial.TradeRange != TradeRange || initial.PlayerRadius != PlayerRadius || initial.StationRadius != StationRadius {
+		t.Errorf("initial state sends trade range %v, player radius %v, station radius %v; want %v, %v, %v",
+			initial.TradeRange, initial.PlayerRadius, initial.StationRadius, TradeRange, PlayerRadius, StationRadius)
+	}
 	if msgs[1].GetPlayerInventory() == nil {
 		t.Errorf("second message = %T, want PlayerInventory", msgs[1].Msg)
 	}

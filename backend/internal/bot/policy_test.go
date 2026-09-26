@@ -9,7 +9,7 @@ var _ Policy = ScriptedPolicy{}
 
 // goalAt builds an observation with the goal at a signed offset, the way Encode fills one
 func goalAt(dx, dy float32) *Observation {
-	return &Observation{goalDX: dx, goalDY: dy, GoalDist: distance(dx, dy)}
+	return &Observation{goalDX: dx, goalDY: dy, GoalDist: distance(dx, dy), tradeRange: testTradeRange}
 }
 
 // bearing puts the goal deg clockwise from north, dist units away
@@ -62,9 +62,9 @@ func TestScriptedPolicySectorBoundaries(t *testing.T) {
 
 func TestScriptedPolicyStopsInRange(t *testing.T) {
 	for _, obs := range []*Observation{
-		goalAt(0, 0),         // standing on the station
-		goalAt(stopRange, 0), // exactly at the range
-		goalAt(stopRange/2, 0),
+		goalAt(0, 0),              // standing on the station
+		goalAt(testTradeRange, 0), // exactly at the range
+		goalAt(testTradeRange/2, 0),
 	} {
 		if got := (ScriptedPolicy{}).Act(obs); got != ActionStop {
 			t.Errorf("Act at distance %v = %v, want %v", obs.GoalDist, got, ActionStop)
@@ -72,8 +72,8 @@ func TestScriptedPolicyStopsInRange(t *testing.T) {
 	}
 
 	// Just outside, it commits to a direction instead
-	if got := (ScriptedPolicy{}).Act(goalAt(0, -(stopRange + 0.1))); got != ActionN {
-		t.Errorf("Act just outside stopRange = %v, want %v", got, ActionN)
+	if got := (ScriptedPolicy{}).Act(goalAt(0, -(testTradeRange + 0.1))); got != ActionN {
+		t.Errorf("Act just outside the trade range = %v, want %v", got, ActionN)
 	}
 }
 

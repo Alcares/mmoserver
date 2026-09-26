@@ -10,13 +10,8 @@ type Policy interface {
 	Act(observation *Observation) Action
 }
 
-// stopRange mirrors game.TradeRange in world units; bot must not import game. It has to stay
-// equal to it: stop short of it and the episode never terminates, stop late and the bot walks
-// past the point it could already trade from.
-const stopRange float32 = 4.0
-
 // ScriptedPolicy heads straight for the goal: the nearest of the 8 directions, stop once inside
-// stopRange. It is the baseline a trained policy has to beat, and the control that says whether
+// the server's trade range. It is the baseline a trained policy has to beat, and the control that says whether
 // a failing training run is the algorithm or the environment.
 //
 // Quantising to 45° leaves the heading up to 22.5° off the true bearing, so it makes at worst
@@ -26,7 +21,7 @@ type ScriptedPolicy struct{}
 
 func (p ScriptedPolicy) Act(observation *Observation) Action {
 	// First, so a bot standing on the station never reaches Atan2(0, 0)
-	if observation.GoalDist <= stopRange {
+	if observation.GoalDist <= observation.tradeRange {
 		return ActionStop
 	}
 

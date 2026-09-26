@@ -45,11 +45,12 @@ func walkToGoal(t testing.TB, e *Env, seed int64) (StepResult, int) {
 			t.Fatal(err)
 		}
 		if res.Terminated || res.Truncated {
-			// stopRange mirrors game.TradeRange by hand. If the bot would keep walking from a
-			// state the env calls arrived, the two have drifted apart.
+			// The policy stops at the trade range it read from InitialGameState, the env at
+			// game.TradeRange. If the bot would keep walking from a state the env calls
+			// arrived, the value on the wire is not the one the server uses.
 			if res.Terminated && policy.Act(res.Obs) != bot.ActionStop {
 				t.Errorf("seed %d: arrived %.2f from the goal but the policy would keep going; "+
-					"bot.stopRange and game.TradeRange disagree", seed, res.Obs.GoalDist)
+					"the trade range the bot received disagrees with game.TradeRange", seed, res.Obs.GoalDist)
 			}
 			return res, step
 		}
