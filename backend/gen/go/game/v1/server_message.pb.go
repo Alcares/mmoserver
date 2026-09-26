@@ -857,6 +857,7 @@ type ServerMessage struct {
 	//	*ServerMessage_GameOver
 	//	*ServerMessage_Episode
 	//	*ServerMessage_PlaybackSpeed
+	//	*ServerMessage_SpectatingOver
 	Msg           isServerMessage_Msg `protobuf_oneof:"msg"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1007,6 +1008,15 @@ func (x *ServerMessage) GetPlaybackSpeed() *PlaybackSpeed {
 	return nil
 }
 
+func (x *ServerMessage) GetSpectatingOver() *SpectatingOver {
+	if x != nil {
+		if x, ok := x.Msg.(*ServerMessage_SpectatingOver); ok {
+			return x.SpectatingOver
+		}
+	}
+	return nil
+}
+
 type isServerMessage_Msg interface {
 	isServerMessage_Msg()
 }
@@ -1065,6 +1075,10 @@ type ServerMessage_PlaybackSpeed struct {
 	PlaybackSpeed *PlaybackSpeed `protobuf:"bytes,12,opt,name=playback_speed,json=playbackSpeed,proto3,oneof"`
 }
 
+type ServerMessage_SpectatingOver struct {
+	SpectatingOver *SpectatingOver `protobuf:"bytes,13,opt,name=spectating_over,json=spectatingOver,proto3,oneof"`
+}
+
 func (*ServerMessage_WorldSnapshot) isServerMessage_Msg() {}
 
 func (*ServerMessage_MarketState) isServerMessage_Msg() {}
@@ -1088,6 +1102,8 @@ func (*ServerMessage_GameOver) isServerMessage_Msg() {}
 func (*ServerMessage_Episode) isServerMessage_Msg() {}
 
 func (*ServerMessage_PlaybackSpeed) isServerMessage_Msg() {}
+
+func (*ServerMessage_SpectatingOver) isServerMessage_Msg() {}
 
 var File_game_v1_server_message_proto protoreflect.FileDescriptor
 
@@ -1156,7 +1172,7 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\fplayer_count\x18\x02 \x01(\x05R\vplayerCount\x12\x1f\n" +
 	"\vmin_players\x18\x03 \x01(\x05R\n" +
 	"minPlayers\x12!\n" +
-	"\fremaining_ms\x18\x04 \x01(\x05R\vremainingMs\"\xf1\x05\n" +
+	"\fremaining_ms\x18\x04 \x01(\x05R\vremainingMs\"\xb5\x06\n" +
 	"\rServerMessage\x12?\n" +
 	"\x0eworld_snapshot\x18\x01 \x01(\v2\x16.game.v1.WorldSnapshotH\x00R\rworldSnapshot\x129\n" +
 	"\fmarket_state\x18\x02 \x01(\v2\x14.game.v1.MarketStateH\x00R\vmarketState\x12C\n" +
@@ -1171,7 +1187,8 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\x10player_inventory\x18\a \x01(\v2\x18.game.v1.PlayerInventoryH\x00R\x0fplayerInventory\x120\n" +
 	"\tgame_over\x18\t \x01(\v2\x11.game.v1.GameOverH\x00R\bgameOver\x12,\n" +
 	"\aepisode\x18\v \x01(\v2\x10.game.v1.EpisodeH\x00R\aepisode\x12?\n" +
-	"\x0eplayback_speed\x18\f \x01(\v2\x16.game.v1.PlaybackSpeedH\x00R\rplaybackSpeedB\x05\n" +
+	"\x0eplayback_speed\x18\f \x01(\v2\x16.game.v1.PlaybackSpeedH\x00R\rplaybackSpeed\x12B\n" +
+	"\x0fspectating_over\x18\r \x01(\v2\x17.game.v1.SpectatingOverH\x00R\x0espectatingOverB\x05\n" +
 	"\x03msgBFZ:github.com/alcares/mmoserver/backend/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
@@ -1213,6 +1230,7 @@ var file_game_v1_server_message_proto_goTypes = []any{
 	(*PlayerInventory)(nil),     // 22: game.v1.PlayerInventory
 	(*Episode)(nil),             // 23: game.v1.Episode
 	(*PlaybackSpeed)(nil),       // 24: game.v1.PlaybackSpeed
+	(*SpectatingOver)(nil),      // 25: game.v1.SpectatingOver
 }
 var file_game_v1_server_message_proto_depIdxs = []int32{
 	14, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
@@ -1241,11 +1259,12 @@ var file_game_v1_server_message_proto_depIdxs = []int32{
 	11, // 23: game.v1.ServerMessage.game_over:type_name -> game.v1.GameOver
 	23, // 24: game.v1.ServerMessage.episode:type_name -> game.v1.Episode
 	24, // 25: game.v1.ServerMessage.playback_speed:type_name -> game.v1.PlaybackSpeed
-	26, // [26:26] is the sub-list for method output_type
-	26, // [26:26] is the sub-list for method input_type
-	26, // [26:26] is the sub-list for extension type_name
-	26, // [26:26] is the sub-list for extension extendee
-	0,  // [0:26] is the sub-list for field type_name
+	25, // 26: game.v1.ServerMessage.spectating_over:type_name -> game.v1.SpectatingOver
+	27, // [27:27] is the sub-list for method output_type
+	27, // [27:27] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_server_message_proto_init() }
@@ -1269,6 +1288,7 @@ func file_game_v1_server_message_proto_init() {
 		(*ServerMessage_GameOver)(nil),
 		(*ServerMessage_Episode)(nil),
 		(*ServerMessage_PlaybackSpeed)(nil),
+		(*ServerMessage_SpectatingOver)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

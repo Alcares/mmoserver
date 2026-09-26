@@ -48,11 +48,12 @@ func (p *SnapshotPolicy) String() string {
 	return fmt.Sprintf("snapshot %d", p.shown)
 }
 
-// Reload advances to the oldest snapshot newer than the current one.
-func (p *SnapshotPolicy) Reload() {
+// Reload advances to the oldest snapshot newer than the current one, and reports true when
+// there is none: the whole archive has played.
+func (p *SnapshotPolicy) Reload() bool {
 	entries, err := os.ReadDir(p.dir)
 	if err != nil {
-		return // no archive yet
+		return false // no archive yet
 	}
 
 	var next int64 = -1
@@ -72,7 +73,7 @@ func (p *SnapshotPolicy) Reload() {
 	}
 
 	if next < 0 {
-		return
+		return true
 	}
 
 	path := filepath.Join(p.dir, fmt.Sprintf("policy_%d.pb", next))
@@ -81,8 +82,9 @@ func (p *SnapshotPolicy) Reload() {
 		// Skip it rather than retry it forever.
 		log.Printf("Snapshot %s: %v", path, err)
 		p.shown = next
-		return
+		return false
 	}
 
 	p.current, p.shown = policy, next
+	return false
 }

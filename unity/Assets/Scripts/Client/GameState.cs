@@ -49,6 +49,8 @@ namespace Game.Client
         /// <summary>The spectated episode: its goal and which training snapshot plays it; null
         /// when connected to a game server.</summary>
         public Episode Episode { get; private set; }
+        /// <summary>The spectator has played every snapshot and closed the connection.</summary>
+        public bool SpectatingOver { get; private set; }
         /// <summary>Why the last create or join attempt failed, null if none has.</summary>
         public JoinRejection? LastRejection { get; private set; }
 
@@ -87,6 +89,7 @@ namespace Game.Client
             _client.OnGameOver += OnGameOver;
             _client.OnPlaybackSpeed += OnPlaybackSpeed;
             _client.OnEpisode += OnEpisode;
+            _client.OnSpectatingOver += OnSpectatingOver;
         }
 
         private void OnDisable()
@@ -100,6 +103,7 @@ namespace Game.Client
             _client.OnGameOver -= OnGameOver;
             _client.OnPlaybackSpeed -= OnPlaybackSpeed;
             _client.OnEpisode -= OnEpisode;
+            _client.OnSpectatingOver -= OnSpectatingOver;
         }
 
         // The server lists the receiving player first in its own snapshot.
@@ -180,6 +184,12 @@ namespace Game.Client
             SessionChanged?.Invoke();
         }
 
+        private void OnSpectatingOver(SpectatingOver _)
+        {
+            SpectatingOver = true;
+            SessionChanged?.Invoke();
+        }
+
         /// <summary>Forgets everything tied to one game, which drops the HUD back to the lobby
         /// panel. The socket is separate and has to go too; see GameClient.Reconnect.</summary>
         public void LeaveGame()
@@ -193,6 +203,7 @@ namespace Game.Client
             LastRejection = null;
             PlaybackSpeed = null;
             Episode = null;
+            SpectatingOver = false;
             Position = null;
             Balance = null;
             _phaseLeft = null;

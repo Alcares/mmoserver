@@ -43,6 +43,7 @@ type hub struct {
 	initial []byte
 	episode []byte
 	speed   float32
+	over    []byte // SpectatingOver, once every snapshot has played
 
 	// retime carries a new tick interval to the episode loop; it only ever holds the latest.
 	retime chan time.Duration
@@ -65,6 +66,11 @@ func newHub(onFirstJoin func()) *hub {
 func (h *hub) add(c *game.WebsocketClient) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if h.over != nil {
+		c.Enqueue(h.over)
+		close(c.Send) // WritePump flushes, sends a close frame and hangs up
+		return
+	}
 	if h.initial != nil {
 		c.Enqueue(h.initial)
 	}
@@ -77,12 +83,35 @@ func (h *hub) add(c *game.WebsocketClient) {
 	h.clients[c] = struct{}{}
 }
 
-// remove closes Send under broadcast's lock, so nothing enqueues after it.
+// remove closes Send under broadcast's lock, so nothing enqueues after it. A client not in
+// clients had its Send closed already, by add or finish.
 func (h *hub) remove(c *game.WebsocketClient) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
+	if _, ok := h.clients[c]; !ok {
+		return
+	}
 	delete(h.clients, c)
 	close(c.Send)
+}
+
+// finish tells every viewer the recap is over and hangs up on them.
+func (h *hub) finish() {
+	payload, err := proto.Marshal(&pb.ServerMessage{Msg: &pb.ServerMessage_SpectatingOver{SpectatingOver: &pb.SpectatingOver{}}})
+	if err != nil {
+		slog.Error("marshal spectating over", "err", err)
+		return
+	}
+
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	h.over = payload
+	for c := range h.clients {
+		c.Enqueue(payload)
+		close(c.Send)
+		delete(h.clients, c)
+	}
 }
 
 func (h *hub) broadcast(payload []byte, initial bool) {
@@ -199,8 +228,8 @@ func isInitialState(payload []byte) bool {
 	return msg.GetInitialState() != nil
 }
 
-// watch plays the same seeds with every snapshot, forever, so the weights are the only
-// thing that changes between them.
+// watch plays the same seeds with every snapshot, so the weights are the only thing that
+// changes between them, and ends the recap after the newest one.
 func watch(env *sim.Env, h *hub, p *bot.SnapshotPolicy, seeds []int64, maxTicks int) {
 	ticker := time.NewTicker(tickInterval(1))
 	defer ticker.Stop()
@@ -223,7 +252,11 @@ func watch(env *sim.Env, h *hub, p *bot.SnapshotPolicy, seeds []int64, maxTicks 
 				"ticks", ticks,
 				"goal_dist", math.Round(float64(result.Obs.GoalDist)*100)/100)
 		}
-		p.Reload()
+		if finished := p.Reload(); finished {
+			slog.Info("spectating over", "policy", p.String())
+			h.finish()
+			return
+		}
 	}
 }
 

@@ -56,9 +56,13 @@ func (c *WebsocketClient) WritePump() {
 
 	for msg := range c.Send {
 		if err := c.Conn.WriteMessage(websocket.BinaryMessage, msg); err != nil {
-			break
+			return
 		}
 	}
+	// cmd/spectator closes Send on a healthy socket when the recap ends; a close frame lets the
+	// client see a clean close instead of an error. The game server only closes Send after the
+	// socket has died, where this write just fails.
+	_ = c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 }
 
 // TODO: I dont like that readpump has this dual identity, we should split it

@@ -32,6 +32,8 @@ namespace Game.Networking
         public event Action<Episode> OnEpisode;
         /// <summary>Only the spectator sends this: the playback speed now applied for every viewer.</summary>
         public event Action<PlaybackSpeed> OnPlaybackSpeed;
+        /// <summary>Only the spectator sends this: every snapshot has played, and it hangs up next.</summary>
+        public event Action<SpectatingOver> OnSpectatingOver;
 
         private string Url => $"ws://{host}:{port}/ws";
 
@@ -114,6 +116,9 @@ namespace Game.Networking
                     break;
                 case ServerMessage.MsgOneofCase.PlaybackSpeed:
                     OnPlaybackSpeed?.Invoke(message.PlaybackSpeed);
+                    break;
+                case ServerMessage.MsgOneofCase.SpectatingOver:
+                    OnSpectatingOver?.Invoke(message.SpectatingOver);
                     break;
             }
         }

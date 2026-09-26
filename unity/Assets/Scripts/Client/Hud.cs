@@ -84,6 +84,7 @@ namespace Game.Client
         private string StatusText()
         {
             var conn = _client.Connection;
+            if (_state.SpectatingOver) return "Status: Recap finished.";
             if (conn == null || conn.CurrentState == GameConnection.State.Connecting) return "Status: Connecting...";
             return conn.CurrentState == GameConnection.State.Connected
                 ? "Status: Connected. Tracking local player."
@@ -114,6 +115,7 @@ namespace Game.Client
             var bannerRect = DrawPhaseBanner(statusRect);
             var speedRect = DrawPlaybackSpeed(bannerRect);
             DrawTrainingProgress(speedRect);
+            if (_state.SpectatingOver) DrawSpectatingOver(screenW, screenH);
 
             if (_state.Position == null) return;
 

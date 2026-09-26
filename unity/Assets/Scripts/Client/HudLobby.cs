@@ -167,6 +167,32 @@ namespace Game.Client
         private static string Millions(long steps) =>
             (steps / 10_000 / 100.0).ToString("0.00", CultureInfo.InvariantCulture) + "M";
 
+        // The spectator played its last snapshot and hung up; the final frame stays behind this.
+        private void DrawSpectatingOver(float screenW, float screenH)
+        {
+            if (_title == null) CreateLobbyStyles();
+
+            float height = LobbyRowHeight * 2f + 40f;
+            var rect = new Rect((screenW - LobbyWidth) / 2f, (screenH - height) / 2f, LobbyWidth, height);
+
+            GUI.color = Color.white;
+            GUI.DrawTexture(rect, _slotBorder);
+            GUI.DrawTexture(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), _slotFill);
+
+            float x = rect.x + 20f;
+            float width = rect.width - 40f;
+
+            _title.normal.textColor = LabelGold;
+            GUI.Label(new Rect(x, rect.y + 14f, width, LobbyRowHeight), "RECAP OVER", _title);
+
+            var episode = _state.Episode;
+            string line = episode != null && episode.SnapshotTimesteps >= 0
+                ? $"Watched every snapshot up to {Millions(episode.SnapshotTimesteps)} steps"
+                : "Watched every snapshot";
+            _lobbyText.normal.textColor = Dim;
+            GUI.Label(new Rect(x, rect.y + 14f + LobbyRowHeight, width, LobbyRowHeight), line, _lobbyText);
+        }
+
         // Final standings, highest net worth first, with how much each player traded to get there.
         private void DrawStandings(float screenW, float screenH)
         {

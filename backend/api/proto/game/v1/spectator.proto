@@ -18,6 +18,10 @@ message Episode {
   int64 final_timesteps = 4;
 }
 
+// Server -> Client: every snapshot has played. The spectator closes the connection right after,
+// and answers anyone who connects later with this and a close.
+message SpectatingOver {}
+
 // Both directions. Client -> Server asks for a playback rate, as a multiple of real time.
 // Server -> Client is the rate actually applied, after clamping, sent to every viewer
 // because playback is shared.

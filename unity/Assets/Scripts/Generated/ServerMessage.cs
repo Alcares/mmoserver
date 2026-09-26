@@ -56,7 +56,7 @@ namespace Game.V1 {
             "ASADKAsyHC5nYW1lLnYxLlBsYXllckZpbmFsU3RhbmRpbmcicAoKR2FtZVN0",
             "YXR1cxIhCgVwaGFzZRgBIAEoDjISLmdhbWUudjEuR2FtZVBoYXNlEhQKDHBs",
             "YXllcl9jb3VudBgCIAEoBRITCgttaW5fcGxheWVycxgDIAEoBRIUCgxyZW1h",
-            "aW5pbmdfbXMYBCABKAUi0QQKDVNlcnZlck1lc3NhZ2USMAoOd29ybGRfc25h",
+            "aW5pbmdfbXMYBCABKAUihQUKDVNlcnZlck1lc3NhZ2USMAoOd29ybGRfc25h",
             "cHNob3QYASABKAsyFi5nYW1lLnYxLldvcmxkU25hcHNob3RIABIsCgxtYXJr",
             "ZXRfc3RhdGUYAiABKAsyFC5nYW1lLnYxLk1hcmtldFN0YXRlSAASMwoQcG93",
             "ZXJfdXBfc3Bhd25lZBgDIAEoCzIXLmdhbWUudjEuUG93ZXJVcFNwYXduZWRI",
@@ -69,9 +69,10 @@ namespace Game.V1 {
             "LmdhbWUudjEuUGxheWVySW52ZW50b3J5SAASJgoJZ2FtZV9vdmVyGAkgASgL",
             "MhEuZ2FtZS52MS5HYW1lT3ZlckgAEiMKB2VwaXNvZGUYCyABKAsyEC5nYW1l",
             "LnYxLkVwaXNvZGVIABIwCg5wbGF5YmFja19zcGVlZBgMIAEoCzIWLmdhbWUu",
-            "djEuUGxheWJhY2tTcGVlZEgAQgUKA21zZ0JGWjpnaXRodWIuY29tL2FsY2Fy",
-            "ZXMvbW1vc2VydmVyL2JhY2tlbmQvZ2VuL2dvL2dhbWUvdjE7Z2FtZXYxqgIH",
-            "R2FtZS5WMWIGcHJvdG8z"));
+            "djEuUGxheWJhY2tTcGVlZEgAEjIKD3NwZWN0YXRpbmdfb3ZlchgNIAEoCzIX",
+            "LmdhbWUudjEuU3BlY3RhdGluZ092ZXJIAEIFCgNtc2dCRlo6Z2l0aHViLmNv",
+            "bS9hbGNhcmVzL21tb3NlcnZlci9iYWNrZW5kL2dlbi9nby9nYW1lL3YxO2dh",
+            "bWV2MaoCB0dhbWUuVjFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, global::Game.V1.PlayerReflection.Descriptor, global::Game.V1.SpectatorReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -88,7 +89,7 @@ namespace Game.V1 {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.JoinRejected), global::Game.V1.JoinRejected.Parser, new[]{ "Reason" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.GameOver), global::Game.V1.GameOver.Parser, new[]{ "Standings" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.GameStatus), global::Game.V1.GameStatus.Parser, new[]{ "Phase", "PlayerCount", "MinPlayers", "RemainingMs" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ServerMessage), global::Game.V1.ServerMessage.Parser, new[]{ "WorldSnapshot", "MarketState", "PowerUpSpawned", "PowerUpDespawned", "GameStatus", "InitialState", "JoinRejected", "Trade", "PlayerInventory", "GameOver", "Episode", "PlaybackSpeed" }, new[]{ "Msg" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ServerMessage), global::Game.V1.ServerMessage.Parser, new[]{ "WorldSnapshot", "MarketState", "PowerUpSpawned", "PowerUpDespawned", "GameStatus", "InitialState", "JoinRejected", "Trade", "PlayerInventory", "GameOver", "Episode", "PlaybackSpeed", "SpectatingOver" }, new[]{ "Msg" }, null, null, null)
           }));
     }
     #endregion
@@ -3832,6 +3833,9 @@ namespace Game.V1 {
         case MsgOneofCase.PlaybackSpeed:
           PlaybackSpeed = other.PlaybackSpeed.Clone();
           break;
+        case MsgOneofCase.SpectatingOver:
+          SpectatingOver = other.SpectatingOver.Clone();
+          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -4005,6 +4009,18 @@ namespace Game.V1 {
       }
     }
 
+    /// <summary>Field number for the "spectating_over" field.</summary>
+    public const int SpectatingOverFieldNumber = 13;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.SpectatingOver SpectatingOver {
+      get { return msgCase_ == MsgOneofCase.SpectatingOver ? (global::Game.V1.SpectatingOver) msg_ : null; }
+      set {
+        msg_ = value;
+        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.SpectatingOver;
+      }
+    }
+
     private object msg_;
     /// <summary>Enum of possible cases for the "msg" oneof.</summary>
     public enum MsgOneofCase {
@@ -4021,6 +4037,7 @@ namespace Game.V1 {
       GameOver = 9,
       Episode = 11,
       PlaybackSpeed = 12,
+      SpectatingOver = 13,
     }
     private MsgOneofCase msgCase_ = MsgOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4063,6 +4080,7 @@ namespace Game.V1 {
       if (!object.Equals(GameOver, other.GameOver)) return false;
       if (!object.Equals(Episode, other.Episode)) return false;
       if (!object.Equals(PlaybackSpeed, other.PlaybackSpeed)) return false;
+      if (!object.Equals(SpectatingOver, other.SpectatingOver)) return false;
       if (MsgCase != other.MsgCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -4083,6 +4101,7 @@ namespace Game.V1 {
       if (msgCase_ == MsgOneofCase.GameOver) hash ^= GameOver.GetHashCode();
       if (msgCase_ == MsgOneofCase.Episode) hash ^= Episode.GetHashCode();
       if (msgCase_ == MsgOneofCase.PlaybackSpeed) hash ^= PlaybackSpeed.GetHashCode();
+      if (msgCase_ == MsgOneofCase.SpectatingOver) hash ^= SpectatingOver.GetHashCode();
       hash ^= (int) msgCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -4150,6 +4169,10 @@ namespace Game.V1 {
         output.WriteRawTag(98);
         output.WriteMessage(PlaybackSpeed);
       }
+      if (msgCase_ == MsgOneofCase.SpectatingOver) {
+        output.WriteRawTag(106);
+        output.WriteMessage(SpectatingOver);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -4208,6 +4231,10 @@ namespace Game.V1 {
         output.WriteRawTag(98);
         output.WriteMessage(PlaybackSpeed);
       }
+      if (msgCase_ == MsgOneofCase.SpectatingOver) {
+        output.WriteRawTag(106);
+        output.WriteMessage(SpectatingOver);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -4253,6 +4280,9 @@ namespace Game.V1 {
       }
       if (msgCase_ == MsgOneofCase.PlaybackSpeed) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(PlaybackSpeed);
+      }
+      if (msgCase_ == MsgOneofCase.SpectatingOver) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(SpectatingOver);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -4338,6 +4368,12 @@ namespace Game.V1 {
             PlaybackSpeed = new global::Game.V1.PlaybackSpeed();
           }
           PlaybackSpeed.MergeFrom(other.PlaybackSpeed);
+          break;
+        case MsgOneofCase.SpectatingOver:
+          if (SpectatingOver == null) {
+            SpectatingOver = new global::Game.V1.SpectatingOver();
+          }
+          SpectatingOver.MergeFrom(other.SpectatingOver);
           break;
       }
 
@@ -4468,6 +4504,15 @@ namespace Game.V1 {
             PlaybackSpeed = subBuilder;
             break;
           }
+          case 106: {
+            global::Game.V1.SpectatingOver subBuilder = new global::Game.V1.SpectatingOver();
+            if (msgCase_ == MsgOneofCase.SpectatingOver) {
+              subBuilder.MergeFrom(SpectatingOver);
+            }
+            input.ReadMessage(subBuilder);
+            SpectatingOver = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -4593,6 +4638,15 @@ namespace Game.V1 {
             }
             input.ReadMessage(subBuilder);
             PlaybackSpeed = subBuilder;
+            break;
+          }
+          case 106: {
+            global::Game.V1.SpectatingOver subBuilder = new global::Game.V1.SpectatingOver();
+            if (msgCase_ == MsgOneofCase.SpectatingOver) {
+              subBuilder.MergeFrom(SpectatingOver);
+            }
+            input.ReadMessage(subBuilder);
+            SpectatingOver = subBuilder;
             break;
           }
         }

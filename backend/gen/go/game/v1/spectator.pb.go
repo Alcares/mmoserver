@@ -93,6 +93,44 @@ func (x *Episode) GetFinalTimesteps() int64 {
 	return 0
 }
 
+// Server -> Client: every snapshot has played. The spectator closes the connection right after,
+// and answers anyone who connects later with this and a close.
+type SpectatingOver struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SpectatingOver) Reset() {
+	*x = SpectatingOver{}
+	mi := &file_game_v1_spectator_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SpectatingOver) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SpectatingOver) ProtoMessage() {}
+
+func (x *SpectatingOver) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_spectator_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SpectatingOver.ProtoReflect.Descriptor instead.
+func (*SpectatingOver) Descriptor() ([]byte, []int) {
+	return file_game_v1_spectator_proto_rawDescGZIP(), []int{1}
+}
+
 // Both directions. Client -> Server asks for a playback rate, as a multiple of real time.
 // Server -> Client is the rate actually applied, after clamping, sent to every viewer
 // because playback is shared.
@@ -105,7 +143,7 @@ type PlaybackSpeed struct {
 
 func (x *PlaybackSpeed) Reset() {
 	*x = PlaybackSpeed{}
-	mi := &file_game_v1_spectator_proto_msgTypes[1]
+	mi := &file_game_v1_spectator_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -117,7 +155,7 @@ func (x *PlaybackSpeed) String() string {
 func (*PlaybackSpeed) ProtoMessage() {}
 
 func (x *PlaybackSpeed) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_spectator_proto_msgTypes[1]
+	mi := &file_game_v1_spectator_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -130,7 +168,7 @@ func (x *PlaybackSpeed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlaybackSpeed.ProtoReflect.Descriptor instead.
 func (*PlaybackSpeed) Descriptor() ([]byte, []int) {
-	return file_game_v1_spectator_proto_rawDescGZIP(), []int{1}
+	return file_game_v1_spectator_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *PlaybackSpeed) GetSpeed() float32 {
@@ -149,7 +187,8 @@ const file_game_v1_spectator_proto_rawDesc = "" +
 	"\x06goal_x\x18\x01 \x01(\x02R\x05goalX\x12\x15\n" +
 	"\x06goal_y\x18\x02 \x01(\x02R\x05goalY\x12-\n" +
 	"\x12snapshot_timesteps\x18\x03 \x01(\x03R\x11snapshotTimesteps\x12'\n" +
-	"\x0ffinal_timesteps\x18\x04 \x01(\x03R\x0efinalTimesteps\"%\n" +
+	"\x0ffinal_timesteps\x18\x04 \x01(\x03R\x0efinalTimesteps\"\x10\n" +
+	"\x0eSpectatingOver\"%\n" +
 	"\rPlaybackSpeed\x12\x14\n" +
 	"\x05speed\x18\x01 \x01(\x02R\x05speedBFZ:github.com/alcares/mmoserver/backend/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
@@ -165,10 +204,11 @@ func file_game_v1_spectator_proto_rawDescGZIP() []byte {
 	return file_game_v1_spectator_proto_rawDescData
 }
 
-var file_game_v1_spectator_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_game_v1_spectator_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_game_v1_spectator_proto_goTypes = []any{
-	(*Episode)(nil),       // 0: game.v1.Episode
-	(*PlaybackSpeed)(nil), // 1: game.v1.PlaybackSpeed
+	(*Episode)(nil),        // 0: game.v1.Episode
+	(*SpectatingOver)(nil), // 1: game.v1.SpectatingOver
+	(*PlaybackSpeed)(nil),  // 2: game.v1.PlaybackSpeed
 }
 var file_game_v1_spectator_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -189,7 +229,7 @@ func file_game_v1_spectator_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_spectator_proto_rawDesc), len(file_game_v1_spectator_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

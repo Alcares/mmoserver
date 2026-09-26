@@ -133,5 +133,6 @@ message ServerMessage {
     // Spectator only
     Episode episode = 11;
     PlaybackSpeed playback_speed = 12;
+    SpectatingOver spectating_over = 13;
   }
 }
