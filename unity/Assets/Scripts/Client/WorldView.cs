@@ -14,9 +14,11 @@ namespace Game.Client
     [RequireComponent(typeof(GameClient), typeof(GameInput), typeof(GameState))]
     public class WorldView : MonoBehaviour
     {
-        private const float CrewmateSize = 1.3f;
-        private const float StationRadius = 0.9f;
+        // The visible part of a commodity icon is about this share of its image width; the rest is
+        // transparent padding. Scaling by it makes the drawing, not the image, as wide as the station.
+        private const float IconArtFill = 0.78f;
         private const int BackgroundOrder = -100;
+        private const int FootprintOrder = -51;
         private const int StationOrder = -50;
         private const int GoalOrder = -49;
         private const int LabelOrder = 10000;
@@ -71,6 +73,7 @@ namespace Game.Client
         private readonly List<uint> _stale = new();
         private readonly List<StationView> _stations = new();
         private GameObject _goal;
+        private float _playerRadius; // the server's collision radius, from InitialGameState
 
         private void Awake()
         {
@@ -240,6 +243,7 @@ namespace Game.Client
         private void HandleInitialState(InitialGameState state)
         {
             if (state.WorldSize > 0f) ApplyWorldSize(state.WorldSize);
+            _playerRadius = state.PlayerRadius;
 
             foreach (var s in _stations) Destroy(s.Go);
             _stations.Clear();
@@ -252,11 +256,23 @@ namespace Game.Client
             foreach (var p in _players.Values) Destroy(p.Go);
             _players.Clear();
 
+            // The server's collision radius, so a player stops exactly where the station looks solid
+            float radius = state.StationRadius;
+
             foreach (var st in state.StationLayout)
             {
                 var go = new GameObject($"Station {st.Label}");
                 go.transform.SetParent(transform, false);
                 go.transform.position = new Vector3(st.X, -st.Y, 0f);
+
+                // The exact circle that blocks movement. The icon art sits low in its frame, so
+                // without this the edge a player stops at would be invisible above it.
+                var footprint = new GameObject("Footprint").AddComponent<SpriteRenderer>();
+                footprint.transform.SetParent(go.transform, false);
+                footprint.transform.localScale = Vector3.one * radius * 2f;
+                footprint.sprite = Shapes.Circle;
+                footprint.color = new Color32(0x0f, 0x17, 0x2a, 0x30);
+                footprint.sortingOrder = FootprintOrder;
 
                 var icon = commodityIcons != null ? commodityIcons.Get(st.Commodity) : null;
                 var art = new GameObject(icon != null ? "Icon" : "Disc");
@@ -268,14 +284,16 @@ namespace Game.Client
                 if (icon != null)
                 {
                     body.sprite = icon;
-                    labelHeight = icon.bounds.extents.y * 0.8f + 0.15f;
+                    float scale = radius * 2f / (icon.bounds.size.x * IconArtFill);
+                    art.transform.localScale = Vector3.one * scale;
+                    labelHeight = icon.bounds.extents.y * scale + 0.1f; // above the image, so tall art never covers it
                 }
                 else
                 {
-                    art.transform.localScale = Vector3.one * StationRadius * 2f;
+                    art.transform.localScale = Vector3.one * radius * 2f;
                     body.sprite = Shapes.Circle;
                     body.color = new Color32(0xf5, 0x9e, 0x0b, 0xff);
-                    labelHeight = 1.1f;
+                    labelHeight = radius + 0.2f;
                 }
 
                 var label = OutlinedLabel.Create(go.transform, new Vector2(0f, labelHeight), Color.white, LabelOrder);
@@ -296,7 +314,7 @@ namespace Game.Client
 
                 var zone = new GameObject("Zone").AddComponent<SpriteRenderer>();
                 zone.transform.SetParent(_goal.transform, false);
-                zone.transform.localScale = Vector3.one * GameState.TradeRange * 2f;
+                zone.transform.localScale = Vector3.one * _state.TradeRange * 2f;
                 zone.sprite = Shapes.Circle;
                 zone.color = new Color32(0x22, 0xc5, 0x5e, 0x40);
                 zone.sortingOrder = GoalOrder;
@@ -308,7 +326,7 @@ namespace Game.Client
                 dot.color = new Color32(0x16, 0xa3, 0x4a, 0xff);
                 dot.sortingOrder = GoalOrder;
 
-                OutlinedLabel.Create(_goal.transform, new Vector2(0f, GameState.TradeRange + 0.4f), Color.white, LabelOrder).Text = "GOAL";
+                OutlinedLabel.Create(_goal.transform, new Vector2(0f, _state.TradeRange + 0.4f), Color.white, LabelOrder).Text = "GOAL";
             }
 
             _goal.transform.position = new Vector3(episode.GoalX, -episode.GoalY, 0f);
@@ -379,13 +397,13 @@ namespace Game.Client
             if (art != null)
             {
                 var sprites = go.AddComponent<DirectionalSpriteView>();
-                sprites.Build(art);
+                sprites.Build(art, _playerRadius * 2f);
                 avatar = sprites;
             }
             else
             {
                 var crew = go.AddComponent<CrewmateView>();
-                crew.Build(isMe ? CrewmateView.Emerald : CrewmateView.ForPlayer(state.Id), CrewmateSize);
+                crew.Build(isMe ? CrewmateView.Emerald : CrewmateView.ForPlayer(state.Id), _playerRadius * 2f);
                 avatar = crew;
             }
 

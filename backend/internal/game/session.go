@@ -52,7 +52,14 @@ func (w *World) initialState() *pb.InitialGameState {
 	for _, s := range w.Stations {
 		stations = append(stations, s.ToProto())
 	}
-	return &pb.InitialGameState{StationLayout: stations, GameId: w.gameID, WorldSize: WorldMaxX}
+	return &pb.InitialGameState{
+		StationLayout: stations,
+		GameId:        w.gameID,
+		WorldSize:     WorldMaxX,
+		TradeRange:    TradeRange,
+		PlayerRadius:  PlayerRadius,
+		StationRadius: StationRadius,
+	}
 }
 
 func (w *World) removePlayer(playerID uint32) {

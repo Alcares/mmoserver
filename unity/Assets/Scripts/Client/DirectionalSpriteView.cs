@@ -15,14 +15,22 @@ namespace Game.Client
         private int _direction; // 0 = S, facing the camera
         private bool _walking;
         private float _clock;
+        private float _scale = 1f;
 
-        public override float LabelHeight => _set.labelHeight;
+        public override float LabelHeight => _set.labelHeight * _scale;
 
-        public void Build(DirectionalAnimationSet set)
+        /// <summary>bodyWidth is the world width the character's body should span: the player
+        /// collision circle's diameter.</summary>
+        public void Build(DirectionalAnimationSet set, float bodyWidth)
         {
             _set = set;
+            // Cells are drawn cellWorldHeight tall and, being square, as wide; the body fills
+            // set.bodyWidth of that.
+            _scale = bodyWidth / (set.cellWorldHeight * set.bodyWidth);
+
             var go = new GameObject("Sprite");
             go.transform.SetParent(transform, false);
+            go.transform.localScale = Vector3.one * _scale;
             _renderer = go.AddComponent<SpriteRenderer>();
             Animate(Vector2.zero, false);
         }

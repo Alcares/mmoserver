@@ -284,14 +284,15 @@ Settled before the steps:
 - [ ] **20. Baseline.** Record the Stage 1 numbers from the Go regression test on the current
       code (success, mean and worst steps/optimal, truncation rate) for `ScriptedPolicy` and the
       current `policy.pb`, so every later step has something to compare against.
-- [ ] **21. Radii on the wire.** `PlayerRadius` and `StationRadius` in
-      `game/config.go`, with a test that `PlayerRadius + StationRadius < TradeRange`: otherwise
+- [x] **21. Radii on the wire.** `PlayerRadius` and `StationRadius` are package constants in
+      `game`, beside `TradeRange`: the same for every world, not `WorldConfig` fields a game
+      could change. A test holds `PlayerRadius + StationRadius < TradeRange`: otherwise
       the closest a player can stand is outside trading range and no station can be used. Send
       `trade_range`, `player_radius` and `station_radius` in `InitialGameState`. The Observer
       needs them to cast rays and `bot` cannot import `game`, which settles the mirrored-constant
       problem `docs/TESTING.md` describes; Unity and the web client read them instead of keeping
       their own copies of `TradeRange`.
-- [ ] **22. Collisions in `stepMovement`.** After moving, push the player out of any station
+- [x] **22. Collisions in `stepMovement`.** After moving, push the player out of any station
       closer than `PlayerRadius + StationRadius`, then clamp to the map. Stations are static and
       players don't touch each other, so the order players are processed in doesn't matter.
       A player exactly on a station's centre has no direction to be pushed in; push along a
@@ -300,7 +301,7 @@ Settled before the steps:
       station is reachable from every side, and a long random walk never ends a tick inside a
       station. `sim.Env` runs the same `stepMovement`, so training gets collisions with no
       change of its own.
-- [ ] **23. Clients.** Unity and the web client draw stations at `station_radius`. The server
+- [x] **23. Clients.** Unity draws stations at `station_radius`. The server
       stays authoritative and neither client predicts, so a blocked player simply stops.
 - [ ] **24. Measure blind.** Re-run step 20 with collisions and the unchanged observation.
       `ScriptedPolicy` can't see stations, so the drop in success and the rise in truncations

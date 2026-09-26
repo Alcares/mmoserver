@@ -24,3 +24,4 @@ MonoBehaviour:
   cellWorldHeight: 2
   pivot: {x: 0.5, y: 0.1}
   labelHeight: 1.8
+  bodyWidth: 0.53

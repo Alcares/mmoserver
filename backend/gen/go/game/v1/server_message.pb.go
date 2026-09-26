@@ -628,6 +628,9 @@ type InitialGameState struct {
 	StationLayout []*TradingStation      `protobuf:"bytes,1,rep,name=station_layout,json=stationLayout,proto3" json:"station_layout,omitempty"`
 	GameId        string                 `protobuf:"bytes,2,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
 	WorldSize     float32                `protobuf:"fixed32,3,opt,name=world_size,json=worldSize,proto3" json:"world_size,omitempty"`
+	TradeRange    float32                `protobuf:"fixed32,4,opt,name=trade_range,json=tradeRange,proto3" json:"trade_range,omitempty"`
+	PlayerRadius  float32                `protobuf:"fixed32,5,opt,name=player_radius,json=playerRadius,proto3" json:"player_radius,omitempty"`
+	StationRadius float32                `protobuf:"fixed32,6,opt,name=station_radius,json=stationRadius,proto3" json:"station_radius,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -679,6 +682,27 @@ func (x *InitialGameState) GetGameId() string {
 func (x *InitialGameState) GetWorldSize() float32 {
 	if x != nil {
 		return x.WorldSize
+	}
+	return 0
+}
+
+func (x *InitialGameState) GetTradeRange() float32 {
+	if x != nil {
+		return x.TradeRange
+	}
+	return 0
+}
+
+func (x *InitialGameState) GetPlayerRadius() float32 {
+	if x != nil {
+		return x.PlayerRadius
+	}
+	return 0
+}
+
+func (x *InitialGameState) GetStationRadius() float32 {
+	if x != nil {
+		return x.StationRadius
 	}
 	return 0
 }
@@ -1156,12 +1180,16 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\tcommodity\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x12\f\n" +
 	"\x01x\x18\x02 \x01(\x02R\x01x\x12\f\n" +
 	"\x01y\x18\x03 \x01(\x02R\x01y\x12\x14\n" +
-	"\x05label\x18\x04 \x01(\tR\x05label\"\x8a\x01\n" +
+	"\x05label\x18\x04 \x01(\tR\x05label\"\xf7\x01\n" +
 	"\x10InitialGameState\x12>\n" +
 	"\x0estation_layout\x18\x01 \x03(\v2\x17.game.v1.TradingStationR\rstationLayout\x12\x17\n" +
 	"\agame_id\x18\x02 \x01(\tR\x06gameId\x12\x1d\n" +
 	"\n" +
-	"world_size\x18\x03 \x01(\x02R\tworldSize\">\n" +
+	"world_size\x18\x03 \x01(\x02R\tworldSize\x12\x1f\n" +
+	"\vtrade_range\x18\x04 \x01(\x02R\n" +
+	"tradeRange\x12#\n" +
+	"\rplayer_radius\x18\x05 \x01(\x02R\fplayerRadius\x12%\n" +
+	"\x0estation_radius\x18\x06 \x01(\x02R\rstationRadius\">\n" +
 	"\fJoinRejected\x12.\n" +
 	"\x06reason\x18\x01 \x01(\x0e2\x16.game.v1.JoinRejectionR\x06reason\"F\n" +
 	"\bGameOver\x12:\n" +

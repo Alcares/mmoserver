@@ -89,6 +89,9 @@ message InitialGameState {
   repeated TradingStation station_layout = 1;
   string game_id = 2;
   float world_size = 3;
+  float trade_range = 4;
+  float player_radius = 5;
+  float station_radius = 6;
 }
 
 message JoinRejected {

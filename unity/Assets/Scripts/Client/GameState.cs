@@ -15,8 +15,8 @@ namespace Game.Client
     [RequireComponent(typeof(GameClient))]
     public class GameState : MonoBehaviour
     {
-        /// <summary>Mirrors backend/internal/game/config.go TradeRange; the server is authoritative.</summary>
-        public const float TradeRange = 4f;
+        /// <summary>How close to a station the server lets a player trade, from InitialGameState.</summary>
+        public float TradeRange { get; private set; }
 
         private GameClient _client;
         private readonly Dictionary<CommodityType, PriceQuote> _prices = new();
@@ -139,6 +139,7 @@ namespace Game.Client
         {
             _stations.Clear();
             _stations.AddRange(s.StationLayout);
+            TradeRange = s.TradeRange;
 
             Joined = true;
             GameId = s.GameId;
