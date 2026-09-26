@@ -10,6 +10,11 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// episodeTicks bounds how long a bot chases one goal: 60s at 20Hz. Liveness, not fairness - a
+// policy that cannot reach the station it picked would otherwise walk at it for the whole round,
+// and giving up on a goal is the only recovery a bot has.
+const episodeTicks = 1200
+
 // BotClient is a Client driven by a policy instead of a socket.
 type BotClient struct {
 	*SendQueue
@@ -22,6 +27,7 @@ type BotClient struct {
 	rng      *rand.Rand
 	stations []*pb.TradingStation
 	goalIdx  int // -1 until the first pick
+	ticks    int // since the current goal was chosen
 }
 
 // SpawnBot joins a policy-driven client to w and starts the goroutine that drives it. The
@@ -78,8 +84,10 @@ func (c *BotClient) step() {
 		return // no snapshot with players yet
 	}
 
-	if obs.GoalDist <= TradeRange {
+	c.ticks++
+	if obs.GoalDist <= TradeRange || c.ticks >= episodeTicks {
 		c.pickGoal()
+		c.ticks = 0
 		if obs, err = c.observer.Encode(c.goal); err != nil {
 			return
 		}
