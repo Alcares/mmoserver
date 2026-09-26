@@ -216,21 +216,46 @@ purpose of this stage is to prove the entire pipeline end to end before the hard
 
 ### Watching training in Unity
 
-Training envs run far faster than 20 Hz, so they can't be streamed directly. Instead, watch an
-evaluation world:
+Training envs run far faster than 20 Hz, so they can't be streamed live. Instead training leaves
+a trail of snapshots, and a separate binary replays them afterwards as a recap of how the bot
+learned.
 
-- [ ] **16. Spectator server.** A 20 Hz world (optionally 2–4× speed) running the in-server bot,
-      reloading `policy.pb` whenever training exports a new one (see step 14: the checkpoint
-      Python saves is `policy.zip`, which Go never reads).
-- [ ] **17. Spectate endpoint.** `/ws?spectate=<botID>` copies the bot's `Send` stream to the
-      websocket instead of adding a player. The bot stays `players[0]`, so the Unity camera
-      follows it and shows exactly its FOV. Spectator input is ignored.
-- [ ] **18. Episode resets.** Resend `InitialGameState` on reset (Unity already rebuilds the
-      stations when it receives it). Snap instead of smoothing when the bot jumps more than
-      ~20 units.
-- [ ] **19. Unity changes.** A `spectating` flag so "me" animates from velocity instead of
-      keyboard input (`WorldView.cs`). A `BotDebug` `ServerMessage` (goal, last action, reward,
-      episode, checkpoint), sent only to spectators, drawn as a line to the target plus HUD text.
+- [x] **16. Snapshot export.** `train.py`'s `ExportSnapshots` callback writes
+      `rl-training/snapshots/policy_<timesteps>.pb` (and `.zip`) about `EXPORTS_PER_RUN` (50)
+      times per run, on rollout boundaries right after PPO updates the weights, and overwrites `policy.pb` each
+      time. The number in the name orders the snapshots and says how far into training each one
+      was taken.
+- [x] **17. Spectator server.** `cmd/spectator` (`make spectator`, run from the repo root) is
+      its own binary, not the game server: it steps `sim.Env` at 20 Hz, so an episode means
+      what it means in training (spawn at the centre, a random goal, arrival or the step
+      limit), and every episode gets a fresh world. `bot.SnapshotPolicy` plays the snapshots
+      oldest first, the scripted policy if there are none. Every snapshot replays the same seeds
+      (`Config.Seed` onwards, 3 by default), so the weights are the only thing that changes
+      between them. Episodes are cut at `MaxTicks` (700), since an early snapshot would
+      otherwise dither for the whole 1200. Playback starts when the first viewer connects;
+      after the newest snapshot it sends `SpectatingOver` and hangs up. Settings are the
+      `Config` constants, there are no flags; it logs to `backend/spectator.log`.
+- [x] **18. The stream.** `Env.OnMessage` forwards the bot's own outgoing messages, so the bot
+      is `players[0]` on the far end: the camera follows it and shows exactly its FOV. Each
+      viewer is a `game.WebsocketClient` that never joins a world, so slow viewers drop frames
+      like players do. A viewer joining mid-episode is replayed the `InitialGameState`,
+      `Episode` and `PlaybackSpeed`. On a reset the new `InitialGameState` makes Unity rebuild
+      the stations and discard its player views, so the bot reappears at spawn rather than
+      gliding there.
+- [x] **19. Spectator API and Unity.** Spectator-only messages live in
+      `game/v1/spectator.proto` but ride the normal envelopes; the game server never sends them
+      and ignores them if received:
+      - `Episode` (goal, `snapshot_timesteps`, `final_timesteps`), once per episode: Unity draws
+        the goal as a disc the size of `TradeRange` and shows `SNAPSHOT 1.23M / 1.99M (61%)`.
+      - `PlaybackSpeed`, both ways: `,`/`.` ask for 0.25-32x, the spectator clamps it, retimes
+        its ticker and tells every viewer the speed applied, since playback is shared. The phase
+        timer counts down at that speed.
+      - `SpectatingOver`: a RECAP OVER panel.
+
+      Bots are marked with `PlayerState.is_bot`, which makes Unity draw them with the robot art
+      and animate them from velocity even as `players[0]`.
+
+Not done: watching a run while it trains, and per-step debug (last action, reward) on screen.
 
 ### Stage 2: trading
 
