@@ -10,6 +10,7 @@ namespace Game.Client
     /// <summary>
     /// Keyboard input: WASD/arrows move, E buys and Q sells at the nearby station, T cycles the
     /// order size, B asks the server for a bot, Ctrl+R leaves for the create/join screen.
+    /// Watching a spectator, comma and period step the playback speed down and up.
     /// Movement is only sent when the vector changes (including back to zero on release), since
     /// the server keeps moving the player along the last direction it received.
     /// </summary>
@@ -25,6 +26,10 @@ namespace Game.Client
 
         /// <summary>Units in the selected order; 0 before the first MarketState.</summary>
         public uint OrderUnits => Multipliers.Count == 0 ? 0 : Multipliers[Math.Min(MultiplierIndex, Multipliers.Count - 1)];
+
+        /// <summary>Playback speeds comma and period step through, as multiples of real time;
+        /// the spectator clamps to the same range.</summary>
+        private static readonly float[] PlaybackSpeeds = { 0.25f, 0.5f, 1f, 2f, 4f, 8f, 16f, 32f };
 
         private GameClient _client;
         private GameState _state;
@@ -75,6 +80,23 @@ namespace Game.Client
             if (kb.eKey.wasPressedThisFrame) TryTrade(OrderIntent.IntentBuy);
             if (kb.qKey.wasPressedThisFrame) TryTrade(OrderIntent.IntentSell);
             if (kb.bKey.wasPressedThisFrame) _client.SendSpawnBot($"BOT {++_botsRequested}");
+
+            if (_state.PlaybackSpeed is { } speed)
+            {
+                if (kb.commaKey.wasPressedThisFrame) StepPlaybackSpeed(speed, -1);
+                if (kb.periodKey.wasPressedThisFrame) StepPlaybackSpeed(speed, +1);
+            }
+        }
+
+        // Steps from the speed the spectator last confirmed, not one we asked for, so a request
+        // it clamped or another viewer overrode is not built on.
+        private void StepPlaybackSpeed(float current, int direction)
+        {
+            int i = 0;
+            while (i < PlaybackSpeeds.Length - 1 && PlaybackSpeeds[i] < current) i++;
+            if (PlaybackSpeeds[i] > current && direction > 0) i--; // current sits between two steps
+            int next = Mathf.Clamp(i + direction, 0, PlaybackSpeeds.Length - 1);
+            if (!Mathf.Approximately(PlaybackSpeeds[next], current)) _client.SendPlaybackSpeed(PlaybackSpeeds[next]);
         }
 
         /// <summary>Leaves the current game for the create/join screen. The socket goes too:

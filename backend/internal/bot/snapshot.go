@@ -21,11 +21,12 @@ type SnapshotPolicy struct {
 	fallback Policy
 	current  Policy
 	shown    int64 // timesteps of the snapshot in current; -1 before the first
+	newest   int64 // timesteps of the newest snapshot in dir at the last Reload; -1 if none
 }
 
 // NewSnapshotPolicy runs fallback until a snapshot loads, and loads the earliest one right away.
 func NewSnapshotPolicy(dir string, fallback Policy) *SnapshotPolicy {
-	p := &SnapshotPolicy{dir: dir, fallback: fallback, current: fallback, shown: -1}
+	p := &SnapshotPolicy{dir: dir, fallback: fallback, current: fallback, shown: -1, newest: -1}
 	p.Reload()
 	return p
 }
@@ -36,6 +37,9 @@ func (p *SnapshotPolicy) Act(observation *Observation) Action {
 
 // Timesteps is the current snapshot's training step, or -1 on the fallback.
 func (p *SnapshotPolicy) Timesteps() int64 { return p.shown }
+
+// NewestTimesteps is the newest snapshot's training step, or -1 if there is none.
+func (p *SnapshotPolicy) NewestTimesteps() int64 { return p.newest }
 
 func (p *SnapshotPolicy) String() string {
 	if p.shown < 0 {
@@ -61,6 +65,7 @@ func (p *SnapshotPolicy) Reload() {
 		if err != nil {
 			continue
 		}
+		p.newest = max(p.newest, steps)
 		if steps > p.shown && (next < 0 || steps < next) {
 			next = steps
 		}

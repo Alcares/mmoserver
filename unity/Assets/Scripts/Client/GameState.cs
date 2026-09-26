@@ -43,6 +43,12 @@ namespace Game.Client
         public int MinPlayers { get; private set; }
         /// <summary>Final standings once the round is over, null before that.</summary>
         public GameOver Standings { get; private set; }
+        /// <summary>Spectator playback speed as a multiple of real time; null when connected to a
+        /// game server, so it doubles as "this is a spectator".</summary>
+        public float? PlaybackSpeed { get; private set; }
+        /// <summary>The spectated episode: its goal and which training snapshot plays it; null
+        /// when connected to a game server.</summary>
+        public Episode Episode { get; private set; }
         /// <summary>Why the last create or join attempt failed, null if none has.</summary>
         public JoinRejection? LastRejection { get; private set; }
 
@@ -51,10 +57,15 @@ namespace Game.Client
         // realtimeSinceStartup, not Time.time: Time.time only advances by deltaTime, which Unity
         // clamps to maximumDeltaTime, so it falls permanently behind whenever frames are slow or
         // the window is unfocused, and the server only resends the status on a phase change.
-        private float? _phaseEndsAt;
+        // Game time runs at the spectator's playback speed, so the countdown does too; a speed
+        // change re-anchors it at the time left then.
+        private float? _phaseLeft;
+        private float _phaseAnchor;
 
-        /// <summary>Seconds left in the current phase, null when the phase is open-ended.</summary>
-        public float? SecondsLeft => _phaseEndsAt.HasValue ? Mathf.Max(0f, _phaseEndsAt.Value - Time.realtimeSinceStartup) : (float?)null;
+        /// <summary>Seconds of game time left in the current phase, null when the phase is open-ended.</summary>
+        public float? SecondsLeft => _phaseLeft.HasValue
+            ? Mathf.Max(0f, _phaseLeft.Value - (Time.realtimeSinceStartup - _phaseAnchor) * (PlaybackSpeed ?? 1f))
+            : (float?)null;
 
         public event Action PricesChanged;
         /// <summary>Raised when the phase, the player count or the join result changes.</summary>
@@ -74,6 +85,8 @@ namespace Game.Client
             _client.OnGameStatus += OnGameStatus;
             _client.OnJoinRejected += OnJoinRejected;
             _client.OnGameOver += OnGameOver;
+            _client.OnPlaybackSpeed += OnPlaybackSpeed;
+            _client.OnEpisode += OnEpisode;
         }
 
         private void OnDisable()
@@ -85,6 +98,8 @@ namespace Game.Client
             _client.OnGameStatus -= OnGameStatus;
             _client.OnJoinRejected -= OnJoinRejected;
             _client.OnGameOver -= OnGameOver;
+            _client.OnPlaybackSpeed -= OnPlaybackSpeed;
+            _client.OnEpisode -= OnEpisode;
         }
 
         // The server lists the receiving player first in its own snapshot.
@@ -133,7 +148,8 @@ namespace Game.Client
             Phase = s.Phase;
             PlayerCount = s.PlayerCount;
             MinPlayers = s.MinPlayers;
-            _phaseEndsAt = s.RemainingMs > 0 ? Time.realtimeSinceStartup + s.RemainingMs / 1000f : (float?)null;
+            _phaseLeft = s.RemainingMs > 0 ? s.RemainingMs / 1000f : (float?)null;
+            _phaseAnchor = Time.realtimeSinceStartup;
             SessionChanged?.Invoke();
         }
 
@@ -149,6 +165,21 @@ namespace Game.Client
             SessionChanged?.Invoke();
         }
 
+        private void OnPlaybackSpeed(PlaybackSpeed s)
+        {
+            // At the old speed, before it changes.
+            _phaseLeft = SecondsLeft;
+            _phaseAnchor = Time.realtimeSinceStartup;
+            PlaybackSpeed = s.Speed;
+            SessionChanged?.Invoke();
+        }
+
+        private void OnEpisode(Episode e)
+        {
+            Episode = e;
+            SessionChanged?.Invoke();
+        }
+
         /// <summary>Forgets everything tied to one game, which drops the HUD back to the lobby
         /// panel. The socket is separate and has to go too; see GameClient.Reconnect.</summary>
         public void LeaveGame()
@@ -160,9 +191,11 @@ namespace Game.Client
             MinPlayers = 0;
             Standings = null;
             LastRejection = null;
+            PlaybackSpeed = null;
+            Episode = null;
             Position = null;
             Balance = null;
-            _phaseEndsAt = null;
+            _phaseLeft = null;
             _stations.Clear();
             _holdings.Clear();
             _prices.Clear();

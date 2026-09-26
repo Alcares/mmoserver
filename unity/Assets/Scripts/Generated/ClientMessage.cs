@@ -25,28 +25,29 @@ namespace Game.V1 {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChxnYW1lL3YxL2NsaWVudF9tZXNzYWdlLnByb3RvEgdnYW1lLnYxGhRnYW1l",
-            "L3YxL2NvbW1vbi5wcm90byIpCg9Nb3ZlbWVudENvbW1hbmQSCgoCdngYASAB",
-            "KAISCgoCdnkYAiABKAIiDAoKQ3JlYXRlR2FtZSIWCghKb2luR2FtZRIKCgJp",
-            "ZBgBIAEoCSIYCghTcGF3bkJvdBIMCgRuYW1lGAEgASgJIm0KDFRyYWRlUmVx",
-            "dWVzdBITCgtzZXF1ZW5jZV9pZBgBIAEoDRIkCgZpbnRlbnQYAiABKA4yFC5n",
-            "YW1lLnYxLk9yZGVySW50ZW50Eg0KBXVuaXRzGAMgASgNEhMKC3ByaWNlX2Nl",
-            "bnRzGAQgASgEIuUBCg1DbGllbnRNZXNzYWdlEikKBWlucHV0GAEgASgLMhgu",
-            "Z2FtZS52MS5Nb3ZlbWVudENvbW1hbmRIABImCgV0cmFkZRgCIAEoCzIVLmdh",
-            "bWUudjEuVHJhZGVSZXF1ZXN0SAASKgoLY3JlYXRlX2dhbWUYAyABKAsyEy5n",
-            "YW1lLnYxLkNyZWF0ZUdhbWVIABImCglqb2luX2dhbWUYBCABKAsyES5nYW1l",
-            "LnYxLkpvaW5HYW1lSAASJgoJc3Bhd25fYm90GAUgASgLMhEuZ2FtZS52MS5T",
-            "cGF3bkJvdEgAQgUKA2NtZEJGWjpnaXRodWIuY29tL2FsY2FyZXMvbW1vc2Vy",
-            "dmVyL2JhY2tlbmQvZ2VuL2dvL2dhbWUvdjE7Z2FtZXYxqgIHR2FtZS5WMWIG",
-            "cHJvdG8z"));
+            "L3YxL2NvbW1vbi5wcm90bxoXZ2FtZS92MS9zcGVjdGF0b3IucHJvdG8iKQoP",
+            "TW92ZW1lbnRDb21tYW5kEgoKAnZ4GAEgASgCEgoKAnZ5GAIgASgCIgwKCkNy",
+            "ZWF0ZUdhbWUiFgoISm9pbkdhbWUSCgoCaWQYASABKAkiGAoIU3Bhd25Cb3QS",
+            "DAoEbmFtZRgBIAEoCSJtCgxUcmFkZVJlcXVlc3QSEwoLc2VxdWVuY2VfaWQY",
+            "ASABKA0SJAoGaW50ZW50GAIgASgOMhQuZ2FtZS52MS5PcmRlckludGVudBIN",
+            "CgV1bml0cxgDIAEoDRITCgtwcmljZV9jZW50cxgEIAEoBCKbAgoNQ2xpZW50",
+            "TWVzc2FnZRIpCgVpbnB1dBgBIAEoCzIYLmdhbWUudjEuTW92ZW1lbnRDb21t",
+            "YW5kSAASJgoFdHJhZGUYAiABKAsyFS5nYW1lLnYxLlRyYWRlUmVxdWVzdEgA",
+            "EioKC2NyZWF0ZV9nYW1lGAMgASgLMhMuZ2FtZS52MS5DcmVhdGVHYW1lSAAS",
+            "JgoJam9pbl9nYW1lGAQgASgLMhEuZ2FtZS52MS5Kb2luR2FtZUgAEiYKCXNw",
+            "YXduX2JvdBgFIAEoCzIRLmdhbWUudjEuU3Bhd25Cb3RIABI0ChJzZXRfcGxh",
+            "eWJhY2tfc3BlZWQYBiABKAsyFi5nYW1lLnYxLlBsYXliYWNrU3BlZWRIAEIF",
+            "CgNjbWRCRlo6Z2l0aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9iYWNrZW5k",
+            "L2dlbi9nby9nYW1lL3YxO2dhbWV2MaoCB0dhbWUuVjFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, global::Game.V1.SpectatorReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.MovementCommand), global::Game.V1.MovementCommand.Parser, new[]{ "Vx", "Vy" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.CreateGame), global::Game.V1.CreateGame.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.JoinGame), global::Game.V1.JoinGame.Parser, new[]{ "Id" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.SpawnBot), global::Game.V1.SpawnBot.Parser, new[]{ "Name" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeRequest), global::Game.V1.TradeRequest.Parser, new[]{ "SequenceId", "Intent", "Units", "PriceCents" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ClientMessage), global::Game.V1.ClientMessage.Parser, new[]{ "Input", "Trade", "CreateGame", "JoinGame", "SpawnBot" }, new[]{ "Cmd" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ClientMessage), global::Game.V1.ClientMessage.Parser, new[]{ "Input", "Trade", "CreateGame", "JoinGame", "SpawnBot", "SetPlaybackSpeed" }, new[]{ "Cmd" }, null, null, null)
           }));
     }
     #endregion
@@ -1228,6 +1229,9 @@ namespace Game.V1 {
         case CmdOneofCase.SpawnBot:
           SpawnBot = other.SpawnBot.Clone();
           break;
+        case CmdOneofCase.SetPlaybackSpeed:
+          SetPlaybackSpeed = other.SetPlaybackSpeed.Clone();
+          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -1299,6 +1303,21 @@ namespace Game.V1 {
       }
     }
 
+    /// <summary>Field number for the "set_playback_speed" field.</summary>
+    public const int SetPlaybackSpeedFieldNumber = 6;
+    /// <summary>
+    /// Spectator only
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.PlaybackSpeed SetPlaybackSpeed {
+      get { return cmdCase_ == CmdOneofCase.SetPlaybackSpeed ? (global::Game.V1.PlaybackSpeed) cmd_ : null; }
+      set {
+        cmd_ = value;
+        cmdCase_ = value == null ? CmdOneofCase.None : CmdOneofCase.SetPlaybackSpeed;
+      }
+    }
+
     private object cmd_;
     /// <summary>Enum of possible cases for the "cmd" oneof.</summary>
     public enum CmdOneofCase {
@@ -1308,6 +1327,7 @@ namespace Game.V1 {
       CreateGame = 3,
       JoinGame = 4,
       SpawnBot = 5,
+      SetPlaybackSpeed = 6,
     }
     private CmdOneofCase cmdCase_ = CmdOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1343,6 +1363,7 @@ namespace Game.V1 {
       if (!object.Equals(CreateGame, other.CreateGame)) return false;
       if (!object.Equals(JoinGame, other.JoinGame)) return false;
       if (!object.Equals(SpawnBot, other.SpawnBot)) return false;
+      if (!object.Equals(SetPlaybackSpeed, other.SetPlaybackSpeed)) return false;
       if (CmdCase != other.CmdCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -1356,6 +1377,7 @@ namespace Game.V1 {
       if (cmdCase_ == CmdOneofCase.CreateGame) hash ^= CreateGame.GetHashCode();
       if (cmdCase_ == CmdOneofCase.JoinGame) hash ^= JoinGame.GetHashCode();
       if (cmdCase_ == CmdOneofCase.SpawnBot) hash ^= SpawnBot.GetHashCode();
+      if (cmdCase_ == CmdOneofCase.SetPlaybackSpeed) hash ^= SetPlaybackSpeed.GetHashCode();
       hash ^= (int) cmdCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -1395,6 +1417,10 @@ namespace Game.V1 {
         output.WriteRawTag(42);
         output.WriteMessage(SpawnBot);
       }
+      if (cmdCase_ == CmdOneofCase.SetPlaybackSpeed) {
+        output.WriteRawTag(50);
+        output.WriteMessage(SetPlaybackSpeed);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1425,6 +1451,10 @@ namespace Game.V1 {
         output.WriteRawTag(42);
         output.WriteMessage(SpawnBot);
       }
+      if (cmdCase_ == CmdOneofCase.SetPlaybackSpeed) {
+        output.WriteRawTag(50);
+        output.WriteMessage(SetPlaybackSpeed);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1449,6 +1479,9 @@ namespace Game.V1 {
       }
       if (cmdCase_ == CmdOneofCase.SpawnBot) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(SpawnBot);
+      }
+      if (cmdCase_ == CmdOneofCase.SetPlaybackSpeed) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(SetPlaybackSpeed);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1492,6 +1525,12 @@ namespace Game.V1 {
             SpawnBot = new global::Game.V1.SpawnBot();
           }
           SpawnBot.MergeFrom(other.SpawnBot);
+          break;
+        case CmdOneofCase.SetPlaybackSpeed:
+          if (SetPlaybackSpeed == null) {
+            SetPlaybackSpeed = new global::Game.V1.PlaybackSpeed();
+          }
+          SetPlaybackSpeed.MergeFrom(other.SetPlaybackSpeed);
           break;
       }
 
@@ -1559,6 +1598,15 @@ namespace Game.V1 {
             SpawnBot = subBuilder;
             break;
           }
+          case 50: {
+            global::Game.V1.PlaybackSpeed subBuilder = new global::Game.V1.PlaybackSpeed();
+            if (cmdCase_ == CmdOneofCase.SetPlaybackSpeed) {
+              subBuilder.MergeFrom(SetPlaybackSpeed);
+            }
+            input.ReadMessage(subBuilder);
+            SetPlaybackSpeed = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -1621,6 +1669,15 @@ namespace Game.V1 {
             }
             input.ReadMessage(subBuilder);
             SpawnBot = subBuilder;
+            break;
+          }
+          case 50: {
+            global::Game.V1.PlaybackSpeed subBuilder = new global::Game.V1.PlaybackSpeed();
+            if (cmdCase_ == CmdOneofCase.SetPlaybackSpeed) {
+              subBuilder.MergeFrom(SetPlaybackSpeed);
+            }
+            input.ReadMessage(subBuilder);
+            SetPlaybackSpeed = subBuilder;
             break;
           }
         }

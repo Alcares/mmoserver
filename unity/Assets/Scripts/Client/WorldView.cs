@@ -87,7 +87,7 @@ namespace Game.Client
         {
             _client.OnWorldSnapshot += HandleSnapshot;
             _client.OnInitialState += HandleInitialState;
-            _client.OnGoalMarker += HandleGoalMarker;
+            _client.OnEpisode += HandleEpisode;
             _state.PricesChanged += RefreshStationLabels;
         }
 
@@ -95,7 +95,7 @@ namespace Game.Client
         {
             _client.OnWorldSnapshot -= HandleSnapshot;
             _client.OnInitialState -= HandleInitialState;
-            _client.OnGoalMarker -= HandleGoalMarker;
+            _client.OnEpisode -= HandleEpisode;
             _state.PricesChanged -= RefreshStationLabels;
         }
 
@@ -287,7 +287,7 @@ namespace Game.Client
 
         // The spectated bot's goal: a translucent disc the size of the arrival radius, so you can
         // see how close counts, with a solid dot on the exact point.
-        private void HandleGoalMarker(GoalMarker goal)
+        private void HandleEpisode(Episode episode)
         {
             if (_goal == null)
             {
@@ -311,7 +311,7 @@ namespace Game.Client
                 OutlinedLabel.Create(_goal.transform, new Vector2(0f, GameState.TradeRange + 0.4f), Color.white, LabelOrder).Text = "GOAL";
             }
 
-            _goal.transform.position = new Vector3(goal.X, -goal.Y, 0f);
+            _goal.transform.position = new Vector3(episode.GoalX, -episode.GoalY, 0f);
             _goal.SetActive(true);
         }
 

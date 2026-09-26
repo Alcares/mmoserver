@@ -28,13 +28,24 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: func(*http.Request) bool { return true },
 }
 
-// hub fans the bot's stream out to spectators and replays the episode's InitialGameState and
-// GoalMarker to late joiners. A spectator is a game.WebsocketClient that never joins a world.
+// Playback speed bounds, as multiples of real time.
+const (
+	MinSpeed = 0.25
+	MaxSpeed = 32
+)
+
+// hub fans the bot's stream out to spectators and replays the episode's InitialGameState,
+// Episode and the playback speed to late joiners. A spectator is a game.WebsocketClient
+// that never joins a world.
 type hub struct {
 	mu      sync.Mutex
 	clients map[*game.WebsocketClient]struct{}
 	initial []byte
-	goal    []byte
+	episode []byte
+	speed   float32
+
+	// retime carries a new tick interval to the episode loop; it only ever holds the latest.
+	retime chan time.Duration
 
 	// onFirstJoin runs once, after the first spectator is added, so no episode plays unwatched
 	// before anyone connects. It keeps playing after everyone leaves.
@@ -43,7 +54,12 @@ type hub struct {
 }
 
 func newHub(onFirstJoin func()) *hub {
-	return &hub{clients: make(map[*game.WebsocketClient]struct{}), onFirstJoin: onFirstJoin}
+	return &hub{
+		clients:     make(map[*game.WebsocketClient]struct{}),
+		speed:       1,
+		retime:      make(chan time.Duration, 1),
+		onFirstJoin: onFirstJoin,
+	}
 }
 
 func (h *hub) add(c *game.WebsocketClient) {
@@ -52,8 +68,11 @@ func (h *hub) add(c *game.WebsocketClient) {
 	if h.initial != nil {
 		c.Enqueue(h.initial)
 	}
-	if h.goal != nil {
-		c.Enqueue(h.goal)
+	if h.episode != nil {
+		c.Enqueue(h.episode)
+	}
+	if payload, err := speedPayload(h.speed); err == nil {
+		c.Enqueue(payload)
 	}
 	h.clients[c] = struct{}{}
 }
@@ -72,29 +91,76 @@ func (h *hub) broadcast(payload []byte, initial bool) {
 
 	if initial {
 		h.initial = payload
-		h.goal = nil // a new world; its goal follows
+		h.episode = nil // a new world; its Episode follows
 	}
 	for c := range h.clients {
 		c.Enqueue(payload)
 	}
 }
 
-// showGoal marks the episode's goal, which is not part of the game stream.
-func (h *hub) showGoal(g bot.Goal) {
-	payload, err := proto.Marshal(&pb.ServerMessage{
-		Msg: &pb.ServerMessage_GoalMarker{GoalMarker: &pb.GoalMarker{X: g.X, Y: g.Y}},
-	})
+// startEpisode tells viewers what the game stream cannot: the goal and which snapshot plays.
+func (h *hub) startEpisode(e *pb.Episode) {
+	payload, err := proto.Marshal(&pb.ServerMessage{Msg: &pb.ServerMessage_Episode{Episode: e}})
 	if err != nil {
-		slog.Error("marshal goal", "err", err)
+		slog.Error("marshal episode", "err", err)
 		return
 	}
 
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	h.goal = payload
+	h.episode = payload
 	for c := range h.clients {
 		c.Enqueue(payload)
 	}
+}
+
+// setSpeed clamps a viewer's request, retimes playback for everyone, and tells every viewer
+// the speed actually applied.
+func (h *hub) setSpeed(speed float32) {
+	if !(speed > 0) { // also rejects NaN
+		return
+	}
+	speed = min(max(speed, MinSpeed), MaxSpeed)
+	payload, err := speedPayload(speed)
+	if err != nil {
+		slog.Error("marshal speed", "err", err)
+		return
+	}
+
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.speed = speed
+	select {
+	case <-h.retime: // drop a change the loop has not picked up yet
+	default:
+	}
+	h.retime <- tickInterval(speed)
+	for c := range h.clients {
+		c.Enqueue(payload)
+	}
+	slog.Info("playback speed", "speed", speed)
+}
+
+// wait blocks until the next tick, retiming the ticker if the speed changes meanwhile.
+func (h *hub) wait(ticker *time.Ticker) {
+	for {
+		select {
+		case <-ticker.C:
+			return
+		case d := <-h.retime:
+			ticker.Reset(d)
+		}
+	}
+}
+
+func speedPayload(speed float32) ([]byte, error) {
+	return proto.Marshal(&pb.ServerMessage{
+		Msg: &pb.ServerMessage_PlaybackSpeed{PlaybackSpeed: &pb.PlaybackSpeed{Speed: speed}},
+	})
+}
+
+func tickInterval(speed float32) time.Duration {
+	return time.Duration(game.TickDuration * float64(time.Second) / float64(speed))
 }
 
 func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
@@ -109,10 +175,18 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 	go c.WritePump()
 	h.firstJoin.Do(h.onFirstJoin)
 
-	// Input is ignored; reading is how we notice the socket closing.
+	// Only PlaybackSpeed means anything here; reading is also how we notice the socket closing.
 	for {
-		if _, _, err := conn.ReadMessage(); err != nil {
+		_, payload, err := conn.ReadMessage()
+		if err != nil {
 			return
+		}
+		var msg pb.ClientMessage
+		if proto.Unmarshal(payload, &msg) != nil {
+			continue
+		}
+		if s := msg.GetSetPlaybackSpeed(); s != nil {
+			h.setSpeed(s.GetSpeed())
 		}
 	}
 }
@@ -128,7 +202,7 @@ func isInitialState(payload []byte) bool {
 // watch plays the same seeds with every snapshot, forever, so the weights are the only
 // thing that changes between them.
 func watch(env *sim.Env, h *hub, p *bot.SnapshotPolicy, seeds []int64, maxTicks int) {
-	ticker := time.NewTicker(time.Duration(game.TickDuration * float64(time.Second)))
+	ticker := time.NewTicker(tickInterval(1))
 	defer ticker.Stop()
 
 	for {
@@ -160,11 +234,17 @@ func episode(env *sim.Env, h *hub, p *bot.SnapshotPolicy, ticker *time.Ticker, s
 		slog.Error("reset", "seed", seed, "err", err)
 		os.Exit(1)
 	}
-	h.showGoal(env.Goal())
+	goal := env.Goal()
+	h.startEpisode(&pb.Episode{
+		GoalX:             goal.X,
+		GoalY:             goal.Y,
+		SnapshotTimesteps: p.Timesteps(),
+		FinalTimesteps:    p.NewestTimesteps(),
+	})
 
 	var result sim.StepResult
 	for ticks := 1; ; ticks++ {
-		<-ticker.C
+		h.wait(ticker)
 
 		if result, err = env.Step(p.Act(obs)); err != nil {
 			slog.Error("step", "seed", seed, "err", err)
@@ -182,7 +262,7 @@ const (
 	DefaultAddr      = ":8080"                 // beside the game server's :8080
 	DefaultSnapshots = "rl-training/snapshots" // where train.py exports
 	DefaultSeed      = 0
-	DefaultEpisodes  = 3
+	DefaultEpisodes  = 1
 	DefaultMaxTicks  = 700 // 35s; the furthest goal takes ~580 ticks
 )
 

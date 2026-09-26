@@ -97,7 +97,8 @@ namespace Game.Client
 
         // While waiting or counting down: the code to share, how many players are in, and
         // the countdown. During the round it becomes the remaining time.
-        private void DrawPhaseBanner(float screenW)
+        // Returns the lowest box drawn, or above if none, so more boxes can stack under it.
+        private Rect DrawPhaseBanner(Rect above)
         {
             if (_title == null) CreateLobbyStyles();
 
@@ -108,32 +109,63 @@ namespace Game.Client
                 GamePhase.Running => $"TIME LEFT {Clock(_state.SecondsLeft)}",
                 _ => null,
             };
-            if (line == null) return;
+            if (line == null) return above;
 
-            var rect = new Rect((screenW - 260f) / 2f, 44f, 260f, 30f);
-            GUI.color = Color.white;
-            GUI.DrawTexture(rect, _panel);
-            _lobbyText.normal.textColor = _state.Phase == GamePhase.Running ? Color.white : LabelGold;
-            GUI.Label(rect, line, _lobbyText);
+            // Stacked under the status box, at its width.
+            var rect = new Rect(above.x, above.yMax + TopGap, above.width, TopBoxHeight);
+            DrawTopBox(rect, line, _state.Phase == GamePhase.Running ? Color.white : LabelGold);
 
-            float nextY = rect.yMax + 4f;
             if (!string.IsNullOrEmpty(_state.GameId) && _state.Phase != GamePhase.Running)
             {
-                var codeRect = new Rect(rect.x, nextY, rect.width, 26f);
-                GUI.DrawTexture(codeRect, _panel);
-                _lobbyText.normal.textColor = Color.white;
-                GUI.Label(codeRect, $"CODE  {_state.GameId}", _lobbyText);
-                nextY = codeRect.yMax + 4f;
+                rect.y += TopBoxHeight + TopGap;
+                DrawTopBox(rect, $"CODE  {_state.GameId}", Color.white);
             }
 
             if (_state.Phase == GamePhase.Waiting)
             {
-                var hintRect = new Rect(rect.x, nextY, rect.width, 22f);
-                GUI.DrawTexture(hintRect, _panel);
-                _lobbyText.normal.textColor = Color.gray;
-                GUI.Label(hintRect, "B ADDS A BOT", _lobbyText);
+                rect.y += TopBoxHeight + TopGap;
+                DrawTopBox(rect, "B ADDS A BOT", Dim);
             }
+            return rect;
         }
+
+        // Only a spectator reports a playback speed. Returns the box, or above if none.
+        private Rect DrawPlaybackSpeed(Rect above)
+        {
+            if (_state.PlaybackSpeed is not { } speed) return above;
+
+            var rect = new Rect(above.x, above.yMax + TopGap, above.width, TopBoxHeight);
+            string text = $"PLAYBACK {speed.ToString(CultureInfo.InvariantCulture)}x   [,] SLOWER  [.] FASTER";
+            DrawTopBox(rect, text, Mathf.Approximately(speed, 1f) ? Color.white : LabelGold);
+            return rect;
+        }
+
+        // How far into training the spectated snapshot was taken, against the newest one.
+        private void DrawTrainingProgress(Rect above)
+        {
+            var episode = _state.Episode;
+            if (episode == null) return;
+
+            var rect = new Rect(above.x, above.yMax + TopGap, above.width, TopBoxHeight);
+            if (episode.SnapshotTimesteps < 0)
+            {
+                DrawTopBox(rect, "NO SNAPSHOTS, SCRIPTED BOT", Dim);
+                return;
+            }
+
+            string text = $"SNAPSHOT {Millions(episode.SnapshotTimesteps)}";
+            if (episode.FinalTimesteps > 0)
+            {
+                long percent = episode.SnapshotTimesteps * 100 / episode.FinalTimesteps;
+                text = $"SNAPSHOT {Millions(episode.SnapshotTimesteps)} / {Millions(episode.FinalTimesteps)} ({percent}%)";
+            }
+            DrawTopBox(rect, text, Color.white);
+        }
+
+        // 1,998,848 -> "1.99M". Truncated rather than rounded, so a snapshot short of the last
+        // never reads the same as it, the way the floored percentage never reads 100% early.
+        private static string Millions(long steps) =>
+            (steps / 10_000 / 100.0).ToString("0.00", CultureInfo.InvariantCulture) + "M";
 
         // Final standings, highest net worth first, with how much each player traded to get there.
         private void DrawStandings(float screenW, float screenH)

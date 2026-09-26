@@ -28,6 +28,10 @@ namespace Game.Networking
         public event Action<GameStatus> OnGameStatus;
         public event Action<JoinRejected> OnJoinRejected;
         public event Action<GameOver> OnGameOver;
+        /// <summary>Only the spectator sends this, as each episode starts: the goal and which training snapshot plays.</summary>
+        public event Action<Episode> OnEpisode;
+        /// <summary>Only the spectator sends this: the playback speed now applied for every viewer.</summary>
+        public event Action<PlaybackSpeed> OnPlaybackSpeed;
 
         private string Url => $"ws://{host}:{port}/ws";
 
@@ -105,6 +109,12 @@ namespace Game.Networking
                 case ServerMessage.MsgOneofCase.GameOver:
                     OnGameOver?.Invoke(message.GameOver);
                     break;
+                case ServerMessage.MsgOneofCase.Episode:
+                    OnEpisode?.Invoke(message.Episode);
+                    break;
+                case ServerMessage.MsgOneofCase.PlaybackSpeed:
+                    OnPlaybackSpeed?.Invoke(message.PlaybackSpeed);
+                    break;
             }
         }
 
@@ -127,6 +137,13 @@ namespace Game.Networking
         public void SendSpawnBot(string name)
         {
             Connection?.Send(new ClientMessage { SpawnBot = new SpawnBot { Name = name } });
+        }
+
+        /// <summary>Asks the spectator to replay at this multiple of real time. It clamps the
+        /// value and answers every viewer with the speed it applied; a game server ignores it.</summary>
+        public void SendPlaybackSpeed(float speed)
+        {
+            Connection?.Send(new ClientMessage { SetPlaybackSpeed = new PlaybackSpeed { Speed = speed } });
         }
 
         public void SendMovement(float vx, float vy)

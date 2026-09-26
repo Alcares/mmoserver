@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package game.v1;
+option go_package = "github.com/alcares/mmoserver/backend/gen/go/game/v1;gamev1";
+option csharp_namespace = "Game.V1";
+
+// Messages only cmd/spectator speaks. They ride the normal ClientMessage/ServerMessage
+// envelopes; the game server never sends them and ignores them if received.
+
+// Server -> Client: sent as each episode starts, and replayed to late joiners.
+message Episode {
+  // Where the watched bot is headed.
+  float goal_x = 1;
+  float goal_y = 2;
+  // Training timesteps of the snapshot playing this episode; -1 while the scripted fallback plays.
+  int64 snapshot_timesteps = 3;
+  // Timesteps of the newest snapshot in the archive, so progress reads as a fraction; -1 if none.
+  int64 final_timesteps = 4;
+}
+
+// Both directions. Client -> Server asks for a playback rate, as a multiple of real time.
+// Server -> Client is the rate actually applied, after clamping, sent to every viewer
+// because playback is shared.
+message PlaybackSpeed {
+  float speed = 1;
+}

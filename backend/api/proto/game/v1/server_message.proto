@@ -6,6 +6,7 @@ option csharp_namespace = "Game.V1";
 
 import "game/v1/common.proto";
 import "game/v1/player.proto";
+import "game/v1/spectator.proto";
 
 // Server -> Client: Where a power-up is spawned in the world
 message PowerUp {
@@ -128,5 +129,9 @@ message ServerMessage {
 
     // One off
     GameOver game_over = 9;
+
+    // Spectator only
+    Episode episode = 11;
+    PlaybackSpeed playback_speed = 12;
   }
 }

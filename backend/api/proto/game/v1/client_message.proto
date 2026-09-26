@@ -5,6 +5,7 @@ option go_package = "github.com/alcares/mmoserver/backend/gen/go/game/v1;gamev1"
 option csharp_namespace = "Game.V1";
 
 import "game/v1/common.proto";
+import "game/v1/spectator.proto";
 
 // Sent whenever a key is pressed
 message MovementCommand {
@@ -42,5 +43,8 @@ message ClientMessage {
     CreateGame create_game = 3;
     JoinGame join_game = 4;
     SpawnBot spawn_bot = 5;
+
+    // Spectator only
+    PlaybackSpeed set_playback_speed = 6;
   }
 }

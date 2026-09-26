@@ -53,8 +53,12 @@ namespace Game.Networking
                 return;
             }
 
-            _ = ReceiveLoop(_cts.Token);
-            _ = SendLoop(_cts.Token);
+            // Task.Run, not a plain call: started from the main thread, the loops would capture
+            // Unity's synchronization context and resume once per frame, capping receives at about
+            // one message a frame while the server sends 20+ a second, so a backlog builds.
+            var token = _cts.Token;
+            _ = Task.Run(() => ReceiveLoop(token));
+            _ = Task.Run(() => SendLoop(token));
         }
 
         public void Send(ClientMessage message)

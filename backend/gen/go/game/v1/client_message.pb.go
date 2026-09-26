@@ -281,6 +281,7 @@ type ClientMessage struct {
 	//	*ClientMessage_CreateGame
 	//	*ClientMessage_JoinGame
 	//	*ClientMessage_SpawnBot
+	//	*ClientMessage_SetPlaybackSpeed
 	Cmd           isClientMessage_Cmd `protobuf_oneof:"cmd"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -368,6 +369,15 @@ func (x *ClientMessage) GetSpawnBot() *SpawnBot {
 	return nil
 }
 
+func (x *ClientMessage) GetSetPlaybackSpeed() *PlaybackSpeed {
+	if x != nil {
+		if x, ok := x.Cmd.(*ClientMessage_SetPlaybackSpeed); ok {
+			return x.SetPlaybackSpeed
+		}
+	}
+	return nil
+}
+
 type isClientMessage_Cmd interface {
 	isClientMessage_Cmd()
 }
@@ -392,6 +402,11 @@ type ClientMessage_SpawnBot struct {
 	SpawnBot *SpawnBot `protobuf:"bytes,5,opt,name=spawn_bot,json=spawnBot,proto3,oneof"`
 }
 
+type ClientMessage_SetPlaybackSpeed struct {
+	// Spectator only
+	SetPlaybackSpeed *PlaybackSpeed `protobuf:"bytes,6,opt,name=set_playback_speed,json=setPlaybackSpeed,proto3,oneof"`
+}
+
 func (*ClientMessage_Input) isClientMessage_Cmd() {}
 
 func (*ClientMessage_Trade) isClientMessage_Cmd() {}
@@ -402,11 +417,13 @@ func (*ClientMessage_JoinGame) isClientMessage_Cmd() {}
 
 func (*ClientMessage_SpawnBot) isClientMessage_Cmd() {}
 
+func (*ClientMessage_SetPlaybackSpeed) isClientMessage_Cmd() {}
+
 var File_game_v1_client_message_proto protoreflect.FileDescriptor
 
 const file_game_v1_client_message_proto_rawDesc = "" +
 	"\n" +
-	"\x1cgame/v1/client_message.proto\x12\agame.v1\x1a\x14game/v1/common.proto\"1\n" +
+	"\x1cgame/v1/client_message.proto\x12\agame.v1\x1a\x14game/v1/common.proto\x1a\x17game/v1/spectator.proto\"1\n" +
 	"\x0fMovementCommand\x12\x0e\n" +
 	"\x02vx\x18\x01 \x01(\x02R\x02vx\x12\x0e\n" +
 	"\x02vy\x18\x02 \x01(\x02R\x02vy\"\f\n" +
@@ -422,14 +439,15 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\x06intent\x18\x02 \x01(\x0e2\x14.game.v1.OrderIntentR\x06intent\x12\x14\n" +
 	"\x05units\x18\x03 \x01(\rR\x05units\x12\x1f\n" +
 	"\vprice_cents\x18\x04 \x01(\x04R\n" +
-	"priceCents\"\x93\x02\n" +
+	"priceCents\"\xdb\x02\n" +
 	"\rClientMessage\x120\n" +
 	"\x05input\x18\x01 \x01(\v2\x18.game.v1.MovementCommandH\x00R\x05input\x12-\n" +
 	"\x05trade\x18\x02 \x01(\v2\x15.game.v1.TradeRequestH\x00R\x05trade\x126\n" +
 	"\vcreate_game\x18\x03 \x01(\v2\x13.game.v1.CreateGameH\x00R\n" +
 	"createGame\x120\n" +
 	"\tjoin_game\x18\x04 \x01(\v2\x11.game.v1.JoinGameH\x00R\bjoinGame\x120\n" +
-	"\tspawn_bot\x18\x05 \x01(\v2\x11.game.v1.SpawnBotH\x00R\bspawnBotB\x05\n" +
+	"\tspawn_bot\x18\x05 \x01(\v2\x11.game.v1.SpawnBotH\x00R\bspawnBot\x12F\n" +
+	"\x12set_playback_speed\x18\x06 \x01(\v2\x16.game.v1.PlaybackSpeedH\x00R\x10setPlaybackSpeedB\x05\n" +
 	"\x03cmdBFZ:github.com/alcares/mmoserver/backend/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
@@ -453,6 +471,7 @@ var file_game_v1_client_message_proto_goTypes = []any{
 	(*TradeRequest)(nil),    // 4: game.v1.TradeRequest
 	(*ClientMessage)(nil),   // 5: game.v1.ClientMessage
 	(OrderIntent)(0),        // 6: game.v1.OrderIntent
+	(*PlaybackSpeed)(nil),   // 7: game.v1.PlaybackSpeed
 }
 var file_game_v1_client_message_proto_depIdxs = []int32{
 	6, // 0: game.v1.TradeRequest.intent:type_name -> game.v1.OrderIntent
@@ -461,11 +480,12 @@ var file_game_v1_client_message_proto_depIdxs = []int32{
 	1, // 3: game.v1.ClientMessage.create_game:type_name -> game.v1.CreateGame
 	2, // 4: game.v1.ClientMessage.join_game:type_name -> game.v1.JoinGame
 	3, // 5: game.v1.ClientMessage.spawn_bot:type_name -> game.v1.SpawnBot
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	7, // 6: game.v1.ClientMessage.set_playback_speed:type_name -> game.v1.PlaybackSpeed
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_client_message_proto_init() }
@@ -474,12 +494,14 @@ func file_game_v1_client_message_proto_init() {
 		return
 	}
 	file_game_v1_common_proto_init()
+	file_game_v1_spectator_proto_init()
 	file_game_v1_client_message_proto_msgTypes[5].OneofWrappers = []any{
 		(*ClientMessage_Input)(nil),
 		(*ClientMessage_Trade)(nil),
 		(*ClientMessage_CreateGame)(nil),
 		(*ClientMessage_JoinGame)(nil),
 		(*ClientMessage_SpawnBot)(nil),
+		(*ClientMessage_SetPlaybackSpeed)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

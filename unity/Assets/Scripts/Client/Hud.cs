@@ -21,6 +21,11 @@ namespace Game.Client
         private const float MultiplierGap = 6f;
         private const float HintWidth = 30f;
 
+        // The boxes stacked at the top centre: status, then the phase banner and its extras.
+        private const float TopMinWidth = 320f;
+        private const float TopBoxHeight = 28f;
+        private const float TopGap = 4f;
+
         private const float SlotSize = 64f;
         private const float SlotGap = 6f;
         private const float BottomMargin = 14f;
@@ -43,8 +48,8 @@ namespace Game.Client
         private static readonly Color MoneyGreen = new Color32(0x86, 0xef, 0xac, 0xff);
         private static readonly Color LabelGold = new Color32(0xd9, 0xc4, 0x8a, 0xff);
 
-        private GUIStyle _status, _slotText, _multiplierText;
-        private Texture2D _panel, _slotBorder, _slotFill, _selectedBorder, _selectedFill;
+        private GUIStyle _slotText, _multiplierText;
+        private Texture2D _slotBorder, _slotFill, _selectedBorder, _selectedFill;
 
         private void Awake()
         {
@@ -95,10 +100,9 @@ namespace Game.Client
             float screenH = Screen.height / scale;
 
             var status = StatusText();
-            var size = _status.CalcSize(new GUIContent(status));
-            var statusRect = new Rect((screenW - size.x - 28f) / 2f, 12f, size.x + 28f, size.y + 12f);
-            GUI.DrawTexture(statusRect, _panel);
-            GUI.Label(statusRect, status, _status);
+            float topWidth = Mathf.Max(TopMinWidth, _slotText.CalcSize(new GUIContent(status)).x + 32f);
+            var statusRect = new Rect((screenW - topWidth) / 2f, 12f, topWidth, TopBoxHeight);
+            DrawTopBox(statusRect, status, Color.white);
 
             // In the lobby there is no game to draw yet, only the create/join panel.
             if (!_state.Joined)
@@ -107,7 +111,9 @@ namespace Game.Client
                 return;
             }
 
-            DrawPhaseBanner(screenW);
+            var bannerRect = DrawPhaseBanner(statusRect);
+            var speedRect = DrawPlaybackSpeed(bannerRect);
+            DrawTrainingProgress(speedRect);
 
             if (_state.Position == null) return;
 
@@ -266,6 +272,16 @@ namespace Game.Client
             return gray;
         }
 
+        // One box of the top stack, in the same bordered-slot style as the rest of the HUD.
+        private void DrawTopBox(Rect rect, string text, Color color)
+        {
+            GUI.color = Color.white;
+            GUI.DrawTexture(rect, _slotBorder);
+            GUI.DrawTexture(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), _slotFill);
+            _slotText.alignment = TextAnchor.MiddleCenter;
+            DrawOutlined(rect, text, color);
+        }
+
         private void DrawOutlined(Rect rect, string text, Color color)
         {
             _slotText.normal.textColor = Color.black;
@@ -287,14 +303,10 @@ namespace Game.Client
 
         private void CreateStyles()
         {
-            _panel = Solid(new Color(15f / 255f, 23f / 255f, 42f / 255f, 0.9f));
             _slotBorder = Solid(new Color32(0x8a, 0x6a, 0x30, 0xff));
             _slotFill = Solid(new Color(0.06f, 0.08f, 0.13f, 0.92f));
             _selectedBorder = Solid(new Color32(0xfa, 0xcc, 0x15, 0xff));
             _selectedFill = Solid(new Color(0.24f, 0.18f, 0.04f, 0.96f));
-
-            _status = new GUIStyle(GUI.skin.label) { fontSize = 13, alignment = TextAnchor.MiddleCenter };
-            _status.normal.textColor = new Color32(0xf8, 0xfa, 0xfc, 0xff);
 
             _slotText = new GUIStyle(GUI.skin.label) { fontSize = 13, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, wordWrap = false };
             _slotText.padding = new RectOffset(0, 0, 0, 0);
