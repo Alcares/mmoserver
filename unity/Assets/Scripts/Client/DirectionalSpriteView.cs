@@ -9,6 +9,9 @@ namespace Game.Client
         // (sectors are 45 wide, so 27.5 gives a 5 degree dead zone that stops diagonal flicker).
         private const float SwitchAngle = 27.5f;
         private const float MinDirectionSqr = 0.0025f;
+        // Share of a frame's width the player art's solid body fills. One value for every set, so
+        // bots and players, drawn in same-sized frames, stand the same height.
+        private const float BodyFill = 0.63f;
 
         private DirectionalAnimationSet _set;
         private SpriteRenderer _renderer;
@@ -24,9 +27,8 @@ namespace Game.Client
         public void Build(DirectionalAnimationSet set, float bodyWidth)
         {
             _set = set;
-            // Cells are drawn cellWorldHeight tall and, being square, as wide; the body fills
-            // set.bodyWidth of that.
-            _scale = bodyWidth / (set.cellWorldHeight * set.bodyWidth);
+            // Cells are drawn cellWorldHeight tall and, being square, as wide
+            _scale = bodyWidth / (set.cellWorldHeight * BodyFill);
 
             var go = new GameObject("Sprite");
             go.transform.SetParent(transform, false);

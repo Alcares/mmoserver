@@ -44,10 +44,6 @@ namespace Game.Client
         [Tooltip("Height above the player's position where the name label is drawn.")]
         public float labelHeight = 1.8f;
 
-        [Tooltip("Share of a cell's width the character's body fills. The view scales the sprite so the " +
-                 "body is exactly as wide as the server's player collision circle.")]
-        [Range(0.05f, 1f)] public float bodyWidth = 1f;
-
         [NonSerialized] private readonly Dictionary<int, Sprite> _sprites = new();
 
         public int Rows => mirrorWest ? 5 : DirectionCount;
