@@ -82,7 +82,7 @@ mapping action index → `(vx, vy)` is defined **once, in Go**. Python only ever
 ### Episode end
 
 - **Terminated:** the bot is within `TradeRange` (4 units) of the goal.
-- **Truncated:** the step limit ran out (`MaxSteps`, 1200 ticks = 60 s).
+- **Truncated:** the step limit ran out (`MaxSteps`, 600 ticks = 30 s).
 
 These are reported separately: PPO treats a real ending and a timeout differently.
 
