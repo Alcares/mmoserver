@@ -3,6 +3,7 @@ using Game.Networking;
 using Game.V1;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 namespace Game.Client
 {
@@ -23,6 +24,10 @@ namespace Game.Client
         private const int GoalOrder = -49;
         private const int ClosedOrder = -48;
         private const int LabelOrder = 10000;
+        // Rock outlines are generated at this radius, in sprite units, so the texture has enough
+        // pixels to stay sharp once scaled down to the station.
+        private const float RockPointRadius = 8f;
+        private const int RockVariants = 4;
 
         [Tooltip("Orthographic half-height the camera starts at, in tiles.")]
         [SerializeField] private float cameraSize = 12f;
@@ -59,6 +64,10 @@ namespace Game.Client
             public string Name;
             public OutlinedLabel Label;
             public GameObject Go;
+            /// <summary>The commodity icon or disc a game station is drawn with.</summary>
+            public GameObject Art;
+            /// <summary>What the station is drawn as while spectating training, where it is only an obstacle.</summary>
+            public GameObject Rock;
             /// <summary>The X drawn over the station while a CLOSED event runs on its commodity.</summary>
             public GameObject ClosedMark;
         }
@@ -96,6 +105,7 @@ namespace Game.Client
             _client.OnEpisode += HandleEpisode;
             _state.PricesChanged += RefreshStationLabels;
             _state.EventChanged += RefreshStationEvents;
+            _state.SessionChanged += RefreshStationStyle;
         }
 
         private void OnDisable()
@@ -105,6 +115,7 @@ namespace Game.Client
             _client.OnEpisode -= HandleEpisode;
             _state.PricesChanged -= RefreshStationLabels;
             _state.EventChanged -= RefreshStationEvents;
+            _state.SessionChanged -= RefreshStationStyle;
         }
 
         private void Update()
@@ -303,11 +314,76 @@ namespace Game.Client
 
                 var label = OutlinedLabel.Create(go.transform, new Vector2(0f, labelHeight), Color.white, LabelOrder);
                 var closedMark = BuildClosedMark(go.transform, radius);
-                _stations.Add(new StationView { Commodity = st.Commodity, Name = st.Label, Label = label, Go = go, ClosedMark = closedMark });
+                var rock = BuildRock(go.transform, radius, _stations.Count);
+                _stations.Add(new StationView
+                {
+                    Commodity = st.Commodity, Name = st.Label, Label = label, Go = go,
+                    ClosedMark = closedMark, Art = art, Rock = rock,
+                });
             }
 
             RefreshStationLabels();
             RefreshStationEvents();
+            RefreshStationStyle();
+        }
+
+        // Spectating shows every station as a rock without a label: in training a station is
+        // only something to walk around. Both are built up front because the spectator sends
+        // its first layout before the playback speed that identifies it.
+        private void RefreshStationStyle()
+        {
+            bool spectating = _state.PlaybackSpeed.HasValue;
+            foreach (var s in _stations)
+            {
+                s.Art.SetActive(!spectating);
+                s.Rock.SetActive(spectating);
+                s.Label.gameObject.SetActive(!spectating);
+            }
+        }
+
+        // A grey boulder as wide as the station's footprint: a shadow, the body, and a highlight
+        // on the upper left, from one of a few irregular outlines so neighbours don't match.
+        private static GameObject BuildRock(Transform station, float radius, int index)
+        {
+            var rock = new GameObject("Rock");
+            rock.transform.SetParent(station, false);
+            rock.AddComponent<SortingGroup>().sortingOrder = StationOrder;
+
+            var shape = RockShape(index % RockVariants);
+            AddRockLayer(rock.transform, shape, radius, new Vector2(0.08f, -0.1f) * radius, 1f, new Color32(0x33, 0x41, 0x55, 0xff), 0);
+            AddRockLayer(rock.transform, shape, radius, Vector2.zero, 1f, new Color32(0x64, 0x74, 0x8b, 0xff), 1);
+            AddRockLayer(rock.transform, shape, radius, new Vector2(-0.18f, 0.2f) * radius, 0.5f, new Color32(0x94, 0xa3, 0xb8, 0xff), 2);
+
+            rock.SetActive(false);
+            return rock;
+        }
+
+        private static void AddRockLayer(Transform rock, Sprite shape, float radius, Vector2 offset, float size, Color color, int order)
+        {
+            var layer = new GameObject("Layer").AddComponent<SpriteRenderer>();
+            layer.transform.SetParent(rock, false);
+            layer.transform.localPosition = offset;
+            layer.transform.localScale = Vector3.one * (radius / RockPointRadius * size);
+            layer.sprite = shape;
+            layer.color = color;
+            layer.sortingOrder = order;
+        }
+
+        // A lumpy closed outline: points evenly spaced around a circle, each nudged in angle and
+        // pulled in by a random amount. Seeded by the variant, so the same variant always matches.
+        private static Sprite RockShape(int variant)
+        {
+            const int points = 9;
+            var rng = new System.Random(variant);
+            var outline = new Vector2[points];
+            float step = Mathf.PI * 2f / points;
+            for (int i = 0; i < points; i++)
+            {
+                float angle = i * step + ((float)rng.NextDouble() - 0.5f) * step * 0.5f;
+                float r = RockPointRadius * (0.78f + 0.22f * (float)rng.NextDouble());
+                outline[i] = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * r;
+            }
+            return Shapes.Polygon($"rock{variant}", outline);
         }
 
         // A big red X across the station's footprint, hidden until its station closes.
