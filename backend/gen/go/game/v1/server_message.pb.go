@@ -140,7 +140,7 @@ type RandomEventOccurred struct {
 	state         protoimpl.MessageState   `protogen:"open.v1"`
 	EventType     RandomCommodityEventType `protobuf:"varint,1,opt,name=event_type,json=eventType,proto3,enum=game.v1.RandomCommodityEventType" json:"event_type,omitempty"`
 	Commodity     CommodityType            `protobuf:"varint,2,opt,name=commodity,proto3,enum=game.v1.CommodityType" json:"commodity,omitempty"`
-	RemainingMs   int32                    `protobuf:"varint,3,opt,name=remaining_ms,json=remainingMs,proto3" json:"remaining_ms,omitempty"` // in ms
+	RemainingMs   int32                    `protobuf:"varint,3,opt,name=remaining_ms,json=remainingMs,proto3" json:"remaining_ms,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -179,7 +179,7 @@ func (x *RandomEventOccurred) GetEventType() RandomCommodityEventType {
 	if x != nil {
 		return x.EventType
 	}
-	return RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE
+	return RandomCommodityEventType_RANDOM_COMMODITY_EVENT_UNSPECIFIED
 }
 
 func (x *RandomEventOccurred) GetCommodity() CommodityType {
@@ -238,7 +238,7 @@ func (x *RandomEventEnded) GetEventType() RandomCommodityEventType {
 	if x != nil {
 		return x.EventType
 	}
-	return RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE
+	return RandomCommodityEventType_RANDOM_COMMODITY_EVENT_UNSPECIFIED
 }
 
 func (x *RandomEventEnded) GetCommodity() CommodityType {
@@ -674,7 +674,6 @@ type TradingStation struct {
 	X             float32                `protobuf:"fixed32,2,opt,name=x,proto3" json:"x,omitempty"`
 	Y             float32                `protobuf:"fixed32,3,opt,name=y,proto3" json:"y,omitempty"`
 	Label         string                 `protobuf:"bytes,4,opt,name=label,proto3" json:"label,omitempty"`
-	Open          bool                   `protobuf:"varint,5,opt,name=open,proto3" json:"open,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -735,13 +734,6 @@ func (x *TradingStation) GetLabel() string {
 		return x.Label
 	}
 	return ""
-}
-
-func (x *TradingStation) GetOpen() bool {
-	if x != nil {
-		return x.Open
-	}
-	return false
 }
 
 type InitialGameState struct {
@@ -994,7 +986,7 @@ type ServerMessage struct {
 	//	*ServerMessage_MarketState
 	//	*ServerMessage_PowerUpSpawned
 	//	*ServerMessage_PowerUpDespawned
-	//	*ServerMessage_RandomEffectOccurred
+	//	*ServerMessage_RandomEventOccurred
 	//	*ServerMessage_RandomEventEnded
 	//	*ServerMessage_GameStatus
 	//	*ServerMessage_InitialState
@@ -1083,10 +1075,10 @@ func (x *ServerMessage) GetPowerUpDespawned() *PowerUpDespawned {
 	return nil
 }
 
-func (x *ServerMessage) GetRandomEffectOccurred() *RandomEventOccurred {
+func (x *ServerMessage) GetRandomEventOccurred() *RandomEventOccurred {
 	if x != nil {
-		if x, ok := x.Msg.(*ServerMessage_RandomEffectOccurred); ok {
-			return x.RandomEffectOccurred
+		if x, ok := x.Msg.(*ServerMessage_RandomEventOccurred); ok {
+			return x.RandomEventOccurred
 		}
 	}
 	return nil
@@ -1204,8 +1196,8 @@ type ServerMessage_PowerUpDespawned struct {
 	PowerUpDespawned *PowerUpDespawned `protobuf:"bytes,4,opt,name=power_up_despawned,json=powerUpDespawned,proto3,oneof"`
 }
 
-type ServerMessage_RandomEffectOccurred struct {
-	RandomEffectOccurred *RandomEventOccurred `protobuf:"bytes,14,opt,name=random_effect_occurred,json=randomEffectOccurred,proto3,oneof"`
+type ServerMessage_RandomEventOccurred struct {
+	RandomEventOccurred *RandomEventOccurred `protobuf:"bytes,14,opt,name=random_event_occurred,json=randomEventOccurred,proto3,oneof"`
 }
 
 type ServerMessage_RandomEventEnded struct {
@@ -1260,7 +1252,7 @@ func (*ServerMessage_PowerUpSpawned) isServerMessage_Msg() {}
 
 func (*ServerMessage_PowerUpDespawned) isServerMessage_Msg() {}
 
-func (*ServerMessage_RandomEffectOccurred) isServerMessage_Msg() {}
+func (*ServerMessage_RandomEventOccurred) isServerMessage_Msg() {}
 
 func (*ServerMessage_RandomEventEnded) isServerMessage_Msg() {}
 
@@ -1337,13 +1329,12 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"priceCents\x123\n" +
 	"\x16new_cash_balance_cents\x18\t \x01(\x04R\x13newCashBalanceCents\x12*\n" +
 	"\x11new_holding_units\x18\n" +
-	" \x01(\x04R\x0fnewHoldingUnits\"\x8c\x01\n" +
+	" \x01(\x04R\x0fnewHoldingUnits\"x\n" +
 	"\x0eTradingStation\x124\n" +
 	"\tcommodity\x18\x01 \x01(\x0e2\x16.game.v1.CommodityTypeR\tcommodity\x12\f\n" +
 	"\x01x\x18\x02 \x01(\x02R\x01x\x12\f\n" +
 	"\x01y\x18\x03 \x01(\x02R\x01y\x12\x14\n" +
-	"\x05label\x18\x04 \x01(\tR\x05label\x12\x12\n" +
-	"\x04open\x18\x05 \x01(\bR\x04open\"\xf7\x01\n" +
+	"\x05label\x18\x04 \x01(\tR\x05label\"\xf7\x01\n" +
 	"\x10InitialGameState\x12>\n" +
 	"\x0estation_layout\x18\x01 \x03(\v2\x17.game.v1.TradingStationR\rstationLayout\x12\x17\n" +
 	"\agame_id\x18\x02 \x01(\tR\x06gameId\x12\x1d\n" +
@@ -1363,13 +1354,13 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\fplayer_count\x18\x02 \x01(\x05R\vplayerCount\x12\x1f\n" +
 	"\vmin_players\x18\x03 \x01(\x05R\n" +
 	"minPlayers\x12!\n" +
-	"\fremaining_ms\x18\x04 \x01(\x05R\vremainingMs\"\xd6\a\n" +
+	"\fremaining_ms\x18\x04 \x01(\x05R\vremainingMs\"\xd4\a\n" +
 	"\rServerMessage\x12?\n" +
 	"\x0eworld_snapshot\x18\x01 \x01(\v2\x16.game.v1.WorldSnapshotH\x00R\rworldSnapshot\x129\n" +
 	"\fmarket_state\x18\x02 \x01(\v2\x14.game.v1.MarketStateH\x00R\vmarketState\x12C\n" +
 	"\x10power_up_spawned\x18\x03 \x01(\v2\x17.game.v1.PowerUpSpawnedH\x00R\x0epowerUpSpawned\x12I\n" +
-	"\x12power_up_despawned\x18\x04 \x01(\v2\x19.game.v1.PowerUpDespawnedH\x00R\x10powerUpDespawned\x12T\n" +
-	"\x16random_effect_occurred\x18\x0e \x01(\v2\x1c.game.v1.RandomEventOccurredH\x00R\x14randomEffectOccurred\x12I\n" +
+	"\x12power_up_despawned\x18\x04 \x01(\v2\x19.game.v1.PowerUpDespawnedH\x00R\x10powerUpDespawned\x12R\n" +
+	"\x15random_event_occurred\x18\x0e \x01(\v2\x1c.game.v1.RandomEventOccurredH\x00R\x13randomEventOccurred\x12I\n" +
 	"\x12random_event_ended\x18\x0f \x01(\v2\x19.game.v1.RandomEventEndedH\x00R\x10randomEventEnded\x126\n" +
 	"\vgame_status\x18\n" +
 	" \x01(\v2\x13.game.v1.GameStatusH\x00R\n" +
@@ -1451,7 +1442,7 @@ var file_game_v1_server_message_proto_depIdxs = []int32{
 	6,  // 19: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
 	1,  // 20: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
 	4,  // 21: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
-	2,  // 22: game.v1.ServerMessage.random_effect_occurred:type_name -> game.v1.RandomEventOccurred
+	2,  // 22: game.v1.ServerMessage.random_event_occurred:type_name -> game.v1.RandomEventOccurred
 	3,  // 23: game.v1.ServerMessage.random_event_ended:type_name -> game.v1.RandomEventEnded
 	14, // 24: game.v1.ServerMessage.game_status:type_name -> game.v1.GameStatus
 	11, // 25: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
@@ -1482,7 +1473,7 @@ func file_game_v1_server_message_proto_init() {
 		(*ServerMessage_MarketState)(nil),
 		(*ServerMessage_PowerUpSpawned)(nil),
 		(*ServerMessage_PowerUpDespawned)(nil),
-		(*ServerMessage_RandomEffectOccurred)(nil),
+		(*ServerMessage_RandomEventOccurred)(nil),
 		(*ServerMessage_RandomEventEnded)(nil),
 		(*ServerMessage_GameStatus)(nil),
 		(*ServerMessage_InitialState)(nil),
