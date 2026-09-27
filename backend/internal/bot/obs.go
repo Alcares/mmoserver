@@ -10,7 +10,7 @@ import (
 const (
 	// ObsSize is the length of Encode's output, and the policy network's input width
 	ObsSize  = 11
-	RaySize  = 15.0
+	RaySize  = 15.0 // Chosen empirically
 	RayCount = ActionCount
 )
 
