@@ -12,7 +12,7 @@ import (
 
 const (
 	MoveSpeed        = 15.6 // World units per second
-	DefaultFOVRadius = 25.0 // Float-based vision circle
+	DefaultFOVRadius = 37.5 // Float-based vision circle
 	WorldMinX        = 0.0
 	WorldMaxX        = 250.0
 	WorldMinY        = 0.0

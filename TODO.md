@@ -6,6 +6,19 @@
 # UI
 - [ ] Show player model changing with the amount of money he is holding
 
+# Soundtrack (see docs/royalty_free_assets.md)
+- Add sound effects for following actions
+  - [ ] buy
+  - [ ] sell
+  - [ ] change multiplier
+  - [ ] spawn bot
+  - [ ] player joined
+  - [ ] player left
+  - [ ] station closed
+  - [ ] station opened
+
+  - [ ] bot reached goal
+
 # Gameplay
 - [ ] Add market moving events
 - [ ] Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
