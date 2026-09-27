@@ -186,9 +186,13 @@ func (w *World) randomEvents() {
 		return
 	}
 
-	if e := w.activeEvent; e != nil && w.tick >= e.endTick {
-		w.endEvent()
-	} else if e == nil && w.nextEventTick != 0 && w.tick >= w.nextEventTick {
-		w.startEvent()
+	if len(w.eventTicks) > 0 && w.tick >= w.eventTicks[0] {
+		w.eventTicks = w.eventTicks[1:]
+		w.startNextEvent()
+	}
+	for id, e := range w.activeEvents {
+		if w.tick >= e.endTick {
+			w.endEvent(id)
+		}
 	}
 }

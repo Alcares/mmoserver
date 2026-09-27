@@ -27,11 +27,11 @@ namespace Game.V1 {
             "ChRnYW1lL3YxL2NvbW1vbi5wcm90bxIHZ2FtZS52MSpLCgtQb3dlclVwVHlw",
             "ZRIdChlQT1dFUl9VUF9UWVBFX1VOU1BFQ0lGSUVEEAASHQoZUE9XRVJfVVBf",
             "VFlQRV9GVUxMX1ZJU0lPThABKuEBChhSYW5kb21Db21tb2RpdHlFdmVudFR5",
-            "cGUSJgoiUkFORE9NX0NPTU1PRElUWV9FVkVOVF9VTlNQRUNJRklFRBAAEioK",
-            "JlJBTkRPTV9DT01NT0RJVFlfRVZFTlRfU1VQUExZX1NIT1JUQUdFEAESJwoj",
-            "UkFORE9NX0NPTU1PRElUWV9FVkVOVF9TVVBQTFlfRkxPT0QQAhIlCiFSQU5E",
-            "T01fQ09NTU9ESVRZX0VWRU5UX1NBTkNUSU9ORUQQAxIhCh1SQU5ET01fQ09N",
-            "TU9ESVRZX0VWRU5UX0NMT1NFRBAEKqkBCg1Db21tb2RpdHlUeXBlEhkKFUNP",
+            "cGUSJgoiUkFORE9NX0NPTU1PRElUWV9FVkVOVF9VTlNQRUNJRklFRBAAEiUK",
+            "IVJBTkRPTV9DT01NT0RJVFlfRVZFTlRfU0FOQ1RJT05FRBABEiEKHVJBTkRP",
+            "TV9DT01NT0RJVFlfRVZFTlRfQ0xPU0VEEAISJwojUkFORE9NX0NPTU1PRElU",
+            "WV9FVkVOVF9TVVBQTFlfRkxPT0QQAxIqCiZSQU5ET01fQ09NTU9ESVRZX0VW",
+            "RU5UX1NVUFBMWV9TSE9SVEFHRRAEKqkBCg1Db21tb2RpdHlUeXBlEhkKFUNP",
             "TU1PRElUWV9VTlNQRUNJRklFRBAAEhMKD0NPTU1PRElUWV9XSEVBVBABEhQK",
             "EENPTU1PRElUWV9DT0ZGRUUQAhIVChFDT01NT0RJVFlfTElUSElVTRADEhIK",
             "DkNPTU1PRElUWV9HT0xEEAQSEQoNQ09NTU9ESVRZX09JTBAFEhQKEENPTU1P",
@@ -70,21 +70,21 @@ namespace Game.V1 {
   public enum RandomCommodityEventType {
     [pbr::OriginalName("RANDOM_COMMODITY_EVENT_UNSPECIFIED")] RandomCommodityEventUnspecified = 0,
     /// <summary>
-    /// Prices will go up
-    /// </summary>
-    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE")] RandomCommodityEventSupplyShortage = 1,
-    /// <summary>
-    /// Prices will go down
-    /// </summary>
-    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD")] RandomCommodityEventSupplyFlood = 2,
-    /// <summary>
     /// Exchange will take a cut from trading
     /// </summary>
-    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_SANCTIONED")] RandomCommodityEventSanctioned = 3,
+    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_SANCTIONED")] RandomCommodityEventSanctioned = 1,
     /// <summary>
     /// Trading will be closed for a moment
     /// </summary>
-    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_CLOSED")] RandomCommodityEventClosed = 4,
+    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_CLOSED")] RandomCommodityEventClosed = 2,
+    /// <summary>
+    /// Prices will go down
+    /// </summary>
+    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD")] RandomCommodityEventSupplyFlood = 3,
+    /// <summary>
+    /// Prices will go up
+    /// </summary>
+    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE")] RandomCommodityEventSupplyShortage = 4,
   }
 
   public enum CommodityType {

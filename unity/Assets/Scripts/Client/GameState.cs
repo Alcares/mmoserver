@@ -69,21 +69,33 @@ namespace Game.Client
             ? Mathf.Max(0f, _phaseLeft.Value - (Time.realtimeSinceStartup - _phaseAnchor) * (PlaybackSpeed ?? 1f))
             : (float?)null;
 
-        /// <summary>The random event running now, null between events. The server runs one at a
-        /// time, and only its RandomEventEnded clears it; the countdown below is for display.</summary>
-        public RandomEventOccurred ActiveEvent { get; private set; }
-        // The remaining_ms the event arrived with, in seconds, counted down locally from when it
-        // arrived. realtimeSinceStartup for the same reason as the phase timer.
-        private float _eventTotal;
-        private float _eventStartedAt;
+        /// <summary>A random event the server has started and not yet ended. The server never runs
+        /// two with the same type and commodity at once, so that pair identifies it.</summary>
+        public sealed class ActiveEvent
+        {
+            public RandomEventOccurred Event;
+            // The remaining_ms it arrived with, in seconds, counted down locally from when it
+            // arrived. realtimeSinceStartup for the same reason as the phase timer.
+            public float Total;
+            public float StartedAt;
 
-        /// <summary>Share of the active event still to run, 1 when it starts and 0 when it is due to end.</summary>
-        public float EventLeftFraction => ActiveEvent != null && _eventTotal > 0f
-            ? Mathf.Clamp01(1f - (Time.realtimeSinceStartup - _eventStartedAt) / _eventTotal)
-            : 0f;
+            /// <summary>Share still to run, 1 when it starts and 0 when it is due to end.</summary>
+            public float LeftFraction => Total > 0f
+                ? Mathf.Clamp01(1f - (Time.realtimeSinceStartup - StartedAt) / Total)
+                : 0f;
 
-        /// <summary>Seconds left in the active event, 0 when there is none.</summary>
-        public float EventSecondsLeft => EventLeftFraction * _eventTotal;
+            public float SecondsLeft => LeftFraction * Total;
+        }
+
+        private readonly List<ActiveEvent> _events = new();
+
+        /// <summary>The random events running now, oldest first. Only an event's own RandomEventEnded
+        /// removes it; the countdowns are for display.</summary>
+        public IReadOnlyList<ActiveEvent> ActiveEvents => _events;
+
+        /// <summary>Whether an event of type t is running on commodity c.</summary>
+        public bool EventOn(CommodityType c, RandomCommodityEventType t) =>
+            _events.Exists(a => a.Event.EventType == t && a.Event.Commodity == c);
 
         public event Action PricesChanged;
         /// <summary>Raised when the phase, the player count or the join result changes.</summary>
@@ -162,7 +174,7 @@ namespace Game.Client
             _stations.Clear();
             _stations.AddRange(s.StationLayout);
             TradeRange = s.TradeRange;
-            SetEvent(null, 0f);
+            ClearEvents();
 
             Joined = true;
             GameId = s.GameId;
@@ -214,20 +226,22 @@ namespace Game.Client
             SessionChanged?.Invoke();
         }
 
-        private void OnRandomEventOccurred(RandomEventOccurred e) => SetEvent(e, e.RemainingMs / 1000f);
-
-        // Only the end of the event we are showing clears it, so a stray end can't hide a newer one.
-        private void OnRandomEventEnded(RandomEventEnded e)
+        private void OnRandomEventOccurred(RandomEventOccurred e)
         {
-            if (ActiveEvent != null && ActiveEvent.EventType == e.EventType && ActiveEvent.Commodity == e.Commodity)
-                SetEvent(null, 0f);
+            _events.RemoveAll(a => a.Event.EventType == e.EventType && a.Event.Commodity == e.Commodity);
+            _events.Add(new ActiveEvent { Event = e, Total = e.RemainingMs / 1000f, StartedAt = Time.realtimeSinceStartup });
+            EventChanged?.Invoke();
         }
 
-        private void SetEvent(RandomEventOccurred e, float seconds)
+        private void OnRandomEventEnded(RandomEventEnded e)
         {
-            ActiveEvent = e;
-            _eventTotal = seconds;
-            _eventStartedAt = Time.realtimeSinceStartup;
+            if (_events.RemoveAll(a => a.Event.EventType == e.EventType && a.Event.Commodity == e.Commodity) > 0)
+                EventChanged?.Invoke();
+        }
+
+        private void ClearEvents()
+        {
+            _events.Clear();
             EventChanged?.Invoke();
         }
 
@@ -253,7 +267,7 @@ namespace Game.Client
             _prices.Clear();
             _orderSizes.Clear();
 
-            SetEvent(null, 0f);
+            ClearEvents();
             SessionChanged?.Invoke();
             PricesChanged?.Invoke();
         }

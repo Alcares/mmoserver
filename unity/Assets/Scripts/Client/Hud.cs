@@ -124,7 +124,7 @@ namespace Game.Client
             }
 
             var bannerRect = DrawPhaseBanner(statusRect);
-            var eventRect = DrawEventBar(bannerRect);
+            var eventRect = DrawEventBars(bannerRect);
             var speedRect = DrawPlaybackSpeed(eventRect);
             DrawTrainingProgress(speedRect);
             if (_state.SpectatingOver) DrawSpectatingOver(screenW, screenH);

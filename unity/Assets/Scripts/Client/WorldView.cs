@@ -451,16 +451,14 @@ namespace Game.Client
             shape.sortingOrder = order;
         }
 
-        // Shows what the active event does to each station: an X while it is closed, a % coin
-        // while its trades are taxed.
+        // Shows what the running events do to each station: an X while it is closed, a % coin
+        // while its trades are taxed. Both at once is possible.
         private void RefreshStationEvents()
         {
-            var e = _state.ActiveEvent;
             foreach (var s in _stations)
             {
-                bool here = e != null && e.Commodity == s.Commodity;
-                s.ClosedMark.SetActive(here && e.EventType == RandomCommodityEventType.RandomCommodityEventClosed);
-                s.TaxMark.SetActive(here && e.EventType == RandomCommodityEventType.RandomCommodityEventSanctioned);
+                s.ClosedMark.SetActive(_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventClosed));
+                s.TaxMark.SetActive(_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventSanctioned));
             }
         }
 
@@ -497,7 +495,6 @@ namespace Game.Client
         private void RefreshStationLabels()
         {
             uint units = _input.OrderUnits;
-            var e = _state.ActiveEvent;
             foreach (var s in _stations)
             {
                 // Per-unit prices for the selected order size: E buys that many, Q sells that many.
@@ -506,8 +503,7 @@ namespace Game.Client
                     : s.Name;
 
                 // The quotes stay untaxed; the fee comes on top, so warn before the trade.
-                if (e != null && e.Commodity == s.Commodity
-                    && e.EventType == RandomCommodityEventType.RandomCommodityEventSanctioned)
+                if (_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventSanctioned))
                     text += " +TAX";
                 s.Label.Text = text;
             }

@@ -2,6 +2,7 @@
 - [x] Log trades 
 - [x] Log players joining and leaving
 - [ ] Log game creation and game ending
+- [ ] Log random events starting and ending
 
 # UI
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
@@ -26,7 +27,8 @@
   - [x] Station taxed
   - [ ] Supply flood
   - [ ] Supply shortage
-- [ ] Increase the frequency of random events as game progresses (multiple can be on at the same time)
+- [x] Increase the frequency of random events as game progresses (multiple can be on at the same time)
+- [x] Allow for multiple events at the same time
 - [ ] Add a warning countdown (5s) before next random event
 
 # Training

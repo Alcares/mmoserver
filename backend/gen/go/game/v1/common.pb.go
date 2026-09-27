@@ -71,27 +71,27 @@ type RandomCommodityEventType int32
 
 const (
 	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_UNSPECIFIED     RandomCommodityEventType = 0
-	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE RandomCommodityEventType = 1 // Prices will go up
-	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD    RandomCommodityEventType = 2 // Prices will go down
-	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SANCTIONED      RandomCommodityEventType = 3 // Exchange will take a cut from trading
-	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED          RandomCommodityEventType = 4 // Trading will be closed for a moment
+	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SANCTIONED      RandomCommodityEventType = 1 // Exchange will take a cut from trading
+	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED          RandomCommodityEventType = 2 // Trading will be closed for a moment
+	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD    RandomCommodityEventType = 3 // Prices will go down
+	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE RandomCommodityEventType = 4 // Prices will go up
 )
 
 // Enum value maps for RandomCommodityEventType.
 var (
 	RandomCommodityEventType_name = map[int32]string{
 		0: "RANDOM_COMMODITY_EVENT_UNSPECIFIED",
-		1: "RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE",
-		2: "RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD",
-		3: "RANDOM_COMMODITY_EVENT_SANCTIONED",
-		4: "RANDOM_COMMODITY_EVENT_CLOSED",
+		1: "RANDOM_COMMODITY_EVENT_SANCTIONED",
+		2: "RANDOM_COMMODITY_EVENT_CLOSED",
+		3: "RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD",
+		4: "RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE",
 	}
 	RandomCommodityEventType_value = map[string]int32{
 		"RANDOM_COMMODITY_EVENT_UNSPECIFIED":     0,
-		"RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE": 1,
-		"RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD":    2,
-		"RANDOM_COMMODITY_EVENT_SANCTIONED":      3,
-		"RANDOM_COMMODITY_EVENT_CLOSED":          4,
+		"RANDOM_COMMODITY_EVENT_SANCTIONED":      1,
+		"RANDOM_COMMODITY_EVENT_CLOSED":          2,
+		"RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD":    3,
+		"RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE": 4,
 	}
 )
 
@@ -419,11 +419,11 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x19POWER_UP_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19POWER_UP_TYPE_FULL_VISION\x10\x01*\xe1\x01\n" +
 	"\x18RandomCommodityEventType\x12&\n" +
-	"\"RANDOM_COMMODITY_EVENT_UNSPECIFIED\x10\x00\x12*\n" +
-	"&RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE\x10\x01\x12'\n" +
-	"#RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD\x10\x02\x12%\n" +
-	"!RANDOM_COMMODITY_EVENT_SANCTIONED\x10\x03\x12!\n" +
-	"\x1dRANDOM_COMMODITY_EVENT_CLOSED\x10\x04*\xa9\x01\n" +
+	"\"RANDOM_COMMODITY_EVENT_UNSPECIFIED\x10\x00\x12%\n" +
+	"!RANDOM_COMMODITY_EVENT_SANCTIONED\x10\x01\x12!\n" +
+	"\x1dRANDOM_COMMODITY_EVENT_CLOSED\x10\x02\x12'\n" +
+	"#RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD\x10\x03\x12*\n" +
+	"&RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE\x10\x04*\xa9\x01\n" +
 	"\rCommodityType\x12\x19\n" +
 	"\x15COMMODITY_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fCOMMODITY_WHEAT\x10\x01\x12\x14\n" +

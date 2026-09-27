@@ -11,10 +11,10 @@ enum PowerUpType {
 
 enum RandomCommodityEventType {
   RANDOM_COMMODITY_EVENT_UNSPECIFIED = 0;
-  RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE = 1;  // Prices will go up
-  RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD = 2;     // Prices will go down
-  RANDOM_COMMODITY_EVENT_SANCTIONED = 3;       // Exchange will take a cut from trading
-  RANDOM_COMMODITY_EVENT_CLOSED = 4;           // Trading will be closed for a moment
+  RANDOM_COMMODITY_EVENT_SANCTIONED = 1;       // Exchange will take a cut from trading
+  RANDOM_COMMODITY_EVENT_CLOSED = 2;           // Trading will be closed for a moment
+  RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD = 3;     // Prices will go down
+  RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE = 4;  // Prices will go up
 }
 
 enum CommodityType {

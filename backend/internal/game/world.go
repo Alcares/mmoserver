@@ -24,8 +24,9 @@ type World struct {
 	Stations     []*TradingStation
 	Commodities  map[pb.CommodityType]*CommodityState
 
-	activeEvent   *RandomEvent
-	nextEventTick uint64
+	activeEvents map[uint64]*RandomEvent
+	nextEventID  uint64
+	eventTicks   []uint64 // ticks the round's remaining events start at, soonest first
 
 	// Communication channels
 	movementQueue chan PlayerMovementInput
@@ -49,6 +50,7 @@ func NewWorld(gameID string, cfg WorldConfig) *World {
 		phase:         pb.GamePhase_GAME_PHASE_WAITING,
 		players:       make(map[uint32]*Player),
 		clients:       make(map[uint32]Client),
+		activeEvents:  make(map[uint64]*RandomEvent),
 		Stations:      cfg.Layout(cfg.Rng),
 		Commodities:   NewCommodities(),
 		movementQueue: make(chan PlayerMovementInput, 1024), // Buffered to handle bursts
