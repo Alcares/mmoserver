@@ -1,6 +1,10 @@
 package game
 
-import "math"
+import (
+	"math"
+
+	"github.com/alcares/mmoserver/backend/internal/geometry"
+)
 
 const (
 	CellSize = 10.0 // 10x10 world units per cell
@@ -20,15 +24,15 @@ func (sg *SpatialGrid) Clear() {
 	clear(sg.cellToPlayers)
 }
 
-func (sg *SpatialGrid) Insert(id uint32, pos Vec2f) {
+func (sg *SpatialGrid) Insert(id uint32, pos geometry.Vec2f) {
 	cx := int32(math.Floor(pos.X / CellSize))
 	cy := int32(math.Floor(pos.Y / CellSize))
-	key := CompactCoordinates(cx, cy)
+	key := geometry.CompactCoordinates(cx, cy)
 
 	sg.cellToPlayers[key] = append(sg.cellToPlayers[key], id)
 }
 
-func (sg *SpatialGrid) QueryRadius(pos Vec2f, radius float64) []uint32 {
+func (sg *SpatialGrid) QueryRadius(pos geometry.Vec2f, radius float64) []uint32 {
 	minX := int32(math.Floor((pos.X - radius) / CellSize))
 	maxX := int32(math.Floor((pos.X + radius) / CellSize))
 	minY := int32(math.Floor((pos.Y - radius) / CellSize))
@@ -38,7 +42,7 @@ func (sg *SpatialGrid) QueryRadius(pos Vec2f, radius float64) []uint32 {
 
 	for cx := minX; cx <= maxX; cx++ {
 		for cy := minY; cy <= maxY; cy++ {
-			key := CompactCoordinates(cx, cy)
+			key := geometry.CompactCoordinates(cx, cy)
 			candidates = append(candidates, sg.cellToPlayers[key]...)
 		}
 	}

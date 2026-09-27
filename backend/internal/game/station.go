@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/alcares/mmoserver/backend/internal/geometry"
 )
 
 type TradingStation struct {
 	Label     string
 	Commodity pb.CommodityType
-	Pos       Vec2f
+	Pos       geometry.Vec2f
 }
 
 // ToProto maps internal domain state to wire DTO
@@ -27,7 +28,7 @@ func (t *TradingStation) ToProto() *pb.TradingStation {
 func NewTradingStations(rand *rand.Rand) []*TradingStation {
 	types := GetCommodityTypes()
 
-	positions := ellipsePoints(WorldMaxX/2.0, WorldMaxY/2.0, 25, 16, len(types))
+	positions := geometry.EllipsePoints(WorldMaxX/2.0, WorldMaxY/2.0, 25, 16, len(types))
 	rand.Shuffle(len(positions), func(i, j int) {
 		positions[i], positions[j] = positions[j], positions[i]
 	})
@@ -48,19 +49,19 @@ const (
 // other and from spawn itself. The same rng state always gives the same layout.
 func RandomTradingStations(rng *rand.Rand) []*TradingStation {
 	types := GetCommodityTypes()
-	positions := make([]Vec2f, 0, len(types))
+	positions := make([]geometry.Vec2f, 0, len(types))
 	for len(positions) < len(types) {
 		// sqrt keeps the density uniform over the disc instead of bunching at the centre
 		r := randomLayoutRadius * math.Sqrt(rng.Float64())
 		theta := 2 * math.Pi * rng.Float64()
-		p := Vec2f{X: SpawnPos.X + r*math.Cos(theta), Y: SpawnPos.Y + r*math.Sin(theta)}
+		p := geometry.Vec2f{X: SpawnPos.X + r*math.Cos(theta), Y: SpawnPos.Y + r*math.Sin(theta)}
 
-		if EuclideanDistance(p, SpawnPos) < spawnClearance {
+		if geometry.EuclideanDistance(p, SpawnPos) < spawnClearance {
 			continue
 		}
 		clear := true
 		for _, q := range positions {
-			if EuclideanDistance(p, q) < stationSpacing {
+			if geometry.EuclideanDistance(p, q) < stationSpacing {
 				clear = false
 				break
 			}
@@ -73,7 +74,7 @@ func RandomTradingStations(rng *rand.Rand) []*TradingStation {
 }
 
 // stationsAt pairs each commodity with the position at the same index.
-func stationsAt(types []pb.CommodityType, positions []Vec2f) []*TradingStation {
+func stationsAt(types []pb.CommodityType, positions []geometry.Vec2f) []*TradingStation {
 	stations := make([]*TradingStation, len(types))
 	for i, cType := range types {
 		stations[i] = &TradingStation{

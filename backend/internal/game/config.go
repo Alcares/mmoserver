@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/alcares/mmoserver/backend/internal/bot"
+	"github.com/alcares/mmoserver/backend/internal/geometry"
 )
 
 const (
@@ -38,7 +39,7 @@ var (
 )
 
 // SpawnPos is where every player joins: the centre of the map
-var SpawnPos = Vec2f{X: (WorldMinX + WorldMaxX) / 2, Y: (WorldMinY + WorldMaxY) / 2}
+var SpawnPos = geometry.Vec2f{X: (WorldMinX + WorldMaxX) / 2, Y: (WorldMinY + WorldMaxY) / 2}
 
 // WorldConfig holds one game's settings
 type WorldConfig struct {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/alcares/mmoserver/backend/internal/geometry"
 )
 
 const (
@@ -14,8 +15,8 @@ type Player struct {
 	ID        uint32
 	Name      string
 	IsBot     bool
-	Pos       Vec2f
-	TargetDir Vec2f // Current intended movement heading (-1 to 1)
+	Pos       geometry.Vec2f
+	TargetDir geometry.Vec2f // Current intended movement heading (-1 to 1)
 	Speed     float64
 	// private
 	balance     uint64
@@ -24,7 +25,7 @@ type Player struct {
 	unitsTraded uint64
 }
 
-func NewPlayer(id uint32, pos Vec2f) *Player {
+func NewPlayer(id uint32, pos geometry.Vec2f) *Player {
 	commodityTypes := GetCommodityTypes()
 
 	ownedCommodities := make(map[pb.CommodityType]uint64, len(commodityTypes))

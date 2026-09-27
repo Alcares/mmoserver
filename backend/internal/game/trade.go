@@ -2,6 +2,7 @@ package game
 
 import (
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/alcares/mmoserver/backend/internal/geometry"
 )
 
 // TradeOrder created out of proto TradeRequest
@@ -14,11 +15,11 @@ type TradeOrder struct {
 }
 
 // nearestStation is the closest station within TradeRange of pos, or nil
-func (w *World) nearestStation(pos Vec2f) *TradingStation {
+func (w *World) nearestStation(pos geometry.Vec2f) *TradingStation {
 	var target *TradingStation
 	nearest := TradeRange
 	for _, station := range w.Stations {
-		if d := EuclideanDistance(pos, station.Pos); d <= nearest {
+		if d := geometry.EuclideanDistance(pos, station.Pos); d <= nearest {
 			nearest = d
 			target = station
 		}

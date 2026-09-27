@@ -4,6 +4,7 @@ import (
 	"math"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/alcares/mmoserver/backend/internal/geometry"
 )
 
 func (w *World) Tick(grid *SpatialGrid) {
@@ -97,8 +98,8 @@ func (w *World) stepMovement() {
 func (w *World) pushOutOfStations(player *Player) {
 	const minDist = PlayerRadius + StationRadius
 	for _, station := range w.Stations {
-		if EuclideanDistance(player.Pos, station.Pos) < minDist {
-			player.Pos = projectOntoCircle(station.Pos, player.Pos, minDist)
+		if geometry.EuclideanDistance(player.Pos, station.Pos) < minDist {
+			player.Pos = geometry.ProjectOntoCircle(station.Pos, player.Pos, minDist)
 		}
 	}
 }

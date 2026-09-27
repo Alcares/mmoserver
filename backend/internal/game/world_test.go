@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/alcares/mmoserver/backend/internal/geometry"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -107,7 +108,7 @@ func TestMovementDistanceTraveled(t *testing.T) {
 	targetDistance := 6.0
 	gameTicks := int(math.Round(targetDistance / (MoveSpeed * TickDuration)))
 
-	for _, pos := range []Vec2f{{1.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}} {
+	for _, pos := range []geometry.Vec2f{{X: 1.0, Y: 0.0}, {X: 0.0, Y: 1.0}, {X: 1.0, Y: 1.0}} {
 		startingPos := player.Pos
 		w.EnqueueMovement(PlayerMovementInput{
 			PlayerID: player.ID,

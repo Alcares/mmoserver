@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/alcares/mmoserver/backend/internal/geometry"
 )
 
 // newTradeWorld returns a world with one player standing on the first station
@@ -52,7 +53,7 @@ func TestTradeRejections(t *testing.T) {
 	}{
 		{
 			name:  "not at a station",
-			setup: func(p *Player, _ *TradingStation, _ *CommodityState) { p.Pos = Vec2f{X: 0, Y: 0} },
+			setup: func(p *Player, _ *TradingStation, _ *CommodityState) { p.Pos = geometry.Vec2f{X: 0, Y: 0} },
 			order: func(pool *CommodityState) TradeOrder {
 				return TradeOrder{Intent: pb.OrderIntent_INTENT_BUY, Units: 1, PriceCents: pool.buyPrice(1)}
 			},

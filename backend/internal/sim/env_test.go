@@ -7,6 +7,7 @@ import (
 
 	"github.com/alcares/mmoserver/backend/internal/bot"
 	"github.com/alcares/mmoserver/backend/internal/game"
+	"github.com/alcares/mmoserver/backend/internal/geometry"
 )
 
 // reversal reports whether b points exactly opposite a: what a policy oscillating between two
@@ -98,7 +99,7 @@ func TestEnvLayoutChangesPerSeed(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Compared as sets: the game's layout reshuffles commodities between the same spots
-	spots := make(map[game.Vec2f]bool)
+	spots := make(map[geometry.Vec2f]bool)
 	for _, s := range e.world.Stations {
 		spots[s.Pos] = true
 	}

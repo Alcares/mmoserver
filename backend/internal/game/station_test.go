@@ -3,6 +3,8 @@ package game
 import (
 	"math/rand"
 	"testing"
+
+	"github.com/alcares/mmoserver/backend/internal/geometry"
 )
 
 func TestRandomTradingStationsKeepApart(t *testing.T) {
@@ -20,12 +22,12 @@ func TestRandomTradingStationsKeepApart(t *testing.T) {
 			}
 			seen[s.Label] = true
 
-			d := EuclideanDistance(s.Pos, SpawnPos)
+			d := geometry.EuclideanDistance(s.Pos, SpawnPos)
 			if d > randomLayoutRadius || d < spawnClearance {
 				t.Errorf("seed %d: %s is %.2f from spawn, want between %v and %v", seed, s.Label, d, spawnClearance, randomLayoutRadius)
 			}
 			for _, other := range stations[i+1:] {
-				if gap := EuclideanDistance(s.Pos, other.Pos); gap < stationSpacing {
+				if gap := geometry.EuclideanDistance(s.Pos, other.Pos); gap < stationSpacing {
 					t.Errorf("seed %d: %s and %s are %.2f apart, want at least %v", seed, s.Label, other.Label, gap, stationSpacing)
 				}
 			}
@@ -46,7 +48,7 @@ func TestRandomTradingStationsPerSeed(t *testing.T) {
 		}
 	}
 	// Compared as sets: shuffling commodities between the same spots would still be learnable
-	spots := make(map[Vec2f]bool)
+	spots := make(map[geometry.Vec2f]bool)
 	for _, s := range a {
 		spots[s.Pos] = true
 	}
