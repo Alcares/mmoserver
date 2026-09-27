@@ -21,6 +21,7 @@ namespace Game.Client
         private const int FootprintOrder = -51;
         private const int StationOrder = -50;
         private const int GoalOrder = -49;
+        private const int ClosedOrder = -48;
         private const int LabelOrder = 10000;
 
         [Tooltip("Orthographic half-height the camera starts at, in tiles.")]
@@ -58,6 +59,8 @@ namespace Game.Client
             public string Name;
             public OutlinedLabel Label;
             public GameObject Go;
+            /// <summary>The X drawn over the station while a CLOSED event runs on its commodity.</summary>
+            public GameObject ClosedMark;
         }
 
         private GameClient _client;
@@ -92,6 +95,7 @@ namespace Game.Client
             _client.OnInitialState += HandleInitialState;
             _client.OnEpisode += HandleEpisode;
             _state.PricesChanged += RefreshStationLabels;
+            _state.EventChanged += RefreshStationEvents;
         }
 
         private void OnDisable()
@@ -100,6 +104,7 @@ namespace Game.Client
             _client.OnInitialState -= HandleInitialState;
             _client.OnEpisode -= HandleEpisode;
             _state.PricesChanged -= RefreshStationLabels;
+            _state.EventChanged -= RefreshStationEvents;
         }
 
         private void Update()
@@ -297,10 +302,44 @@ namespace Game.Client
                 }
 
                 var label = OutlinedLabel.Create(go.transform, new Vector2(0f, labelHeight), Color.white, LabelOrder);
-                _stations.Add(new StationView { Commodity = st.Commodity, Name = st.Label, Label = label, Go = go });
+                var closedMark = BuildClosedMark(go.transform, radius);
+                _stations.Add(new StationView { Commodity = st.Commodity, Name = st.Label, Label = label, Go = go, ClosedMark = closedMark });
             }
 
             RefreshStationLabels();
+            RefreshStationEvents();
+        }
+
+        // A big red X across the station's footprint, hidden until its station closes.
+        private static GameObject BuildClosedMark(Transform station, float radius)
+        {
+            var mark = new GameObject("Closed");
+            mark.transform.SetParent(station, false);
+
+            foreach (float angle in new[] { 45f, -45f })
+            {
+                var bar = new GameObject("Bar").AddComponent<SpriteRenderer>();
+                bar.transform.SetParent(mark.transform, false);
+                bar.transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+                bar.transform.localScale = new Vector3(radius * 2.6f, radius * 0.35f, 1f);
+                bar.sprite = Shapes.Square;
+                bar.color = new Color32(0xdc, 0x26, 0x26, 0xe6);
+                bar.sortingOrder = ClosedOrder;
+            }
+
+            mark.SetActive(false);
+            return mark;
+        }
+
+        // Shows what the active event does to each station; only CLOSED marks one today.
+        private void RefreshStationEvents()
+        {
+            var e = _state.ActiveEvent;
+            foreach (var s in _stations)
+            {
+                s.ClosedMark.SetActive(e != null && e.Commodity == s.Commodity
+                    && e.EventType == RandomCommodityEventType.RandomCommodityEventClosed);
+            }
         }
 
         // The spectated bot's goal: a translucent disc the size of the arrival radius, so you can

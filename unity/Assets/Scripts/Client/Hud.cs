@@ -21,7 +21,10 @@ namespace Game.Client
         private const float MultiplierGap = 6f;
         private const float HintWidth = 30f;
 
-        // The boxes stacked at the top centre: status, then the phase banner and its extras.
+        // Gap between the screen edge and the stats panel (top left) and the top stack (top right).
+        private const float EdgeMargin = 16f;
+
+        // The boxes stacked at the top right: status, then the phase banner and its extras.
         private const float TopMinWidth = 320f;
         private const float TopBoxHeight = 28f;
         private const float TopGap = 4f;
@@ -78,6 +81,7 @@ namespace Game.Client
             TradeRejection.InsufficientCash => "Not enough cash",
             TradeRejection.InsufficientUnits => "Not enough units to sell",
             TradeRejection.PoolExhausted => "Market can't fill that order",
+            TradeRejection.StationClosed => "This station is closed",
             _ => "Trade rejected",
         };
 
@@ -102,7 +106,7 @@ namespace Game.Client
 
             var status = StatusText();
             float topWidth = Mathf.Max(TopMinWidth, _slotText.CalcSize(new GUIContent(status)).x + 32f);
-            var statusRect = new Rect((screenW - topWidth) / 2f, 12f, topWidth, TopBoxHeight);
+            var statusRect = new Rect(screenW - topWidth - EdgeMargin, EdgeMargin, topWidth, TopBoxHeight);
             DrawTopBox(statusRect, status, Color.white);
 
             // In the lobby there is no game to draw yet, only the create/join panel.
@@ -113,7 +117,8 @@ namespace Game.Client
             }
 
             var bannerRect = DrawPhaseBanner(statusRect);
-            var speedRect = DrawPlaybackSpeed(bannerRect);
+            var eventRect = DrawEventBar(bannerRect);
+            var speedRect = DrawPlaybackSpeed(eventRect);
             DrawTrainingProgress(speedRect);
             if (_state.SpectatingOver) DrawSpectatingOver(screenW, screenH);
 
@@ -184,7 +189,7 @@ namespace Game.Client
             _rows.Add(("PORTFOLIO", GameState.Money(portfolio), MoneyGreen));
 
             const float rowHeight = 22f, padding = 9f, width = 214f;
-            var rect = new Rect(16f, 16f, width, padding * 2f + _rows.Count * rowHeight);
+            var rect = new Rect(EdgeMargin, EdgeMargin, width, padding * 2f + _rows.Count * rowHeight);
 
             GUI.color = Color.white;
             GUI.DrawTexture(rect, _slotBorder);

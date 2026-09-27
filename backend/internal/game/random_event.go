@@ -19,12 +19,13 @@ type RandomEvent struct {
 func (w *World) chooseEvent() *RandomEvent {
 	rng := w.config.Rng
 	station := w.Stations[rng.Intn(len(w.Stations))]
-	eventType := pb.RandomCommodityEventType(1 + rng.Intn(len(pb.RandomCommodityEventType_name)-1))
+	// Any type but UNSPECIFIED, once the other types have an effect:
+	// eventType := pb.RandomCommodityEventType(1 + rng.Intn(len(pb.RandomCommodityEventType_name)-1))
 
 	return &RandomEvent{
 		endTick:   w.tick + ticks(RandomEventDuration),
 		commodity: station.Commodity,
-		eventType: eventType,
+		eventType: pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED,
 	}
 }
 
@@ -35,8 +36,8 @@ func (w *World) startEvent() {
 	remainingMs := int32(float64(e.endTick-w.tick) * TickDuration * 1000)
 
 	w.sendToAll(&pb.ServerMessage{
-		Msg: &pb.ServerMessage_RandomEffectOccurred{
-			RandomEffectOccurred: &pb.RandomEventOccurred{
+		Msg: &pb.ServerMessage_RandomEventOccurred{
+			RandomEventOccurred: &pb.RandomEventOccurred{
 				EventType:   e.eventType,
 				Commodity:   e.commodity,
 				RemainingMs: remainingMs,

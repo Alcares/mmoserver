@@ -25,6 +25,8 @@ namespace Game.Networking
         public event Action<TradeReceipt> OnTradeReceipt;
         public event Action<PowerUpSpawned> OnPowerUpSpawned;
         public event Action<PowerUpDespawned> OnPowerUpDespawned;
+        public event Action<RandomEventOccurred> OnRandomEventOccurred;
+        public event Action<RandomEventEnded> OnRandomEventEnded;
         public event Action<GameStatus> OnGameStatus;
         public event Action<JoinRejected> OnJoinRejected;
         public event Action<GameOver> OnGameOver;
@@ -101,6 +103,12 @@ namespace Game.Networking
                     break;
                 case ServerMessage.MsgOneofCase.PowerUpDespawned:
                     OnPowerUpDespawned?.Invoke(message.PowerUpDespawned);
+                    break;
+                case ServerMessage.MsgOneofCase.RandomEventOccurred:
+                    OnRandomEventOccurred?.Invoke(message.RandomEventOccurred);
+                    break;
+                case ServerMessage.MsgOneofCase.RandomEventEnded:
+                    OnRandomEventEnded?.Invoke(message.RandomEventEnded);
                     break;
                 case ServerMessage.MsgOneofCase.GameStatus:
                     OnGameStatus?.Invoke(message.GameStatus);
