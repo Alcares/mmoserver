@@ -13,6 +13,9 @@ namespace Game.Client
         [SerializeField] private AudioClip gameTrack;
         [Tooltip("Looped while spectating training, until the last snapshot has played.")]
         [SerializeField] private AudioClip spectatorTrack;
+        [Tooltip("Both tracks play at this volume, 0 to 1.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float volume = 0.5f;
 
         private GameState _state;
         private AudioSource _source;
@@ -22,6 +25,7 @@ namespace Game.Client
             _state = GetComponent<GameState>();
             _source = gameObject.AddComponent<AudioSource>();
             _source.loop = true;
+            _source.volume = volume;
             _source.playOnAwake = false;
         }
 
