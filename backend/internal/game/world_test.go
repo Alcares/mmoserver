@@ -105,10 +105,12 @@ func TestMovementDistanceTraveled(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	targetDistance := 6.0
-	gameTicks := int(math.Round(targetDistance / (MoveSpeed * TickDuration)))
+	const gameTicks = 10
+	targetDistance := gameTicks * MoveSpeed * TickDuration
 
 	for _, pos := range []geometry.Vec2f{{X: 1.0, Y: 0.0}, {X: 0.0, Y: 1.0}, {X: 1.0, Y: 1.0}} {
+		// Each leg from the spawn, so the walks don't add up into a station
+		player.Pos = SpawnPos
 		startingPos := player.Pos
 		w.EnqueueMovement(PlayerMovementInput{
 			PlayerID: player.ID,
