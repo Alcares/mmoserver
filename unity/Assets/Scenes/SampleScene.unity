@@ -379,6 +379,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07eeb8c3ad654b61b20816ea6871d051, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Client.Music
+  lobbyTrack: {fileID: 8300000, guid: 862d09e75bda403e8e80d8a7eab904fd, type: 3}
+  countdownTrack: {fileID: 8300000, guid: bd3dffd73a464d699011ca843b5f3baa, type: 3}
   gameTrack: {fileID: 8300000, guid: 21c24e8e194c42eea3dfbb39ce3f124e, type: 3}
   spectatorTrack: {fileID: 8300000, guid: 29546eb9d7864134bf8c2b9afdec8496, type: 3}
 --- !u!1 &619394800
