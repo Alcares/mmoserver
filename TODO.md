@@ -11,7 +11,7 @@
 - [ ] Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
 - [ ] Add random events (trading stations swapping places)
 
-
 # Training
+- [ ] Train on GPU instead of CPU 
 - [ ] Output a graph showing how to training progressed (success rate vs the success rate of the scripted policy)
 - [ ] Train a trading model (BOT_TRAINING.md)
