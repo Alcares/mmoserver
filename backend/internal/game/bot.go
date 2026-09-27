@@ -10,10 +10,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// episodeTicks bounds how long a bot chases one goal: 60s at 20Hz. Liveness, not fairness - a
+// episodeTicks bounds how long a bot chases one goal: 30s at 20Hz. Liveness, not fairness - a
 // policy that cannot reach the station it picked would otherwise walk at it for the whole round,
 // and giving up on a goal is the only recovery a bot has.
-const episodeTicks = 1200
+const episodeTicks = 600
 
 // BotClient is a Client driven by a policy instead of a socket.
 type BotClient struct {

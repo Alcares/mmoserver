@@ -14,9 +14,9 @@ const (
 	MoveSpeed        = 12.0 // World units per second
 	DefaultFOVRadius = 25.0 // Float-based vision circle
 	WorldMinX        = 0.0
-	WorldMaxX        = 500.0
+	WorldMaxX        = 250.0
 	WorldMinY        = 0.0
-	WorldMaxY        = 500.0
+	WorldMaxY        = 250.0
 	TickDuration     = 0.05 // 50ms = 20Hz
 	TradeRange       = 4.0  // Max distance to a station a player can trade from. Have to be kept in sync with its mirrors
 	PlayerRadius     = 1.0

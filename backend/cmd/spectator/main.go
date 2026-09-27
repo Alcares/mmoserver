@@ -295,8 +295,8 @@ const (
 	DefaultAddr      = ":8080"                 // beside the game server's :8080
 	DefaultSnapshots = "rl-training/snapshots" // where train.py exports
 	DefaultSeed      = 0
-	DefaultEpisodes  = 1
-	DefaultMaxTicks  = 700 // 35s; the furthest goal takes ~580 ticks
+	DefaultEpisodes  = 5
+	DefaultMaxTicks  = 350
 )
 
 type Config struct {

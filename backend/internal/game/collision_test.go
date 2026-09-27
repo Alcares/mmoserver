@@ -59,7 +59,7 @@ func assertOutsideStations(t *testing.T, w *World, player *Player, tick int) {
 }
 
 func TestCollisionHeadOnStopsAtContact(t *testing.T) {
-	station := geometry.Vec2f{X: 300, Y: 250}
+	station := geometry.Vec2f{X: 150, Y: 125}
 	w, player := oneStation(t, station)
 	player.Pos = geometry.Vec2f{X: station.X - contact - 5, Y: station.Y}
 
@@ -73,7 +73,7 @@ func TestCollisionHeadOnStopsAtContact(t *testing.T) {
 }
 
 func TestCollisionOnCentrePushesNorth(t *testing.T) {
-	station := geometry.Vec2f{X: 300, Y: 250}
+	station := geometry.Vec2f{X: 150, Y: 125}
 	w, player := oneStation(t, station)
 	player.Pos = station // no direction from the centre to push along
 
@@ -86,7 +86,7 @@ func TestCollisionOnCentrePushesNorth(t *testing.T) {
 }
 
 func TestCollisionGlancingSlidesPast(t *testing.T) {
-	station := geometry.Vec2f{X: 300, Y: 250}
+	station := geometry.Vec2f{X: 150, Y: 125}
 	w, player := oneStation(t, station)
 	// Heading east, a third of the contact distance south of the centre line: a hit, not a miss
 	start := geometry.Vec2f{X: station.X - contact - 5, Y: station.Y + contact/3}
