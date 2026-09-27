@@ -68,8 +68,10 @@ baseline:
 	uv run --project $(RL_DIR) python -m rl_training.baseline $(ARGS)
 
 # Trains and evaluates; both spawn their own sim, so there is no stale binary to forget about.
+# Clears the previous run's snapshots first, so the spectator never mixes two runs.
 # TensorBoard reads rl-training/runs.
 train:
+	rm -rf $(RL_DIR)/snapshots
 	uv run --project $(RL_DIR) python -m rl_training.train $(ARGS)
 
 clean:
