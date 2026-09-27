@@ -10,8 +10,6 @@ Run `python -m rl_training.baseline` first. If scripted does not measure ~1.05 t
 wrapper, fix that before reading anything into a training curve.
 """
 
-from __future__ import annotations
-
 import argparse
 import tempfile
 from pathlib import Path
@@ -117,7 +115,7 @@ class ExportSnapshots(BaseCallback):
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--envs", type=int, default=128)
-    parser.add_argument("--timesteps", type=int, default=2_000_000)
+    parser.add_argument("--timesteps", type=int, default=1_000_000)
     parser.add_argument("--n-steps", type=int, default=128, help="per env, so the rollout is envs*n_steps")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="auto")

@@ -212,8 +212,8 @@ instead. `InitialGameState` now carries `trade_range`, `player_radius` and `stat
 and the Unity client and `bot.Observer` read them from there; see `SHARED_CONSTANTS.md`. What
 remains is checked in Go:
 `TestJoinSendsStationsBeforeSnapshots` that the values go out, and `sim/env_test.go` that a
-state the env calls arrived is one where `ScriptedPolicy`, stopping at the range it received,
-returns `ActionStop`.
+state the env calls arrived is one where `Observation.Arrived`, judged by the range the bot
+received, is true.
 
 ---
 

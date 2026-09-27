@@ -75,9 +75,15 @@ covers every bearing and distance rather than the six the fixed layout produces.
 
 ### Actions
 
-9 discrete actions: stop plus 8 directions, matching what a keyboard can send. The table
+8 discrete actions, the 8 directions a keyboard can send, clockwise from north. The table
 mapping action index → `(vx, vy)` is defined **once, in Go**. Python only ever sees integers
-0–8.
+0–7.
+
+There is no stop. It was never right in this task, since the episode ends on arrival, but a
+trained policy still rated it highest in a few spots near stations. Stop is the only action
+that leaves the next observation identical, so under argmax one such spot froze the bot until
+truncation, about 1% of episodes with 40 stations. Standing still belongs to whatever decides
+the bot has arrived (`Observation.Arrived`), not to the steering policy.
 
 ### Episode end
 
@@ -221,7 +227,7 @@ a trail of snapshots, and a separate binary replays them afterwards as a recap o
 learned.
 
 - [x] **16. Snapshot export.** `train.py`'s `ExportSnapshots` callback writes
-      `rl-training/snapshots/policy_<timesteps>.pb` (and `.zip`) about `EXPORTS_PER_RUN` (50)
+      `rl-training/snapshots/policy_<timesteps>.pb` (and `.zip`) about `EXPORTS_PER_RUN`
       times per run, on rollout boundaries right after PPO updates the weights, and overwrites `policy.pb` each
       time. The number in the name orders the snapshots and says how far into training each one
       was taken.
@@ -346,6 +352,52 @@ Settled before the steps:
 
 Open for this stage: whether 10 units is enough ray range at 12 u/s, 8 rays versus 16, and
 per-tick station positions once stations move.
+
+### Stage 1c: difficult terrain
+
+With 40 stations per training layout the policy reaches 99.6% of goals against scripted's
+95.0%. Every remaining failure is the same: the goal sits just behind a station or inside a
+cluster, the rays towards it read 0, and the bot alternates between the two directions either
+side of the goal (N/NW, W/SW) at about 50/50, pushing into the station and sliding back until
+truncation. Getting out means first walking away from the goal. With 6 stations such pockets
+almost never formed; at 40, stations 7 apart make short walls with 1-unit gaps. The aim is a
+policy that learns to walk around them, not a planner that does it instead.
+
+Why the current policy can't learn it:
+
+- **The reward punishes detours.** Progress is measured in straight-line distance, so every
+  tick spent going around costs about −1. The shaping itself points into the trap.
+- **No memory.** Having stepped back, the next observation says "the goal is that way" again,
+  so it turns straight back in. A detour needs commitment the observation doesn't carry.
+- **Coarse sight.** 8 rays reach `RaySize` (15 units) but are 45° apart, so 5 units out they
+  are already ~4 units apart: a 1-unit gap between stations falls between them, and they can't
+  tell which side of a cluster is shorter.
+- **Rare.** 0.4% of episodes is too little signal to learn from.
+
+In this order, each measured before the next is started. 29 and 30 change only the env, not the
+observation contract, so no Go runtime work and no retrain for a new format.
+
+- [ ] **29. Walking-distance shaping.** Measure progress in walking distance, the shortest path
+      to the goal around stations, instead of straight-line distance. The env knows the whole
+      layout, so it builds the distance map once per episode, outward from the goal on a grid.
+      Going around then pays every tick and pushing into a station pays nothing. Shaping by a
+      potential leaves the optimal policy unchanged; it only changes how easily PPO finds it.
+      `optimalSteps` switches to walking distance too, so steps/optimal stops blaming the bot
+      for a straight line that was never possible. The grid has to be fine, ~0.25 units: gaps
+      between stations are 1 unit, and a coarse grid closes gaps a player fits through.
+- [ ] **30. Hard-case curriculum.** For a share of episodes, ~30%, place the goal in a station's
+      shadow as seen from spawn: just behind a station or inside a cluster. That turns a 0.4%
+      case into a routine one. Keep a fixed set of such seeds as a separate evaluation, because
+      the average success rate will always hide them.
+- [ ] **31. Finer sight, only if 29–30 fall short.** More rays first, 16 or more; the range is
+      already `RaySize` (15). A local occupancy grid around the bot (~16×16 cells) shows the
+      whole shape of nearby clusters, but it's a much bigger observation and suits a different
+      network design. Either changes `ObsSize` and needs a retrain. So does changing `RaySize`
+      alone, though nothing catches it: the ray inputs change meaning while `ObsSize` stays the
+      same, so an old policy loads and misreads them.
+- [ ] **32. Memory, only if it still flip-flops mid-detour.** Previous observations or actions
+      stacked into the input keep the MLP, so Go only has to keep a short history.
+      `RecurrentPPO` (sb3-contrib) is the heavier option: Go would have to run an LSTM.
 
 ### Stage 2: trading
 

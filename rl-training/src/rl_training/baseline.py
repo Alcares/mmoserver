@@ -5,10 +5,10 @@ The scripted baseline is the point of this file. Go's ScriptedPolicy terminates 
 does not reproduce that, the wrapper is wrong, and it is far cheaper to learn that here than
 from a PPO run that fails to converge for unrelated reasons.
 
-The policy below picks a heading and never stops. Go's stops inside TradeRange, but the episode
-has already terminated by then, so the two agree step for step - and this way Python needs no
-copy of TradeRange or the world size. The duplicated arctan2 is deliberate: an independent
-second implementation is what makes the comparison worth running.
+The policy below picks a heading every step, as Go's does; neither has a stop action, and the
+episode terminates on arrival, so Python needs no copy of TradeRange or the world size. The
+duplicated arctan2 is deliberate: an independent second implementation is what makes the
+comparison worth running.
 """
 
 import argparse
@@ -22,17 +22,17 @@ from rl_training.env import SimVecEnv, launch_sim
 
 def scripted(observations: np.ndarray, _rng: np.random.Generator) -> np.ndarray:
     """The nearest of the 8 directions, as bot.ScriptedPolicy computes it."""
-    dx, dy = observations[:, 2], observations[:, 3]
+    dx, dy = observations[:, 0], observations[:, 1]
     # arctan2(dx, -dy) is the bearing clockwise from north, the order the Action constants are
-    # declared in, so the sector is the action with ActionStop taken off.
+    # declared in, so the sector is the action.
     sector = np.rint(np.arctan2(dx, -dy) / (np.pi / 4)).astype(np.int64)
-    return (sector % 8) + 1
+    return sector % 8
 
 
 def uniform_random(action_count: int):
     """The floor any trained policy has to clear.
 
-    Takes the action count from the env rather than hardcoding 9, which is the number
+    Takes the action count from the env rather than hardcoding 8, which is the number
     ResetResponse.action_count exists to supply: Stage 2 appends buy and sell actions after the
     8 directions, and a hardcoded bound would quietly keep sampling movement only.
     """

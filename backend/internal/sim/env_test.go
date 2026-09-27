@@ -13,16 +13,13 @@ import (
 // reversal reports whether b points exactly opposite a: what a policy oscillating between two
 // directions near the goal would look like, instead of converging on it.
 func reversal(a, b bot.Action) bool {
-	if a == bot.ActionStop || b == bot.ActionStop {
-		return false
-	}
 	avx, avy := a.Vector()
 	bvx, bvy := b.Vector()
 	return avx == -bvx && avy == -bvy
 }
 
 // walkToGoal runs one episode under the scripted policy and returns the last result and the
-// number of steps taken. It is the best route the 9 actions allow, so it is also the reference
+// number of steps taken. It is the best route the 8 directions allow, so it is also the reference
 // every trained policy is measured against.
 func walkToGoal(t testing.TB, e *Env, seed int64) (StepResult, int) {
 	t.Helper()
@@ -32,11 +29,11 @@ func walkToGoal(t testing.TB, e *Env, seed int64) (StepResult, int) {
 	}
 
 	var policy bot.ScriptedPolicy
-	prev := bot.ActionStop
+	var prev bot.Action
 
 	for step := 1; ; step++ {
 		action := policy.Act(obs)
-		if reversal(prev, action) {
+		if step > 1 && reversal(prev, action) {
 			t.Fatalf("seed %d, step %d: %v reversed into %v, %.2f from the goal",
 				seed, step, prev, action, obs.GoalDist)
 		}
@@ -46,10 +43,10 @@ func walkToGoal(t testing.TB, e *Env, seed int64) (StepResult, int) {
 			t.Fatal(err)
 		}
 		if res.Terminated || res.Truncated {
-			// The policy stops at the trade range it read from InitialGameState, the env at
-			// game.TradeRange. If the bot would keep walking from a state the env calls
-			// arrived, the value on the wire is not the one the server uses.
-			if res.Terminated && policy.Act(res.Obs) != bot.ActionStop {
+			// The bot judges arrival by the trade range it read from InitialGameState, the env
+			// by game.TradeRange. If the bot would not call arrived a state the env does, the
+			// value on the wire is not the one the server uses.
+			if res.Terminated && !res.Obs.Arrived() {
 				t.Errorf("seed %d: arrived %.2f from the goal but the policy would keep going; "+
 					"the trade range the bot received disagrees with game.TradeRange", seed, res.Obs.GoalDist)
 			}
@@ -128,26 +125,32 @@ func TestEnvSameSeedSameStart(t *testing.T) {
 	}
 }
 
-func TestEnvTruncatesWhenStandingStill(t *testing.T) {
+// There is no stop action, so the bot heads straight away from the goal until the map edge
+// pins it: it never gets any closer, which is what a policy that never arrives looks like.
+func TestEnvTruncatesWhenWalkingAway(t *testing.T) {
 	e := NewEnv()
-	if _, err := e.Reset(1); err != nil {
+	obs, err := e.Reset(1)
+	if err != nil {
 		t.Fatal(err)
 	}
 
+	var policy bot.ScriptedPolicy
+	away := func(obs *bot.Observation) bot.Action { return (policy.Act(obs) + 4) % bot.Action(bot.ActionCount) }
 	for step := 1; step <= MaxSteps; step++ {
-		res, err := e.Step(bot.ActionStop)
+		res, err := e.Step(away(obs))
 		if err != nil {
 			t.Fatal(err)
 		}
 		if res.Terminated {
-			t.Fatal("terminated without moving; spawn is inside TradeRange of the goal")
+			t.Fatal("terminated while walking away; spawn is inside TradeRange of the goal")
 		}
 		if res.Truncated != (step == MaxSteps) {
 			t.Fatalf("step %d: truncated = %v", step, res.Truncated)
 		}
+		obs = res.Obs
 	}
 
-	if _, err := e.Step(bot.ActionStop); err == nil {
+	if _, err := e.Step(away(obs)); err == nil {
 		t.Error("Step after the episode ended: want error")
 	}
 }

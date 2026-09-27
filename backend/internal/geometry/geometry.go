@@ -1,6 +1,9 @@
 package geometry
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
 type Vec2f struct {
 	X float64
@@ -26,21 +29,36 @@ func EllipsePoints(centerX, centerY, radiusX, radiusY float64, count int) []Vec2
 }
 
 func EuclideanDistance(from, to Vec2f) float64 {
-	return math.Sqrt(math.Pow(math.Abs(from.X-to.X), 2) + math.Pow(math.Abs(from.Y-to.Y), 2))
+	return math.Hypot(from.X-to.X, from.Y-to.Y)
+}
+
+// Normalize returns v scaled to length 1. The zero vector has no direction and comes back as is.
+func Normalize(v Vec2f) Vec2f {
+	length := math.Hypot(v.X, v.Y)
+	if length == 0 {
+		return v
+	}
+	return Vec2f{X: v.X / length, Y: v.Y / length}
+}
+
+// RandomPointInDisc returns a point uniformly distributed over the disc of radius around center.
+func RandomPointInDisc(rng *rand.Rand, center Vec2f, radius float64) Vec2f {
+	// sqrt keeps the density uniform over the disc instead of bunching at the centre
+	r := radius * math.Sqrt(rng.Float64())
+	theta := 2 * math.Pi * rng.Float64()
+	return Vec2f{X: center.X + r*math.Cos(theta), Y: center.Y + r*math.Sin(theta)}
 }
 
 // ProjectOntoCircle returns the point on the circle around center that is closest to point: in the
 // same direction from center as point, exactly radius away. It moves point outward or inward alike.
 func ProjectOntoCircle(center, point Vec2f, radius float64) Vec2f {
-	dx := point.X - center.X
-	dy := point.Y - center.Y
-	dist := EuclideanDistance(point, center)
-	if dist == 0 { // exactly on the centre: no direction to go in, so pick north
-		dx, dy, dist = 0, -1, 1
+	direction := Normalize(Vec2f{X: point.X - center.X, Y: point.Y - center.Y})
+	if direction == (Vec2f{}) { // exactly on the centre: no direction to go in, so pick north
+		direction = Vec2f{X: 0, Y: -1}
 	}
 	return Vec2f{
-		X: center.X + dx/dist*radius,
-		Y: center.Y + dy/dist*radius,
+		X: center.X + direction.X*radius,
+		Y: center.Y + direction.Y*radius,
 	}
 }
 

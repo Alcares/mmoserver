@@ -38,23 +38,26 @@ func NewTradingStations(rand *rand.Rand) []*TradingStation {
 
 const (
 	// Random stations land within this distance of spawn, the area the bot always crosses first.
-	randomLayoutRadius = 40.0
+	baseLayoutRadius = 40.0
 	// Room between spawn and a station, so no player joins touching one.
 	spawnClearance = PlayerRadius + StationRadius + 2
 	// Centre-to-centre distance that leaves a player room to pass between two stations.
 	stationSpacing = 2*(PlayerRadius+StationRadius) + 1
 )
 
-// RandomTradingStations places one station per commodity at random around spawn, apart from each
-// other and from spawn itself. The same rng state always gives the same layout.
-func RandomTradingStations(rng *rand.Rand) []*TradingStation {
-	types := GetCommodityTypes()
-	positions := make([]geometry.Vec2f, 0, len(types))
-	for len(positions) < len(types) {
-		// sqrt keeps the density uniform over the disc instead of bunching at the centre
-		r := randomLayoutRadius * math.Sqrt(rng.Float64())
-		theta := 2 * math.Pi * rng.Float64()
-		p := geometry.Vec2f{X: SpawnPos.X + r*math.Cos(theta), Y: SpawnPos.Y + r*math.Sin(theta)}
+// RandomTradingStations places count stations at random around spawn, apart from each other and
+// from spawn itself, cycling through the commodities. The same rng state always gives the same layout.
+func RandomTradingStations(rng *rand.Rand, count int) []*TradingStation {
+	commodities := GetCommodityTypes()
+	types := make([]pb.CommodityType, count)
+	for i := range types {
+		types[i] = commodities[i%len(commodities)]
+	}
+
+	radius := randomLayoutRadius(count)
+	positions := make([]geometry.Vec2f, 0, count)
+	for len(positions) < count {
+		p := geometry.RandomPointInDisc(rng, SpawnPos, radius)
 
 		if geometry.EuclideanDistance(p, SpawnPos) < spawnClearance {
 			continue
@@ -71,6 +74,12 @@ func RandomTradingStations(rng *rand.Rand) []*TradingStation {
 		}
 	}
 	return stationsAt(types, positions)
+}
+
+// randomLayoutRadius grows the disc with the station count, keeping the density of one station
+// per commodity within baseLayoutRadius.
+func randomLayoutRadius(count int) float64 {
+	return baseLayoutRadius * math.Sqrt(float64(count)/float64(len(GetCommodityTypes())))
 }
 
 // stationsAt pairs each commodity with the position at the same index.

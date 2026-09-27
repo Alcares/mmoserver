@@ -13,8 +13,12 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// MaxSteps ends an episode as truncated: 1200 ticks = 60s of game time
-const MaxSteps = 1200
+// MaxSteps ends an episode as truncated: 600 ticks = 30s of game time
+const MaxSteps = 600
+
+// layoutStations is how many stations a random layout places: far more than the server's one
+// per commodity, so stations get in the way often enough for the rays to matter
+const layoutStations = 40
 
 // Reward shaping
 const (
@@ -71,7 +75,9 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 
 	layout := e.Layout
 	if layout == nil {
-		layout = game.RandomTradingStations
+		layout = func(rng *rand.Rand) []*game.TradingStation {
+			return game.RandomTradingStations(rng, layoutStations)
+		}
 	}
 
 	e.rng = rand.New(rand.NewSource(seed))

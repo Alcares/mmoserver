@@ -60,25 +60,29 @@ func TestScriptedPolicySectorBoundaries(t *testing.T) {
 	}
 }
 
-func TestScriptedPolicyStopsInRange(t *testing.T) {
+func TestObservationArrived(t *testing.T) {
 	for _, obs := range []*Observation{
 		goalAt(0, 0),              // standing on the station
 		goalAt(testTradeRange, 0), // exactly at the range
 		goalAt(testTradeRange/2, 0),
 	} {
-		if got := (ScriptedPolicy{}).Act(obs); got != ActionStop {
-			t.Errorf("Act at distance %v = %v, want %v", obs.GoalDist, got, ActionStop)
+		if !obs.Arrived() {
+			t.Errorf("Arrived at distance %v = false, want true", obs.GoalDist)
 		}
 	}
 
-	// Just outside, it commits to a direction instead
-	if got := (ScriptedPolicy{}).Act(goalAt(0, -(testTradeRange + 0.1))); got != ActionN {
+	// Just outside, it has not arrived and the policy commits to a direction
+	obs := goalAt(0, -(testTradeRange + 0.1))
+	if obs.Arrived() {
+		t.Errorf("Arrived at distance %v = true, want false", obs.GoalDist)
+	}
+	if got := (ScriptedPolicy{}).Act(obs); got != ActionN {
 		t.Errorf("Act just outside the trade range = %v, want %v", got, ActionN)
 	}
 }
 
 func TestActionValid(t *testing.T) {
-	for a := ActionStop; a <= ActionNW; a++ {
+	for a := ActionN; a <= ActionNW; a++ {
 		if !a.Valid() {
 			t.Errorf("Valid(%v) = false, want true", a)
 		}
