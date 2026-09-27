@@ -10,6 +10,11 @@ Multiplayer trading game. You walk around a map between trading stations and buy
 ## Setup
 Everything goes through the `Makefile`, read it
 
+### Git LFS
+The client's audio is in git LFS, so install it before you clone (`sudo pacman -S git-lfs`, then `git lfs install`).
+Without it you get tiny pointer files instead of the audio, unity can't import them and the client has no music.
+Already cloned without it? `git lfs install && git lfs pull`.
+
 ### Train the bots
 Needs `uv`. First time do `make proto-py` or `make-proto`, then
 ```
