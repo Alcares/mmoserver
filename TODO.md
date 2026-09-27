@@ -4,7 +4,7 @@
 - [ ] Log game creation and game ending
 
 # UI
-- [ ] Show player model changing with the amount of money he is holding
+- [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
 
 # Soundtrack (see docs/royalty_free_assets.md)
 - Add sound effects for following actions
@@ -20,16 +20,19 @@
   - [ ] bot reached goal
 
 # Gameplay
-- [ ] Add market moving events
 - [ ] Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
 - Add random events
   - [x] Station closed
   - [x] Station taxed
   - [ ] Supply flood
   - [ ] Supply shortage
-- Increase the frequency of random events as game progresses (multiple can be on at the same time)
+- [ ] Increase the frequency of random events as game progresses (multiple can be on at the same time)
+- [ ] Add a warning countdown (5s) before next random event
 
 # Training
 - [ ] Train on GPU instead of CPU 
 - [ ] Output a graph showing how to training progressed (success rate vs the success rate of the scripted policy)
 - [ ] Train a trading model (BOT_TRAINING.md)
+
+# Accessibility
+- [ ] Make the game renderable on web
