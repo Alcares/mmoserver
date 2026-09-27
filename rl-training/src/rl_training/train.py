@@ -26,7 +26,7 @@ from rl_training.export import export
 
 RL_DIR = REPO_ROOT / "rl-training"
 
-EXPORTS_PER_RUN = 50  # export is a model snapshot mid-training
+EXPORTS_PER_RUN = 20  # export is a model snapshot mid-training
 
 
 class EpisodeMetrics(BaseCallback):
@@ -64,9 +64,8 @@ class ExportSnapshots(BaseCallback):
 
     The unit is rollouts because that is the only rate that means anything: PPO mutates the
     policy once per rollout and then runs its gradient epochs, so two exports inside one rollout
-    are byte-identical files. A 2M run at the defaults is 128*128 = 16,384 timesteps per rollout,
-    so 122 rollouts total - which is why EXPORTS_PER_RUN of 100 rounds to every rollout here and
-    only starts thinning out on longer runs.
+    are byte-identical files. A 1M run at the defaults is 128*128 = 16,384 timesteps per rollout,
+    so 61 rollouts total - which is why EXPORTS_PER_RUN of 20 rounds to every third rollout here.
 
     `_on_rollout_start`, not `_on_step`: `_on_step` fires once per *vectorised* step, so any
     frequency set there is silently multiplied by the env count, and both it and
@@ -75,7 +74,7 @@ class ExportSnapshots(BaseCallback):
 
     Each firing writes three files from one set of weights, so none of them can drift: a
     numbered `.pb` into the archive, the fixed `policy.pb` a live spectator watches, and a
-    numbered `.zip`. The `.zip` is not for Go at all - it is the opponent pool self-play will
+    numbered `.zip`. The untrained weights at timestep 0 go to the archive only. The `.zip` is not for Go at all - it is the opponent pool self-play will
     want later (BOT_TRAINING.md "Self-play"), which is why the archive is kept rather than
     overwritten.
     """
@@ -89,22 +88,27 @@ class ExportSnapshots(BaseCallback):
 
     def _on_rollout_start(self) -> None:
         # Fires before the first rollout too, when no update has happened yet and the weights
-        # are still the initialisation.
+        # are still the initialisation. Those go to the archive only, so a recap opens on the bot
+        # wandering before it learnt anything, while policy.pb keeps what a live server plays.
         if self.model.num_timesteps == 0:
+            self._archive()
             return
 
         self._rollouts += 1
         if self._rollouts % self.every:
             return
 
+        self._archive()
+        # The same weights as the numbered .pb: the archive is what bot.SnapshotPolicy plays
+        # through in order, the fixed path what bot.ReloadingPolicy watches for the newest.
+        # Which a spectator uses is the server's choice, not ours.
+        export(self.model, self.policy_path)
+
+    def _archive(self) -> None:
         self.archive.mkdir(parents=True, exist_ok=True)
         steps = self.model.num_timesteps
         self.model.save(self.archive / f"policy_{steps}.zip")
-        # Both the numbered .pb and the fixed one, from the same weights: the archive is what
-        # bot.SnapshotPolicy plays through in order, the fixed path what bot.ReloadingPolicy
-        # watches for the newest. Which a spectator uses is the server's choice, not ours.
         export(self.model, self.archive / f"policy_{steps}.pb")
-        export(self.model, self.policy_path)
 
     def _on_step(self) -> bool:
         return True
