@@ -9,6 +9,14 @@ enum PowerUpType {
   POWER_UP_TYPE_FULL_VISION = 1;
 }
 
+enum RandomCommodityEventType {
+  RANDOM_COMMODITY_EVENT_UNSPECIFIED = 0;
+  RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE = 1;  // Prices will go up
+  RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD = 2;     // Prices will go down
+  RANDOM_COMMODITY_EVENT_SANCTIONED = 3;       // Exchange will take a cut from trading
+  RANDOM_COMMODITY_EVENT_CLOSED = 4;           // Trading will be closed for a moment
+}
+
 enum CommodityType {
   COMMODITY_UNSPECIFIED = 0;
   COMMODITY_WHEAT = 1;
@@ -35,6 +43,7 @@ enum TradeRejection {
   TRADE_REJECTION_INSUFFICIENT_UNITS = 5; // Holds fewer units than the order sells
   TRADE_REJECTION_POOL_EXHAUSTED     = 6; // The pool can't fill it: buying its last unit, or units worth under a cent
   TRADE_REJECTION_GAME_NOT_RUNNING   = 7;
+  TRADE_REJECTION_STATION_CLOSED     = 8;
 }
 
 enum JoinRejection {

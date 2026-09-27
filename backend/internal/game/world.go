@@ -24,6 +24,9 @@ type World struct {
 	Stations     []*TradingStation
 	Commodities  map[pb.CommodityType]*CommodityState
 
+	activeEvent   *RandomEvent
+	nextEventTick uint64
+
 	// Communication channels
 	movementQueue chan PlayerMovementInput
 	tradeQueue    chan TradeOrder

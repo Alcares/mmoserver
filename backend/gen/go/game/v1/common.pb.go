@@ -67,6 +67,58 @@ func (PowerUpType) EnumDescriptor() ([]byte, []int) {
 	return file_game_v1_common_proto_rawDescGZIP(), []int{0}
 }
 
+type RandomCommodityEventType int32
+
+const (
+	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE RandomCommodityEventType = 0 // Prices will go up
+	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD    RandomCommodityEventType = 1 // Prices will go down
+	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SANCTIONED      RandomCommodityEventType = 2 // Exchange will take a cut from trading
+	RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED          RandomCommodityEventType = 3 // Trading will be closed for a moment
+)
+
+// Enum value maps for RandomCommodityEventType.
+var (
+	RandomCommodityEventType_name = map[int32]string{
+		0: "RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE",
+		1: "RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD",
+		2: "RANDOM_COMMODITY_EVENT_SANCTIONED",
+		3: "RANDOM_COMMODITY_EVENT_CLOSED",
+	}
+	RandomCommodityEventType_value = map[string]int32{
+		"RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE": 0,
+		"RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD":    1,
+		"RANDOM_COMMODITY_EVENT_SANCTIONED":      2,
+		"RANDOM_COMMODITY_EVENT_CLOSED":          3,
+	}
+)
+
+func (x RandomCommodityEventType) Enum() *RandomCommodityEventType {
+	p := new(RandomCommodityEventType)
+	*p = x
+	return p
+}
+
+func (x RandomCommodityEventType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RandomCommodityEventType) Descriptor() protoreflect.EnumDescriptor {
+	return file_game_v1_common_proto_enumTypes[1].Descriptor()
+}
+
+func (RandomCommodityEventType) Type() protoreflect.EnumType {
+	return &file_game_v1_common_proto_enumTypes[1]
+}
+
+func (x RandomCommodityEventType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RandomCommodityEventType.Descriptor instead.
+func (RandomCommodityEventType) EnumDescriptor() ([]byte, []int) {
+	return file_game_v1_common_proto_rawDescGZIP(), []int{1}
+}
+
 type CommodityType int32
 
 const (
@@ -112,11 +164,11 @@ func (x CommodityType) String() string {
 }
 
 func (CommodityType) Descriptor() protoreflect.EnumDescriptor {
-	return file_game_v1_common_proto_enumTypes[1].Descriptor()
+	return file_game_v1_common_proto_enumTypes[2].Descriptor()
 }
 
 func (CommodityType) Type() protoreflect.EnumType {
-	return &file_game_v1_common_proto_enumTypes[1]
+	return &file_game_v1_common_proto_enumTypes[2]
 }
 
 func (x CommodityType) Number() protoreflect.EnumNumber {
@@ -125,7 +177,7 @@ func (x CommodityType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use CommodityType.Descriptor instead.
 func (CommodityType) EnumDescriptor() ([]byte, []int) {
-	return file_game_v1_common_proto_rawDescGZIP(), []int{1}
+	return file_game_v1_common_proto_rawDescGZIP(), []int{2}
 }
 
 type OrderIntent int32
@@ -161,11 +213,11 @@ func (x OrderIntent) String() string {
 }
 
 func (OrderIntent) Descriptor() protoreflect.EnumDescriptor {
-	return file_game_v1_common_proto_enumTypes[2].Descriptor()
+	return file_game_v1_common_proto_enumTypes[3].Descriptor()
 }
 
 func (OrderIntent) Type() protoreflect.EnumType {
-	return &file_game_v1_common_proto_enumTypes[2]
+	return &file_game_v1_common_proto_enumTypes[3]
 }
 
 func (x OrderIntent) Number() protoreflect.EnumNumber {
@@ -174,7 +226,7 @@ func (x OrderIntent) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use OrderIntent.Descriptor instead.
 func (OrderIntent) EnumDescriptor() ([]byte, []int) {
-	return file_game_v1_common_proto_rawDescGZIP(), []int{2}
+	return file_game_v1_common_proto_rawDescGZIP(), []int{3}
 }
 
 // Why the server refused a trade, carried in TradeReceipt
@@ -189,6 +241,7 @@ const (
 	TradeRejection_TRADE_REJECTION_INSUFFICIENT_UNITS TradeRejection = 5 // Holds fewer units than the order sells
 	TradeRejection_TRADE_REJECTION_POOL_EXHAUSTED     TradeRejection = 6 // The pool can't fill it: buying its last unit, or units worth under a cent
 	TradeRejection_TRADE_REJECTION_GAME_NOT_RUNNING   TradeRejection = 7
+	TradeRejection_TRADE_REJECTION_STATION_CLOSED     TradeRejection = 8
 )
 
 // Enum value maps for TradeRejection.
@@ -202,6 +255,7 @@ var (
 		5: "TRADE_REJECTION_INSUFFICIENT_UNITS",
 		6: "TRADE_REJECTION_POOL_EXHAUSTED",
 		7: "TRADE_REJECTION_GAME_NOT_RUNNING",
+		8: "TRADE_REJECTION_STATION_CLOSED",
 	}
 	TradeRejection_value = map[string]int32{
 		"TRADE_REJECTION_UNSPECIFIED":        0,
@@ -212,6 +266,7 @@ var (
 		"TRADE_REJECTION_INSUFFICIENT_UNITS": 5,
 		"TRADE_REJECTION_POOL_EXHAUSTED":     6,
 		"TRADE_REJECTION_GAME_NOT_RUNNING":   7,
+		"TRADE_REJECTION_STATION_CLOSED":     8,
 	}
 )
 
@@ -226,11 +281,11 @@ func (x TradeRejection) String() string {
 }
 
 func (TradeRejection) Descriptor() protoreflect.EnumDescriptor {
-	return file_game_v1_common_proto_enumTypes[3].Descriptor()
+	return file_game_v1_common_proto_enumTypes[4].Descriptor()
 }
 
 func (TradeRejection) Type() protoreflect.EnumType {
-	return &file_game_v1_common_proto_enumTypes[3]
+	return &file_game_v1_common_proto_enumTypes[4]
 }
 
 func (x TradeRejection) Number() protoreflect.EnumNumber {
@@ -239,7 +294,7 @@ func (x TradeRejection) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TradeRejection.Descriptor instead.
 func (TradeRejection) EnumDescriptor() ([]byte, []int) {
-	return file_game_v1_common_proto_rawDescGZIP(), []int{3}
+	return file_game_v1_common_proto_rawDescGZIP(), []int{4}
 }
 
 type JoinRejection int32
@@ -281,11 +336,11 @@ func (x JoinRejection) String() string {
 }
 
 func (JoinRejection) Descriptor() protoreflect.EnumDescriptor {
-	return file_game_v1_common_proto_enumTypes[4].Descriptor()
+	return file_game_v1_common_proto_enumTypes[5].Descriptor()
 }
 
 func (JoinRejection) Type() protoreflect.EnumType {
-	return &file_game_v1_common_proto_enumTypes[4]
+	return &file_game_v1_common_proto_enumTypes[5]
 }
 
 func (x JoinRejection) Number() protoreflect.EnumNumber {
@@ -294,7 +349,7 @@ func (x JoinRejection) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use JoinRejection.Descriptor instead.
 func (JoinRejection) EnumDescriptor() ([]byte, []int) {
-	return file_game_v1_common_proto_rawDescGZIP(), []int{4}
+	return file_game_v1_common_proto_rawDescGZIP(), []int{5}
 }
 
 type GamePhase int32
@@ -336,11 +391,11 @@ func (x GamePhase) String() string {
 }
 
 func (GamePhase) Descriptor() protoreflect.EnumDescriptor {
-	return file_game_v1_common_proto_enumTypes[5].Descriptor()
+	return file_game_v1_common_proto_enumTypes[6].Descriptor()
 }
 
 func (GamePhase) Type() protoreflect.EnumType {
-	return &file_game_v1_common_proto_enumTypes[5]
+	return &file_game_v1_common_proto_enumTypes[6]
 }
 
 func (x GamePhase) Number() protoreflect.EnumNumber {
@@ -349,7 +404,7 @@ func (x GamePhase) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GamePhase.Descriptor instead.
 func (GamePhase) EnumDescriptor() ([]byte, []int) {
-	return file_game_v1_common_proto_rawDescGZIP(), []int{5}
+	return file_game_v1_common_proto_rawDescGZIP(), []int{6}
 }
 
 var File_game_v1_common_proto protoreflect.FileDescriptor
@@ -359,7 +414,12 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x14game/v1/common.proto\x12\agame.v1*K\n" +
 	"\vPowerUpType\x12\x1d\n" +
 	"\x19POWER_UP_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
-	"\x19POWER_UP_TYPE_FULL_VISION\x10\x01*\xa9\x01\n" +
+	"\x19POWER_UP_TYPE_FULL_VISION\x10\x01*\xb9\x01\n" +
+	"\x18RandomCommodityEventType\x12*\n" +
+	"&RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE\x10\x00\x12'\n" +
+	"#RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD\x10\x01\x12%\n" +
+	"!RANDOM_COMMODITY_EVENT_SANCTIONED\x10\x02\x12!\n" +
+	"\x1dRANDOM_COMMODITY_EVENT_CLOSED\x10\x03*\xa9\x01\n" +
 	"\rCommodityType\x12\x19\n" +
 	"\x15COMMODITY_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fCOMMODITY_WHEAT\x10\x01\x12\x14\n" +
@@ -372,7 +432,7 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x12INTENT_UNSPECIFIED\x10\x00\x12\x0e\n" +
 	"\n" +
 	"INTENT_BUY\x10\x01\x12\x0f\n" +
-	"\vINTENT_SELL\x10\x02*\xb2\x02\n" +
+	"\vINTENT_SELL\x10\x02*\xd6\x02\n" +
 	"\x0eTradeRejection\x12\x1f\n" +
 	"\x1bTRADE_REJECTION_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eTRADE_REJECTION_NOT_AT_STATION\x10\x01\x12!\n" +
@@ -381,7 +441,8 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"!TRADE_REJECTION_INSUFFICIENT_CASH\x10\x04\x12&\n" +
 	"\"TRADE_REJECTION_INSUFFICIENT_UNITS\x10\x05\x12\"\n" +
 	"\x1eTRADE_REJECTION_POOL_EXHAUSTED\x10\x06\x12$\n" +
-	" TRADE_REJECTION_GAME_NOT_RUNNING\x10\a*\xb5\x01\n" +
+	" TRADE_REJECTION_GAME_NOT_RUNNING\x10\a\x12\"\n" +
+	"\x1eTRADE_REJECTION_STATION_CLOSED\x10\b*\xb5\x01\n" +
 	"\rJoinRejection\x12\x1e\n" +
 	"\x1aJOIN_REJECTION_UNSPECIFIED\x10\x00\x12!\n" +
 	"\x1dJOIN_REJECTION_GAME_NOT_FOUND\x10\x01\x12\x1c\n" +
@@ -407,14 +468,15 @@ func file_game_v1_common_proto_rawDescGZIP() []byte {
 	return file_game_v1_common_proto_rawDescData
 }
 
-var file_game_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_game_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
 var file_game_v1_common_proto_goTypes = []any{
-	(PowerUpType)(0),    // 0: game.v1.PowerUpType
-	(CommodityType)(0),  // 1: game.v1.CommodityType
-	(OrderIntent)(0),    // 2: game.v1.OrderIntent
-	(TradeRejection)(0), // 3: game.v1.TradeRejection
-	(JoinRejection)(0),  // 4: game.v1.JoinRejection
-	(GamePhase)(0),      // 5: game.v1.GamePhase
+	(PowerUpType)(0),              // 0: game.v1.PowerUpType
+	(RandomCommodityEventType)(0), // 1: game.v1.RandomCommodityEventType
+	(CommodityType)(0),            // 2: game.v1.CommodityType
+	(OrderIntent)(0),              // 3: game.v1.OrderIntent
+	(TradeRejection)(0),           // 4: game.v1.TradeRejection
+	(JoinRejection)(0),            // 5: game.v1.JoinRejection
+	(GamePhase)(0),                // 6: game.v1.GamePhase
 }
 var file_game_v1_common_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -434,7 +496,7 @@ func file_game_v1_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_common_proto_rawDesc), len(file_game_v1_common_proto_rawDesc)),
-			NumEnums:      6,
+			NumEnums:      7,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,

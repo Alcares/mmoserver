@@ -53,6 +53,10 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 	if station == nil {
 		return reject(pb.TradeRejection_TRADE_REJECTION_NOT_AT_STATION)
 	}
+	if w.eventOn(station.Commodity, pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED) {
+		return reject(pb.TradeRejection_TRADE_REJECTION_STATION_CLOSED)
+	}
+
 	receipt.Commodity = station.Commodity
 	pool = w.Commodities[station.Commodity]
 

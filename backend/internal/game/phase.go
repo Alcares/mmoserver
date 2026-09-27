@@ -44,6 +44,9 @@ func (w *World) advancePhase() {
 	case pb.GamePhase_GAME_PHASE_COUNTDOWN:
 		if w.tick >= w.phaseEndTick {
 			w.setPhase(pb.GamePhase_GAME_PHASE_RUNNING, w.config.Duration)
+			if w.config.RandomEvents {
+				w.nextEventTick = w.tick + ticks(DelayBetweenEvents)
+			}
 		}
 	case pb.GamePhase_GAME_PHASE_RUNNING:
 		if w.tick >= w.phaseEndTick {
@@ -79,6 +82,10 @@ func (w *World) finish() {
 	sort.Slice(standings, func(i, j int) bool {
 		return standings[i].NetWorth > standings[j].NetWorth
 	})
+
+	if w.activeEvent != nil {
+		w.endEvent()
+	}
 
 	w.statusDirty = false
 	w.sendToAll(&pb.ServerMessage{

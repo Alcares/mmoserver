@@ -29,69 +29,79 @@ namespace Game.V1 {
             "djEvc3BlY3RhdG9yLnByb3RvIk8KB1Bvd2VyVXASCgoCaWQYASABKA0SCQoB",
             "eBgCIAEoBRIJCgF5GAMgASgFEiIKBHR5cGUYBCABKA4yFC5nYW1lLnYxLlBv",
             "d2VyVXBUeXBlIjQKDlBvd2VyVXBTcGF3bmVkEiIKCHBvd2VyX3VwGAEgASgL",
-            "MhAuZ2FtZS52MS5Qb3dlclVwIj4KEFBvd2VyVXBEZXNwYXduZWQSCgoCaWQY",
-            "ASABKA0SHgoWY29sbGVjdGVkX2J5X3BsYXllcl9pZBgCIAEoDSJECg1Xb3Js",
-            "ZFNuYXBzaG90EgwKBHRpY2sYASABKAQSJQoHcGxheWVycxgCIAMoCzIULmdh",
-            "bWUudjEuUGxheWVyU3RhdGUiQAoLTWFya2V0U3RhdGUSDAoEdGljaxgBIAEo",
-            "BBIjCgZxdW90ZXMYAiADKAsyEy5nYW1lLnYxLlByaWNlUXVvdGUisQEKClBy",
-            "aWNlUXVvdGUSKQoJY29tbW9kaXR5GAEgASgOMhYuZ2FtZS52MS5Db21tb2Rp",
-            "dHlUeXBlEhoKEmRlbHRhX2Jhc2lzX3BvaW50cxgCIAEoBRIcChRhdmFpbGFi",
-            "bGVfcG9vbF91bml0cxgDIAEoDRIZChFkb21pbmFudF93aGFsZV9pZBgEIAEo",
-            "DRIjCgZvcmRlcnMYBSADKAsyEy5nYW1lLnYxLk9yZGVyUXVvdGUiTgoKT3Jk",
-            "ZXJRdW90ZRINCgV1bml0cxgBIAEoDRIXCg9idXlfcHJpY2VfY2VudHMYAiAB",
-            "KAQSGAoQc2VsbF9wcmljZV9jZW50cxgDIAEoBCK5AgoMVHJhZGVSZWNlaXB0",
-            "EhMKC3NlcXVlbmNlX2lkGAEgASgNEg8KB3N1Y2Nlc3MYAiABKAgSKgoJcmVq",
-            "ZWN0aW9uGAMgASgOMhcuZ2FtZS52MS5UcmFkZVJlamVjdGlvbhIkCgZpbnRl",
-            "bnQYBCABKA4yFC5nYW1lLnYxLk9yZGVySW50ZW50EikKCWNvbW1vZGl0eRgF",
-            "IAEoDjIWLmdhbWUudjEuQ29tbW9kaXR5VHlwZRIcChR0b3RhbF9iYWxhbmNl",
-            "X2NoYW5nZRgGIAEoBBIYChB1bml0c190cmFuc2FjdGVkGAcgASgEEhMKC3By",
-            "aWNlX2NlbnRzGAggASgEEh4KFm5ld19jYXNoX2JhbGFuY2VfY2VudHMYCSAB",
-            "KAQSGQoRbmV3X2hvbGRpbmdfdW5pdHMYCiABKAQiYAoOVHJhZGluZ1N0YXRp",
-            "b24SKQoJY29tbW9kaXR5GAEgASgOMhYuZ2FtZS52MS5Db21tb2RpdHlUeXBl",
-            "EgkKAXgYAiABKAISCQoBeRgDIAEoAhINCgVsYWJlbBgEIAEoCSKsAQoQSW5p",
-            "dGlhbEdhbWVTdGF0ZRIvCg5zdGF0aW9uX2xheW91dBgBIAMoCzIXLmdhbWUu",
-            "djEuVHJhZGluZ1N0YXRpb24SDwoHZ2FtZV9pZBgCIAEoCRISCgp3b3JsZF9z",
-            "aXplGAMgASgCEhMKC3RyYWRlX3JhbmdlGAQgASgCEhUKDXBsYXllcl9yYWRp",
-            "dXMYBSABKAISFgoOc3RhdGlvbl9yYWRpdXMYBiABKAIiNgoMSm9pblJlamVj",
-            "dGVkEiYKBnJlYXNvbhgBIAEoDjIWLmdhbWUudjEuSm9pblJlamVjdGlvbiI7",
-            "CghHYW1lT3ZlchIvCglzdGFuZGluZ3MYASADKAsyHC5nYW1lLnYxLlBsYXll",
-            "ckZpbmFsU3RhbmRpbmcicAoKR2FtZVN0YXR1cxIhCgVwaGFzZRgBIAEoDjIS",
-            "LmdhbWUudjEuR2FtZVBoYXNlEhQKDHBsYXllcl9jb3VudBgCIAEoBRITCgtt",
-            "aW5fcGxheWVycxgDIAEoBRIUCgxyZW1haW5pbmdfbXMYBCABKAUihQUKDVNl",
-            "cnZlck1lc3NhZ2USMAoOd29ybGRfc25hcHNob3QYASABKAsyFi5nYW1lLnYx",
-            "LldvcmxkU25hcHNob3RIABIsCgxtYXJrZXRfc3RhdGUYAiABKAsyFC5nYW1l",
-            "LnYxLk1hcmtldFN0YXRlSAASMwoQcG93ZXJfdXBfc3Bhd25lZBgDIAEoCzIX",
-            "LmdhbWUudjEuUG93ZXJVcFNwYXduZWRIABI3ChJwb3dlcl91cF9kZXNwYXdu",
-            "ZWQYBCABKAsyGS5nYW1lLnYxLlBvd2VyVXBEZXNwYXduZWRIABIqCgtnYW1l",
-            "X3N0YXR1cxgKIAEoCzITLmdhbWUudjEuR2FtZVN0YXR1c0gAEjIKDWluaXRp",
-            "YWxfc3RhdGUYBSABKAsyGS5nYW1lLnYxLkluaXRpYWxHYW1lU3RhdGVIABIu",
-            "Cg1qb2luX3JlamVjdGVkGAggASgLMhUuZ2FtZS52MS5Kb2luUmVqZWN0ZWRI",
-            "ABImCgV0cmFkZRgGIAEoCzIVLmdhbWUudjEuVHJhZGVSZWNlaXB0SAASNAoQ",
-            "cGxheWVyX2ludmVudG9yeRgHIAEoCzIYLmdhbWUudjEuUGxheWVySW52ZW50",
-            "b3J5SAASJgoJZ2FtZV9vdmVyGAkgASgLMhEuZ2FtZS52MS5HYW1lT3ZlckgA",
-            "EiMKB2VwaXNvZGUYCyABKAsyEC5nYW1lLnYxLkVwaXNvZGVIABIwCg5wbGF5",
-            "YmFja19zcGVlZBgMIAEoCzIWLmdhbWUudjEuUGxheWJhY2tTcGVlZEgAEjIK",
-            "D3NwZWN0YXRpbmdfb3ZlchgNIAEoCzIXLmdhbWUudjEuU3BlY3RhdGluZ092",
-            "ZXJIAEIFCgNtc2dCRlo6Z2l0aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9i",
-            "YWNrZW5kL2dlbi9nby9nYW1lL3YxO2dhbWV2MaoCB0dhbWUuVjFiBnByb3Rv",
-            "Mw=="));
+            "MhAuZ2FtZS52MS5Qb3dlclVwIo0BChNSYW5kb21FdmVudE9jY3VycmVkEjUK",
+            "CmV2ZW50X3R5cGUYASABKA4yIS5nYW1lLnYxLlJhbmRvbUNvbW1vZGl0eUV2",
+            "ZW50VHlwZRIpCgljb21tb2RpdHkYAiABKA4yFi5nYW1lLnYxLkNvbW1vZGl0",
+            "eVR5cGUSFAoMcmVtYWluaW5nX21zGAMgASgFInQKEFJhbmRvbUV2ZW50RW5k",
+            "ZWQSNQoKZXZlbnRfdHlwZRgBIAEoDjIhLmdhbWUudjEuUmFuZG9tQ29tbW9k",
+            "aXR5RXZlbnRUeXBlEikKCWNvbW1vZGl0eRgCIAEoDjIWLmdhbWUudjEuQ29t",
+            "bW9kaXR5VHlwZSI+ChBQb3dlclVwRGVzcGF3bmVkEgoKAmlkGAEgASgNEh4K",
+            "FmNvbGxlY3RlZF9ieV9wbGF5ZXJfaWQYAiABKA0iRAoNV29ybGRTbmFwc2hv",
+            "dBIMCgR0aWNrGAEgASgEEiUKB3BsYXllcnMYAiADKAsyFC5nYW1lLnYxLlBs",
+            "YXllclN0YXRlIkAKC01hcmtldFN0YXRlEgwKBHRpY2sYASABKAQSIwoGcXVv",
+            "dGVzGAIgAygLMhMuZ2FtZS52MS5QcmljZVF1b3RlIrEBCgpQcmljZVF1b3Rl",
+            "EikKCWNvbW1vZGl0eRgBIAEoDjIWLmdhbWUudjEuQ29tbW9kaXR5VHlwZRIa",
+            "ChJkZWx0YV9iYXNpc19wb2ludHMYAiABKAUSHAoUYXZhaWxhYmxlX3Bvb2xf",
+            "dW5pdHMYAyABKA0SGQoRZG9taW5hbnRfd2hhbGVfaWQYBCABKA0SIwoGb3Jk",
+            "ZXJzGAUgAygLMhMuZ2FtZS52MS5PcmRlclF1b3RlIk4KCk9yZGVyUXVvdGUS",
+            "DQoFdW5pdHMYASABKA0SFwoPYnV5X3ByaWNlX2NlbnRzGAIgASgEEhgKEHNl",
+            "bGxfcHJpY2VfY2VudHMYAyABKAQiuQIKDFRyYWRlUmVjZWlwdBITCgtzZXF1",
+            "ZW5jZV9pZBgBIAEoDRIPCgdzdWNjZXNzGAIgASgIEioKCXJlamVjdGlvbhgD",
+            "IAEoDjIXLmdhbWUudjEuVHJhZGVSZWplY3Rpb24SJAoGaW50ZW50GAQgASgO",
+            "MhQuZ2FtZS52MS5PcmRlckludGVudBIpCgljb21tb2RpdHkYBSABKA4yFi5n",
+            "YW1lLnYxLkNvbW1vZGl0eVR5cGUSHAoUdG90YWxfYmFsYW5jZV9jaGFuZ2UY",
+            "BiABKAQSGAoQdW5pdHNfdHJhbnNhY3RlZBgHIAEoBBITCgtwcmljZV9jZW50",
+            "cxgIIAEoBBIeChZuZXdfY2FzaF9iYWxhbmNlX2NlbnRzGAkgASgEEhkKEW5l",
+            "d19ob2xkaW5nX3VuaXRzGAogASgEIm4KDlRyYWRpbmdTdGF0aW9uEikKCWNv",
+            "bW1vZGl0eRgBIAEoDjIWLmdhbWUudjEuQ29tbW9kaXR5VHlwZRIJCgF4GAIg",
+            "ASgCEgkKAXkYAyABKAISDQoFbGFiZWwYBCABKAkSDAoEb3BlbhgFIAEoCCKs",
+            "AQoQSW5pdGlhbEdhbWVTdGF0ZRIvCg5zdGF0aW9uX2xheW91dBgBIAMoCzIX",
+            "LmdhbWUudjEuVHJhZGluZ1N0YXRpb24SDwoHZ2FtZV9pZBgCIAEoCRISCgp3",
+            "b3JsZF9zaXplGAMgASgCEhMKC3RyYWRlX3JhbmdlGAQgASgCEhUKDXBsYXll",
+            "cl9yYWRpdXMYBSABKAISFgoOc3RhdGlvbl9yYWRpdXMYBiABKAIiNgoMSm9p",
+            "blJlamVjdGVkEiYKBnJlYXNvbhgBIAEoDjIWLmdhbWUudjEuSm9pblJlamVj",
+            "dGlvbiI7CghHYW1lT3ZlchIvCglzdGFuZGluZ3MYASADKAsyHC5nYW1lLnYx",
+            "LlBsYXllckZpbmFsU3RhbmRpbmcicAoKR2FtZVN0YXR1cxIhCgVwaGFzZRgB",
+            "IAEoDjISLmdhbWUudjEuR2FtZVBoYXNlEhQKDHBsYXllcl9jb3VudBgCIAEo",
+            "BRITCgttaW5fcGxheWVycxgDIAEoBRIUCgxyZW1haW5pbmdfbXMYBCABKAUi",
+            "/gUKDVNlcnZlck1lc3NhZ2USMAoOd29ybGRfc25hcHNob3QYASABKAsyFi5n",
+            "YW1lLnYxLldvcmxkU25hcHNob3RIABIsCgxtYXJrZXRfc3RhdGUYAiABKAsy",
+            "FC5nYW1lLnYxLk1hcmtldFN0YXRlSAASMwoQcG93ZXJfdXBfc3Bhd25lZBgD",
+            "IAEoCzIXLmdhbWUudjEuUG93ZXJVcFNwYXduZWRIABI3ChJwb3dlcl91cF9k",
+            "ZXNwYXduZWQYBCABKAsyGS5nYW1lLnYxLlBvd2VyVXBEZXNwYXduZWRIABI+",
+            "ChZyYW5kb21fZWZmZWN0X29jY3VycmVkGA4gASgLMhwuZ2FtZS52MS5SYW5k",
+            "b21FdmVudE9jY3VycmVkSAASNwoScmFuZG9tX2V2ZW50X2VuZGVkGA8gASgL",
+            "MhkuZ2FtZS52MS5SYW5kb21FdmVudEVuZGVkSAASKgoLZ2FtZV9zdGF0dXMY",
+            "CiABKAsyEy5nYW1lLnYxLkdhbWVTdGF0dXNIABIyCg1pbml0aWFsX3N0YXRl",
+            "GAUgASgLMhkuZ2FtZS52MS5Jbml0aWFsR2FtZVN0YXRlSAASLgoNam9pbl9y",
+            "ZWplY3RlZBgIIAEoCzIVLmdhbWUudjEuSm9pblJlamVjdGVkSAASJgoFdHJh",
+            "ZGUYBiABKAsyFS5nYW1lLnYxLlRyYWRlUmVjZWlwdEgAEjQKEHBsYXllcl9p",
+            "bnZlbnRvcnkYByABKAsyGC5nYW1lLnYxLlBsYXllckludmVudG9yeUgAEiYK",
+            "CWdhbWVfb3ZlchgJIAEoCzIRLmdhbWUudjEuR2FtZU92ZXJIABIjCgdlcGlz",
+            "b2RlGAsgASgLMhAuZ2FtZS52MS5FcGlzb2RlSAASMAoOcGxheWJhY2tfc3Bl",
+            "ZWQYDCABKAsyFi5nYW1lLnYxLlBsYXliYWNrU3BlZWRIABIyCg9zcGVjdGF0",
+            "aW5nX292ZXIYDSABKAsyFy5nYW1lLnYxLlNwZWN0YXRpbmdPdmVySABCBQoD",
+            "bXNnQkZaOmdpdGh1Yi5jb20vYWxjYXJlcy9tbW9zZXJ2ZXIvYmFja2VuZC9n",
+            "ZW4vZ28vZ2FtZS92MTtnYW1ldjGqAgdHYW1lLlYxYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, global::Game.V1.PlayerReflection.Descriptor, global::Game.V1.SpectatorReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PowerUp), global::Game.V1.PowerUp.Parser, new[]{ "Id", "X", "Y", "Type" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PowerUpSpawned), global::Game.V1.PowerUpSpawned.Parser, new[]{ "PowerUp" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.RandomEventOccurred), global::Game.V1.RandomEventOccurred.Parser, new[]{ "EventType", "Commodity", "RemainingMs" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.RandomEventEnded), global::Game.V1.RandomEventEnded.Parser, new[]{ "EventType", "Commodity" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PowerUpDespawned), global::Game.V1.PowerUpDespawned.Parser, new[]{ "Id", "CollectedByPlayerId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.WorldSnapshot), global::Game.V1.WorldSnapshot.Parser, new[]{ "Tick", "Players" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.MarketState), global::Game.V1.MarketState.Parser, new[]{ "Tick", "Quotes" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PriceQuote), global::Game.V1.PriceQuote.Parser, new[]{ "Commodity", "DeltaBasisPoints", "AvailablePoolUnits", "DominantWhaleId", "Orders" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.OrderQuote), global::Game.V1.OrderQuote.Parser, new[]{ "Units", "BuyPriceCents", "SellPriceCents" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeReceipt), global::Game.V1.TradeReceipt.Parser, new[]{ "SequenceId", "Success", "Rejection", "Intent", "Commodity", "TotalBalanceChange", "UnitsTransacted", "PriceCents", "NewCashBalanceCents", "NewHoldingUnits" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradingStation), global::Game.V1.TradingStation.Parser, new[]{ "Commodity", "X", "Y", "Label" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradingStation), global::Game.V1.TradingStation.Parser, new[]{ "Commodity", "X", "Y", "Label", "Open" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.InitialGameState), global::Game.V1.InitialGameState.Parser, new[]{ "StationLayout", "GameId", "WorldSize", "TradeRange", "PlayerRadius", "StationRadius" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.JoinRejected), global::Game.V1.JoinRejected.Parser, new[]{ "Reason" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.GameOver), global::Game.V1.GameOver.Parser, new[]{ "Standings" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.GameStatus), global::Game.V1.GameStatus.Parser, new[]{ "Phase", "PlayerCount", "MinPlayers", "RemainingMs" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ServerMessage), global::Game.V1.ServerMessage.Parser, new[]{ "WorldSnapshot", "MarketState", "PowerUpSpawned", "PowerUpDespawned", "GameStatus", "InitialState", "JoinRejected", "Trade", "PlayerInventory", "GameOver", "Episode", "PlaybackSpeed", "SpectatingOver" }, new[]{ "Msg" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ServerMessage), global::Game.V1.ServerMessage.Parser, new[]{ "WorldSnapshot", "MarketState", "PowerUpSpawned", "PowerUpDespawned", "RandomEffectOccurred", "RandomEventEnded", "GameStatus", "InitialState", "JoinRejected", "Trade", "PlayerInventory", "GameOver", "Episode", "PlaybackSpeed", "SpectatingOver" }, new[]{ "Msg" }, null, null, null)
           }));
     }
     #endregion
@@ -621,6 +631,519 @@ namespace Game.V1 {
   }
 
   /// <summary>
+  /// Discrete event: A new random event has occurred
+  /// </summary>
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class RandomEventOccurred : pb::IMessage<RandomEventOccurred>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<RandomEventOccurred> _parser = new pb::MessageParser<RandomEventOccurred>(() => new RandomEventOccurred());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<RandomEventOccurred> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[2]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RandomEventOccurred() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RandomEventOccurred(RandomEventOccurred other) : this() {
+      eventType_ = other.eventType_;
+      commodity_ = other.commodity_;
+      remainingMs_ = other.remainingMs_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RandomEventOccurred Clone() {
+      return new RandomEventOccurred(this);
+    }
+
+    /// <summary>Field number for the "event_type" field.</summary>
+    public const int EventTypeFieldNumber = 1;
+    private global::Game.V1.RandomCommodityEventType eventType_ = global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.RandomCommodityEventType EventType {
+      get { return eventType_; }
+      set {
+        eventType_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "commodity" field.</summary>
+    public const int CommodityFieldNumber = 2;
+    private global::Game.V1.CommodityType commodity_ = global::Game.V1.CommodityType.CommodityUnspecified;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.CommodityType Commodity {
+      get { return commodity_; }
+      set {
+        commodity_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "remaining_ms" field.</summary>
+    public const int RemainingMsFieldNumber = 3;
+    private int remainingMs_;
+    /// <summary>
+    /// in ms
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int RemainingMs {
+      get { return remainingMs_; }
+      set {
+        remainingMs_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as RandomEventOccurred);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(RandomEventOccurred other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (EventType != other.EventType) return false;
+      if (Commodity != other.Commodity) return false;
+      if (RemainingMs != other.RemainingMs) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) hash ^= EventType.GetHashCode();
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) hash ^= Commodity.GetHashCode();
+      if (RemainingMs != 0) hash ^= RemainingMs.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) EventType);
+      }
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        output.WriteRawTag(16);
+        output.WriteEnum((int) Commodity);
+      }
+      if (RemainingMs != 0) {
+        output.WriteRawTag(24);
+        output.WriteInt32(RemainingMs);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) EventType);
+      }
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        output.WriteRawTag(16);
+        output.WriteEnum((int) Commodity);
+      }
+      if (RemainingMs != 0) {
+        output.WriteRawTag(24);
+        output.WriteInt32(RemainingMs);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) EventType);
+      }
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Commodity);
+      }
+      if (RemainingMs != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(RemainingMs);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(RandomEventOccurred other) {
+      if (other == null) {
+        return;
+      }
+      if (other.EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) {
+        EventType = other.EventType;
+      }
+      if (other.Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        Commodity = other.Commodity;
+      }
+      if (other.RemainingMs != 0) {
+        RemainingMs = other.RemainingMs;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            EventType = (global::Game.V1.RandomCommodityEventType) input.ReadEnum();
+            break;
+          }
+          case 16: {
+            Commodity = (global::Game.V1.CommodityType) input.ReadEnum();
+            break;
+          }
+          case 24: {
+            RemainingMs = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            EventType = (global::Game.V1.RandomCommodityEventType) input.ReadEnum();
+            break;
+          }
+          case 16: {
+            Commodity = (global::Game.V1.CommodityType) input.ReadEnum();
+            break;
+          }
+          case 24: {
+            RemainingMs = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class RandomEventEnded : pb::IMessage<RandomEventEnded>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<RandomEventEnded> _parser = new pb::MessageParser<RandomEventEnded>(() => new RandomEventEnded());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<RandomEventEnded> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[3]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RandomEventEnded() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RandomEventEnded(RandomEventEnded other) : this() {
+      eventType_ = other.eventType_;
+      commodity_ = other.commodity_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public RandomEventEnded Clone() {
+      return new RandomEventEnded(this);
+    }
+
+    /// <summary>Field number for the "event_type" field.</summary>
+    public const int EventTypeFieldNumber = 1;
+    private global::Game.V1.RandomCommodityEventType eventType_ = global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.RandomCommodityEventType EventType {
+      get { return eventType_; }
+      set {
+        eventType_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "commodity" field.</summary>
+    public const int CommodityFieldNumber = 2;
+    private global::Game.V1.CommodityType commodity_ = global::Game.V1.CommodityType.CommodityUnspecified;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.CommodityType Commodity {
+      get { return commodity_; }
+      set {
+        commodity_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as RandomEventEnded);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(RandomEventEnded other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (EventType != other.EventType) return false;
+      if (Commodity != other.Commodity) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) hash ^= EventType.GetHashCode();
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) hash ^= Commodity.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) EventType);
+      }
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        output.WriteRawTag(16);
+        output.WriteEnum((int) Commodity);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) EventType);
+      }
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        output.WriteRawTag(16);
+        output.WriteEnum((int) Commodity);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) EventType);
+      }
+      if (Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Commodity);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(RandomEventEnded other) {
+      if (other == null) {
+        return;
+      }
+      if (other.EventType != global::Game.V1.RandomCommodityEventType.RandomCommodityEventSupplyShortage) {
+        EventType = other.EventType;
+      }
+      if (other.Commodity != global::Game.V1.CommodityType.CommodityUnspecified) {
+        Commodity = other.Commodity;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            EventType = (global::Game.V1.RandomCommodityEventType) input.ReadEnum();
+            break;
+          }
+          case 16: {
+            Commodity = (global::Game.V1.CommodityType) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            EventType = (global::Game.V1.RandomCommodityEventType) input.ReadEnum();
+            break;
+          }
+          case 16: {
+            Commodity = (global::Game.V1.CommodityType) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
   /// Discrete event: Someone picked it up or it expired
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
@@ -638,7 +1161,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -879,7 +1402,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1103,7 +1626,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1327,7 +1850,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1680,7 +2203,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1961,7 +2484,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2510,7 +3033,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[8]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2534,6 +3057,7 @@ namespace Game.V1 {
       x_ = other.x_;
       y_ = other.y_;
       label_ = other.label_;
+      open_ = other.open_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2591,6 +3115,18 @@ namespace Game.V1 {
       }
     }
 
+    /// <summary>Field number for the "open" field.</summary>
+    public const int OpenFieldNumber = 5;
+    private bool open_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Open {
+      get { return open_; }
+      set {
+        open_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -2610,6 +3146,7 @@ namespace Game.V1 {
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
       if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
       if (Label != other.Label) return false;
+      if (Open != other.Open) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2621,6 +3158,7 @@ namespace Game.V1 {
       if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
       if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
       if (Label.Length != 0) hash ^= Label.GetHashCode();
+      if (Open != false) hash ^= Open.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2655,6 +3193,10 @@ namespace Game.V1 {
         output.WriteRawTag(34);
         output.WriteString(Label);
       }
+      if (Open != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(Open);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2681,6 +3223,10 @@ namespace Game.V1 {
         output.WriteRawTag(34);
         output.WriteString(Label);
       }
+      if (Open != false) {
+        output.WriteRawTag(40);
+        output.WriteBool(Open);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2702,6 +3248,9 @@ namespace Game.V1 {
       }
       if (Label.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Label);
+      }
+      if (Open != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2726,6 +3275,9 @@ namespace Game.V1 {
       }
       if (other.Label.Length != 0) {
         Label = other.Label;
+      }
+      if (other.Open != false) {
+        Open = other.Open;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2760,6 +3312,10 @@ namespace Game.V1 {
           }
           case 34: {
             Label = input.ReadString();
+            break;
+          }
+          case 40: {
+            Open = input.ReadBool();
             break;
           }
         }
@@ -2797,6 +3353,10 @@ namespace Game.V1 {
             Label = input.ReadString();
             break;
           }
+          case 40: {
+            Open = input.ReadBool();
+            break;
+          }
         }
       }
     }
@@ -2819,7 +3379,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[9]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3191,7 +3751,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[10]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[12]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3389,7 +3949,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[11]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[13]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3576,7 +4136,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[12]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[14]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3889,7 +4449,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[13]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[15]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3921,6 +4481,12 @@ namespace Game.V1 {
           break;
         case MsgOneofCase.PowerUpDespawned:
           PowerUpDespawned = other.PowerUpDespawned.Clone();
+          break;
+        case MsgOneofCase.RandomEffectOccurred:
+          RandomEffectOccurred = other.RandomEffectOccurred.Clone();
+          break;
+        case MsgOneofCase.RandomEventEnded:
+          RandomEventEnded = other.RandomEventEnded.Clone();
           break;
         case MsgOneofCase.GameStatus:
           GameStatus = other.GameStatus.Clone();
@@ -4011,6 +4577,30 @@ namespace Game.V1 {
       set {
         msg_ = value;
         msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.PowerUpDespawned;
+      }
+    }
+
+    /// <summary>Field number for the "random_effect_occurred" field.</summary>
+    public const int RandomEffectOccurredFieldNumber = 14;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.RandomEventOccurred RandomEffectOccurred {
+      get { return msgCase_ == MsgOneofCase.RandomEffectOccurred ? (global::Game.V1.RandomEventOccurred) msg_ : null; }
+      set {
+        msg_ = value;
+        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.RandomEffectOccurred;
+      }
+    }
+
+    /// <summary>Field number for the "random_event_ended" field.</summary>
+    public const int RandomEventEndedFieldNumber = 15;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.RandomEventEnded RandomEventEnded {
+      get { return msgCase_ == MsgOneofCase.RandomEventEnded ? (global::Game.V1.RandomEventEnded) msg_ : null; }
+      set {
+        msg_ = value;
+        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.RandomEventEnded;
       }
     }
 
@@ -4142,6 +4732,8 @@ namespace Game.V1 {
       MarketState = 2,
       PowerUpSpawned = 3,
       PowerUpDespawned = 4,
+      RandomEffectOccurred = 14,
+      RandomEventEnded = 15,
       GameStatus = 10,
       InitialState = 5,
       JoinRejected = 8,
@@ -4185,6 +4777,8 @@ namespace Game.V1 {
       if (!object.Equals(MarketState, other.MarketState)) return false;
       if (!object.Equals(PowerUpSpawned, other.PowerUpSpawned)) return false;
       if (!object.Equals(PowerUpDespawned, other.PowerUpDespawned)) return false;
+      if (!object.Equals(RandomEffectOccurred, other.RandomEffectOccurred)) return false;
+      if (!object.Equals(RandomEventEnded, other.RandomEventEnded)) return false;
       if (!object.Equals(GameStatus, other.GameStatus)) return false;
       if (!object.Equals(InitialState, other.InitialState)) return false;
       if (!object.Equals(JoinRejected, other.JoinRejected)) return false;
@@ -4206,6 +4800,8 @@ namespace Game.V1 {
       if (msgCase_ == MsgOneofCase.MarketState) hash ^= MarketState.GetHashCode();
       if (msgCase_ == MsgOneofCase.PowerUpSpawned) hash ^= PowerUpSpawned.GetHashCode();
       if (msgCase_ == MsgOneofCase.PowerUpDespawned) hash ^= PowerUpDespawned.GetHashCode();
+      if (msgCase_ == MsgOneofCase.RandomEffectOccurred) hash ^= RandomEffectOccurred.GetHashCode();
+      if (msgCase_ == MsgOneofCase.RandomEventEnded) hash ^= RandomEventEnded.GetHashCode();
       if (msgCase_ == MsgOneofCase.GameStatus) hash ^= GameStatus.GetHashCode();
       if (msgCase_ == MsgOneofCase.InitialState) hash ^= InitialState.GetHashCode();
       if (msgCase_ == MsgOneofCase.JoinRejected) hash ^= JoinRejected.GetHashCode();
@@ -4286,6 +4882,14 @@ namespace Game.V1 {
         output.WriteRawTag(106);
         output.WriteMessage(SpectatingOver);
       }
+      if (msgCase_ == MsgOneofCase.RandomEffectOccurred) {
+        output.WriteRawTag(114);
+        output.WriteMessage(RandomEffectOccurred);
+      }
+      if (msgCase_ == MsgOneofCase.RandomEventEnded) {
+        output.WriteRawTag(122);
+        output.WriteMessage(RandomEventEnded);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -4348,6 +4952,14 @@ namespace Game.V1 {
         output.WriteRawTag(106);
         output.WriteMessage(SpectatingOver);
       }
+      if (msgCase_ == MsgOneofCase.RandomEffectOccurred) {
+        output.WriteRawTag(114);
+        output.WriteMessage(RandomEffectOccurred);
+      }
+      if (msgCase_ == MsgOneofCase.RandomEventEnded) {
+        output.WriteRawTag(122);
+        output.WriteMessage(RandomEventEnded);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -4369,6 +4981,12 @@ namespace Game.V1 {
       }
       if (msgCase_ == MsgOneofCase.PowerUpDespawned) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(PowerUpDespawned);
+      }
+      if (msgCase_ == MsgOneofCase.RandomEffectOccurred) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(RandomEffectOccurred);
+      }
+      if (msgCase_ == MsgOneofCase.RandomEventEnded) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(RandomEventEnded);
       }
       if (msgCase_ == MsgOneofCase.GameStatus) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(GameStatus);
@@ -4433,6 +5051,18 @@ namespace Game.V1 {
             PowerUpDespawned = new global::Game.V1.PowerUpDespawned();
           }
           PowerUpDespawned.MergeFrom(other.PowerUpDespawned);
+          break;
+        case MsgOneofCase.RandomEffectOccurred:
+          if (RandomEffectOccurred == null) {
+            RandomEffectOccurred = new global::Game.V1.RandomEventOccurred();
+          }
+          RandomEffectOccurred.MergeFrom(other.RandomEffectOccurred);
+          break;
+        case MsgOneofCase.RandomEventEnded:
+          if (RandomEventEnded == null) {
+            RandomEventEnded = new global::Game.V1.RandomEventEnded();
+          }
+          RandomEventEnded.MergeFrom(other.RandomEventEnded);
           break;
         case MsgOneofCase.GameStatus:
           if (GameStatus == null) {
@@ -4626,6 +5256,24 @@ namespace Game.V1 {
             SpectatingOver = subBuilder;
             break;
           }
+          case 114: {
+            global::Game.V1.RandomEventOccurred subBuilder = new global::Game.V1.RandomEventOccurred();
+            if (msgCase_ == MsgOneofCase.RandomEffectOccurred) {
+              subBuilder.MergeFrom(RandomEffectOccurred);
+            }
+            input.ReadMessage(subBuilder);
+            RandomEffectOccurred = subBuilder;
+            break;
+          }
+          case 122: {
+            global::Game.V1.RandomEventEnded subBuilder = new global::Game.V1.RandomEventEnded();
+            if (msgCase_ == MsgOneofCase.RandomEventEnded) {
+              subBuilder.MergeFrom(RandomEventEnded);
+            }
+            input.ReadMessage(subBuilder);
+            RandomEventEnded = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -4760,6 +5408,24 @@ namespace Game.V1 {
             }
             input.ReadMessage(subBuilder);
             SpectatingOver = subBuilder;
+            break;
+          }
+          case 114: {
+            global::Game.V1.RandomEventOccurred subBuilder = new global::Game.V1.RandomEventOccurred();
+            if (msgCase_ == MsgOneofCase.RandomEffectOccurred) {
+              subBuilder.MergeFrom(RandomEffectOccurred);
+            }
+            input.ReadMessage(subBuilder);
+            RandomEffectOccurred = subBuilder;
+            break;
+          }
+          case 122: {
+            global::Game.V1.RandomEventEnded subBuilder = new global::Game.V1.RandomEventEnded();
+            if (msgCase_ == MsgOneofCase.RandomEventEnded) {
+              subBuilder.MergeFrom(RandomEventEnded);
+            }
+            input.ReadMessage(subBuilder);
+            RandomEventEnded = subBuilder;
             break;
           }
         }

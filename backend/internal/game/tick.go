@@ -10,6 +10,9 @@ import (
 func (w *World) Tick(grid *SpatialGrid) {
 	w.tick++
 	w.advancePhase()
+	if w.config.RandomEvents {
+		w.randomEvents()
+	}
 
 	w.drainInputs()
 	w.stepMovement()
@@ -62,7 +65,6 @@ func (w *World) drainInputs() {
 					Msg: &pb.ServerMessage_PlayerInventory{PlayerInventory: player.ToProtoInventory()},
 				})
 			}
-
 		default:
 			return
 		}
@@ -177,4 +179,16 @@ func (w *World) broadcastMarket() {
 			},
 		},
 	})
+}
+
+func (w *World) randomEvents() {
+	if w.phase != pb.GamePhase_GAME_PHASE_RUNNING {
+		return
+	}
+
+	if e := w.activeEvent; e != nil && w.tick >= e.endTick {
+		w.endEvent()
+	} else if e == nil && w.nextEventTick != 0 && w.tick >= w.nextEventTick {
+		w.startEvent()
+	}
 }

@@ -87,6 +87,7 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 		Duration:       5 * time.Minute,
 		Rng:            e.rng,
 		Layout:         layout,
+		RandomEvents:   false,
 	})
 	e.client = game.NewSendQueue()
 	e.observer = bot.Observer{}

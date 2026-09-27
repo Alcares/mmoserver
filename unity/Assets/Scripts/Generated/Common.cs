@@ -26,31 +26,36 @@ namespace Game.V1 {
           string.Concat(
             "ChRnYW1lL3YxL2NvbW1vbi5wcm90bxIHZ2FtZS52MSpLCgtQb3dlclVwVHlw",
             "ZRIdChlQT1dFUl9VUF9UWVBFX1VOU1BFQ0lGSUVEEAASHQoZUE9XRVJfVVBf",
-            "VFlQRV9GVUxMX1ZJU0lPThABKqkBCg1Db21tb2RpdHlUeXBlEhkKFUNPTU1P",
-            "RElUWV9VTlNQRUNJRklFRBAAEhMKD0NPTU1PRElUWV9XSEVBVBABEhQKEENP",
-            "TU1PRElUWV9DT0ZGRUUQAhIVChFDT01NT0RJVFlfTElUSElVTRADEhIKDkNP",
-            "TU1PRElUWV9HT0xEEAQSEQoNQ09NTU9ESVRZX09JTBAFEhQKEENPTU1PRElU",
-            "WV9TSUxWRVIQBipGCgtPcmRlckludGVudBIWChJJTlRFTlRfVU5TUEVDSUZJ",
-            "RUQQABIOCgpJTlRFTlRfQlVZEAESDwoLSU5URU5UX1NFTEwQAiqyAgoOVHJh",
-            "ZGVSZWplY3Rpb24SHwobVFJBREVfUkVKRUNUSU9OX1VOU1BFQ0lGSUVEEAAS",
-            "IgoeVFJBREVfUkVKRUNUSU9OX05PVF9BVF9TVEFUSU9OEAESIQodVFJBREVf",
-            "UkVKRUNUSU9OX0lOVkFMSURfT1JERVIQAhIfChtUUkFERV9SRUpFQ1RJT05f",
-            "UFJJQ0VfTU9WRUQQAxIlCiFUUkFERV9SRUpFQ1RJT05fSU5TVUZGSUNJRU5U",
-            "X0NBU0gQBBImCiJUUkFERV9SRUpFQ1RJT05fSU5TVUZGSUNJRU5UX1VOSVRT",
-            "EAUSIgoeVFJBREVfUkVKRUNUSU9OX1BPT0xfRVhIQVVTVEVEEAYSJAogVFJB",
-            "REVfUkVKRUNUSU9OX0dBTUVfTk9UX1JVTk5JTkcQByq1AQoNSm9pblJlamVj",
-            "dGlvbhIeChpKT0lOX1JFSkVDVElPTl9VTlNQRUNJRklFRBAAEiEKHUpPSU5f",
-            "UkVKRUNUSU9OX0dBTUVfTk9UX0ZPVU5EEAESHAoYSk9JTl9SRUpFQ1RJT05f",
-            "R0FNRV9GVUxMEAISIwofSk9JTl9SRUpFQ1RJT05fR0FNRV9JTl9QUk9HUkVT",
-            "UxADEh4KGkpPSU5fUkVKRUNUSU9OX1NFUlZFUl9GVUxMEAQqigEKCUdhbWVQ",
-            "aGFzZRIaChZHQU1FX1BIQVNFX1VOU1BFQ0lGSUVEEAASFgoSR0FNRV9QSEFT",
-            "RV9XQUlUSU5HEAESGAoUR0FNRV9QSEFTRV9DT1VOVERPV04QAhIWChJHQU1F",
-            "X1BIQVNFX1JVTk5JTkcQAxIXChNHQU1FX1BIQVNFX0ZJTklTSEVEEARCRlo6",
-            "Z2l0aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9iYWNrZW5kL2dlbi9nby9n",
-            "YW1lL3YxO2dhbWV2MaoCB0dhbWUuVjFiBnByb3RvMw=="));
+            "VFlQRV9GVUxMX1ZJU0lPThABKrkBChhSYW5kb21Db21tb2RpdHlFdmVudFR5",
+            "cGUSKgomUkFORE9NX0NPTU1PRElUWV9FVkVOVF9TVVBQTFlfU0hPUlRBR0UQ",
+            "ABInCiNSQU5ET01fQ09NTU9ESVRZX0VWRU5UX1NVUFBMWV9GTE9PRBABEiUK",
+            "IVJBTkRPTV9DT01NT0RJVFlfRVZFTlRfU0FOQ1RJT05FRBACEiEKHVJBTkRP",
+            "TV9DT01NT0RJVFlfRVZFTlRfQ0xPU0VEEAMqqQEKDUNvbW1vZGl0eVR5cGUS",
+            "GQoVQ09NTU9ESVRZX1VOU1BFQ0lGSUVEEAASEwoPQ09NTU9ESVRZX1dIRUFU",
+            "EAESFAoQQ09NTU9ESVRZX0NPRkZFRRACEhUKEUNPTU1PRElUWV9MSVRISVVN",
+            "EAMSEgoOQ09NTU9ESVRZX0dPTEQQBBIRCg1DT01NT0RJVFlfT0lMEAUSFAoQ",
+            "Q09NTU9ESVRZX1NJTFZFUhAGKkYKC09yZGVySW50ZW50EhYKEklOVEVOVF9V",
+            "TlNQRUNJRklFRBAAEg4KCklOVEVOVF9CVVkQARIPCgtJTlRFTlRfU0VMTBAC",
+            "KtYCCg5UcmFkZVJlamVjdGlvbhIfChtUUkFERV9SRUpFQ1RJT05fVU5TUEVD",
+            "SUZJRUQQABIiCh5UUkFERV9SRUpFQ1RJT05fTk9UX0FUX1NUQVRJT04QARIh",
+            "Ch1UUkFERV9SRUpFQ1RJT05fSU5WQUxJRF9PUkRFUhACEh8KG1RSQURFX1JF",
+            "SkVDVElPTl9QUklDRV9NT1ZFRBADEiUKIVRSQURFX1JFSkVDVElPTl9JTlNV",
+            "RkZJQ0lFTlRfQ0FTSBAEEiYKIlRSQURFX1JFSkVDVElPTl9JTlNVRkZJQ0lF",
+            "TlRfVU5JVFMQBRIiCh5UUkFERV9SRUpFQ1RJT05fUE9PTF9FWEhBVVNURUQQ",
+            "BhIkCiBUUkFERV9SRUpFQ1RJT05fR0FNRV9OT1RfUlVOTklORxAHEiIKHlRS",
+            "QURFX1JFSkVDVElPTl9TVEFUSU9OX0NMT1NFRBAIKrUBCg1Kb2luUmVqZWN0",
+            "aW9uEh4KGkpPSU5fUkVKRUNUSU9OX1VOU1BFQ0lGSUVEEAASIQodSk9JTl9S",
+            "RUpFQ1RJT05fR0FNRV9OT1RfRk9VTkQQARIcChhKT0lOX1JFSkVDVElPTl9H",
+            "QU1FX0ZVTEwQAhIjCh9KT0lOX1JFSkVDVElPTl9HQU1FX0lOX1BST0dSRVNT",
+            "EAMSHgoaSk9JTl9SRUpFQ1RJT05fU0VSVkVSX0ZVTEwQBCqKAQoJR2FtZVBo",
+            "YXNlEhoKFkdBTUVfUEhBU0VfVU5TUEVDSUZJRUQQABIWChJHQU1FX1BIQVNF",
+            "X1dBSVRJTkcQARIYChRHQU1FX1BIQVNFX0NPVU5URE9XThACEhYKEkdBTUVf",
+            "UEhBU0VfUlVOTklORxADEhcKE0dBTUVfUEhBU0VfRklOSVNIRUQQBEJGWjpn",
+            "aXRodWIuY29tL2FsY2FyZXMvbW1vc2VydmVyL2JhY2tlbmQvZ2VuL2dvL2dh",
+            "bWUvdjE7Z2FtZXYxqgIHR2FtZS5WMWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Game.V1.PowerUpType), typeof(global::Game.V1.CommodityType), typeof(global::Game.V1.OrderIntent), typeof(global::Game.V1.TradeRejection), typeof(global::Game.V1.JoinRejection), typeof(global::Game.V1.GamePhase), }, null, null));
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Game.V1.PowerUpType), typeof(global::Game.V1.RandomCommodityEventType), typeof(global::Game.V1.CommodityType), typeof(global::Game.V1.OrderIntent), typeof(global::Game.V1.TradeRejection), typeof(global::Game.V1.JoinRejection), typeof(global::Game.V1.GamePhase), }, null, null));
     }
     #endregion
 
@@ -59,6 +64,25 @@ namespace Game.V1 {
   public enum PowerUpType {
     [pbr::OriginalName("POWER_UP_TYPE_UNSPECIFIED")] Unspecified = 0,
     [pbr::OriginalName("POWER_UP_TYPE_FULL_VISION")] FullVision = 1,
+  }
+
+  public enum RandomCommodityEventType {
+    /// <summary>
+    /// Prices will go up
+    /// </summary>
+    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE")] RandomCommodityEventSupplyShortage = 0,
+    /// <summary>
+    /// Prices will go down
+    /// </summary>
+    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD")] RandomCommodityEventSupplyFlood = 1,
+    /// <summary>
+    /// Exchange will take a cut from trading
+    /// </summary>
+    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_SANCTIONED")] RandomCommodityEventSanctioned = 2,
+    /// <summary>
+    /// Trading will be closed for a moment
+    /// </summary>
+    [pbr::OriginalName("RANDOM_COMMODITY_EVENT_CLOSED")] RandomCommodityEventClosed = 3,
   }
 
   public enum CommodityType {
@@ -116,6 +140,7 @@ namespace Game.V1 {
     /// </summary>
     [pbr::OriginalName("TRADE_REJECTION_POOL_EXHAUSTED")] PoolExhausted = 6,
     [pbr::OriginalName("TRADE_REJECTION_GAME_NOT_RUNNING")] GameNotRunning = 7,
+    [pbr::OriginalName("TRADE_REJECTION_STATION_CLOSED")] StationClosed = 8,
   }
 
   public enum JoinRejection {

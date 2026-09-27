@@ -55,7 +55,8 @@ type WorldConfig struct {
 	Logger *slog.Logger
 	// Layout places the stations. sanitize defaults it to NewTradingStations, the ellipse every
 	// real game uses; the sim swaps it to control what stands in a bot's way.
-	Layout func(*rand.Rand) []*TradingStation
+	Layout       func(*rand.Rand) []*TradingStation
+	RandomEvents bool
 
 	BotPolicy bot.Policy
 }

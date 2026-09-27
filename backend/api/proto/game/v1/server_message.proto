@@ -21,6 +21,18 @@ message PowerUpSpawned {
   PowerUp power_up = 1;
 }
 
+// Discrete event: A new random event has occurred
+message RandomEventOccurred {
+  RandomCommodityEventType event_type = 1;
+  CommodityType commodity = 2;
+  int32 remaining_ms = 3;
+}
+
+message RandomEventEnded {
+  RandomCommodityEventType event_type = 1;
+  CommodityType commodity = 2;
+}
+
 // Discrete event: Someone picked it up or it expired
 message PowerUpDespawned {
   uint32 id = 1;
@@ -120,6 +132,8 @@ message ServerMessage {
     // Discrete events
     PowerUpSpawned power_up_spawned     = 3;
     PowerUpDespawned power_up_despawned = 4;
+    RandomEventOccurred random_event_occurred = 14;
+    RandomEventEnded random_event_ended = 15;
     GameStatus game_status = 10;
 
     // Initial join/reconnect
