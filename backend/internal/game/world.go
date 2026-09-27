@@ -82,12 +82,16 @@ func (w *World) Run() {
 	}
 }
 
+// loggerEnabled - sim and the tests discard, so skip building the record for them
+func (w *World) loggerEnabled() bool {
+	return w.config.Logger.Enabled(context.Background(), slog.LevelInfo)
+}
+
 // logTrade records one order's outcome, filled or rejected. The pool's reserves are part of
 // the record so the price of any order size at that moment can be recomputed offline; pool is
 // nil when the order was rejected before a station was found.
 func (w *World) logTrade(player *Player, o TradeOrder, receipt *pb.TradeReceipt, pool *CommodityState) {
-	// The sim and the tests discard, so skip building the record for them
-	if !w.config.Logger.Enabled(context.Background(), slog.LevelInfo) {
+	if !w.loggerEnabled() {
 		return
 	}
 
@@ -114,4 +118,32 @@ func (w *World) logTrade(player *Player, o TradeOrder, receipt *pb.TradeReceipt,
 	}
 
 	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "trade", attrs...)
+}
+
+func (w *World) logPlayerJoin(player *Player, err error) {
+	if !w.loggerEnabled() {
+		return
+	}
+
+	attrs := []slog.Attr{slog.String("phase", w.phase.String())}
+	if err != nil {
+		attrs = append(attrs, slog.String("refused", err.Error()))
+	} else {
+		attrs = append(attrs, slog.Uint64("player", uint64(player.ID)))
+	}
+
+	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "join", attrs...)
+}
+
+func (w *World) logPlayerLeave(player *Player) {
+	if !w.loggerEnabled() {
+		return
+	}
+
+	attrs := []slog.Attr{
+		slog.Uint64("player", uint64(player.ID)),
+		slog.String("phase", w.phase.String()),
+	}
+
+	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "leave", attrs...)
 }

@@ -1,6 +1,6 @@
 # Logging
 - [x] Log trades 
-- [ ] Log players joining and leaving
+- [x] Log players joining and leaving
 - [ ] Log game creation and game ending
 
 # UI

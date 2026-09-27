@@ -28,11 +28,13 @@ func (w *World) Join(c Client) (*Player, error) {
 
 	// Allow late joins
 	if w.phase != pb.GamePhase_GAME_PHASE_WAITING && w.phase != pb.GamePhase_GAME_PHASE_COUNTDOWN {
+		w.logPlayerJoin(nil, ErrGameInProgress)
 		return nil, ErrGameInProgress
 	}
 
 	player, err := w.addPlayer(c)
 	if err != nil {
+		w.logPlayerJoin(nil, err)
 		return nil, err
 	}
 
@@ -43,6 +45,7 @@ func (w *World) Join(c Client) (*Player, error) {
 		Msg: &pb.ServerMessage_PlayerInventory{PlayerInventory: player.ToProtoInventory()},
 	})
 
+	w.logPlayerJoin(player, nil)
 	return player, nil
 }
 
@@ -63,6 +66,9 @@ func (w *World) initialState() *pb.InitialGameState {
 }
 
 func (w *World) removePlayer(playerID uint32) {
+	player := w.players[playerID]
+	w.logPlayerLeave(player)
+
 	delete(w.players, playerID)
 	delete(w.clients, playerID)
 
