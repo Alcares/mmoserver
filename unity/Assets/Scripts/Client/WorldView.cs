@@ -70,6 +70,8 @@ namespace Game.Client
             public GameObject Rock;
             /// <summary>The X drawn over the station while a CLOSED event runs on its commodity.</summary>
             public GameObject ClosedMark;
+            /// <summary>The gold % coin at the station's corner while a SANCTIONED event taxes its commodity.</summary>
+            public GameObject TaxMark;
         }
 
         private GameClient _client;
@@ -123,6 +125,13 @@ namespace Game.Client
         private void Update()
         {
             float follow = 1f - Mathf.Exp(-smoothing * Time.deltaTime);
+
+            // The tax coin breathes so it catches the eye among the station icons
+            float pulse = 1f + 0.08f * Mathf.Sin(Time.time * 5f);
+            foreach (var s in _stations)
+            {
+                if (s.TaxMark.activeSelf) s.TaxMark.transform.localScale = Vector3.one * pulse;
+            }
 
             foreach (var view in _players.Values)
             {
@@ -316,11 +325,12 @@ namespace Game.Client
 
                 var label = OutlinedLabel.Create(go.transform, new Vector2(0f, labelHeight), Color.white, LabelOrder);
                 var closedMark = BuildClosedMark(go.transform, radius);
+                var taxMark = BuildTaxMark(go.transform, radius);
                 var rock = BuildRock(go.transform, radius, _stations.Count);
                 _stations.Add(new StationView
                 {
                     Commodity = st.Commodity, Name = st.Label, Label = label, Go = go,
-                    ClosedMark = closedMark, Art = art, Rock = rock,
+                    ClosedMark = closedMark, TaxMark = taxMark, Art = art, Rock = rock,
                 });
             }
 
@@ -409,14 +419,48 @@ namespace Game.Client
             return mark;
         }
 
-        // Shows what the active event does to each station; only CLOSED marks one today.
+        // A gold coin with a % on it, pinned to the station's right edge below the price label,
+        // hidden until its commodity is taxed. Built from shapes so it needs no font.
+        private static GameObject BuildTaxMark(Transform station, float radius)
+        {
+            var mark = new GameObject("Taxed");
+            mark.transform.SetParent(station, false);
+            mark.transform.localPosition = new Vector3(radius * 0.9f, -radius * 0.3f, 0f);
+            mark.AddComponent<SortingGroup>().sortingOrder = ClosedOrder;
+
+            var ink = new Color32(0x5c, 0x3d, 0x0a, 0xff);
+            AddShape(mark.transform, Shapes.Circle, Vector2.zero, new Vector2(1.5f, 1.5f), 0f, ink, 0);
+            AddShape(mark.transform, Shapes.Circle, Vector2.zero, new Vector2(1.3f, 1.3f), 0f, new Color32(0xfa, 0xcc, 0x15, 0xff), 1);
+            AddShape(mark.transform, Shapes.Square, Vector2.zero, new Vector2(0.95f, 0.16f), 50f, ink, 2);
+            AddShape(mark.transform, Shapes.Circle, new Vector2(-0.24f, 0.24f), new Vector2(0.3f, 0.3f), 0f, ink, 2);
+            AddShape(mark.transform, Shapes.Circle, new Vector2(0.24f, -0.24f), new Vector2(0.3f, 0.3f), 0f, ink, 2);
+
+            mark.SetActive(false);
+            return mark;
+        }
+
+        private static void AddShape(Transform parent, Sprite sprite, Vector2 position, Vector2 size, float angle, Color color, int order)
+        {
+            var shape = new GameObject("Shape").AddComponent<SpriteRenderer>();
+            shape.transform.SetParent(parent, false);
+            shape.transform.localPosition = position;
+            shape.transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+            shape.transform.localScale = new Vector3(size.x, size.y, 1f);
+            shape.sprite = sprite;
+            shape.color = color;
+            shape.sortingOrder = order;
+        }
+
+        // Shows what the active event does to each station: an X while it is closed, a % coin
+        // while its trades are taxed.
         private void RefreshStationEvents()
         {
             var e = _state.ActiveEvent;
             foreach (var s in _stations)
             {
-                s.ClosedMark.SetActive(e != null && e.Commodity == s.Commodity
-                    && e.EventType == RandomCommodityEventType.RandomCommodityEventClosed);
+                bool here = e != null && e.Commodity == s.Commodity;
+                s.ClosedMark.SetActive(here && e.EventType == RandomCommodityEventType.RandomCommodityEventClosed);
+                s.TaxMark.SetActive(here && e.EventType == RandomCommodityEventType.RandomCommodityEventSanctioned);
             }
         }
 

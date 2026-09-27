@@ -17,7 +17,7 @@ namespace Game.Client
         [SerializeField] private AudioClip gameTrack;
         [Tooltip("Looped while spectating training, until the last snapshot has played.")]
         [SerializeField] private AudioClip spectatorTrack;
-        [Tooltip("Every track plays at this volume, 0 to 1, except the lobby track at half of it.")]
+        [Tooltip("The game track plays at this volume, 0 to 1; the lobby track at half of it and the spectator track at 0.6 of it.")]
         [Range(0f, 1f)]
         [SerializeField] private float volume = 0.5f;
 
@@ -59,7 +59,7 @@ namespace Game.Client
 
             _source.Stop();
             _source.clip = wanted;
-            _source.volume = wanted == lobbyTrack ? volume * 0.5f : volume;
+            _source.volume = volume * (wanted == lobbyTrack ? 0.5f : wanted == spectatorTrack ? 0.6f : 1f);
             if (wanted != null) _source.Play();
         }
     }

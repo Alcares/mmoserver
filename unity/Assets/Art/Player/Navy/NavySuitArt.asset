@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2d7125da77e045ef7bb1aef104d00a52, type: 3}
-  m_Name: PlayerArt
+  m_Name: NavySuitArt
   m_EditorClassIdentifier: Assembly-CSharp::Game.Client.DirectionalAnimationSet
   idle:
-    sheet: {fileID: 2800000, guid: c75ed0109544fe917bf9258a0cc03aed, type: 3}
+    sheet: {fileID: 2800000, guid: 73ccb829ded242c4a8e7e80e399a5a96, type: 3}
     frames: 4
     fps: 4
   walk:
-    sheet: {fileID: 2800000, guid: 6e2de02f4f41593cba46f133f24cd7a9, type: 3}
+    sheet: {fileID: 2800000, guid: e96ee44ab0394ca2a6d09ce6d3e93c8f, type: 3}
     frames: 6
     fps: 10
   mirrorWest: 0
