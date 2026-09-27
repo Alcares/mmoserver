@@ -86,6 +86,7 @@ func (w *World) startNextEvent() {
 			},
 		},
 	})
+	w.logEvent("event_start", w.nextEventID, e)
 }
 
 // scheduleEvents lists the ticks this round's events start at, from now
@@ -107,6 +108,7 @@ func (w *World) endEvent(eventID uint64) {
 				},
 			},
 		})
+		w.logEvent("event_end", eventID, e)
 		delete(w.activeEvents, eventID)
 	}
 }

@@ -1,8 +1,8 @@
 # Logging
 - [x] Log trades 
 - [x] Log players joining and leaving
+- [x] Log random events starting and ending
 - [ ] Log game creation and game ending
-- [ ] Log random events starting and ending
 
 # UI
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash

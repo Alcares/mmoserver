@@ -152,3 +152,18 @@ func (w *World) logPlayerLeave(player *Player) {
 
 	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "leave", attrs...)
 }
+
+// logEvent records a random event starting or ending
+func (w *World) logEvent(msg string, id uint64, e *RandomEvent) {
+	if !w.loggerEnabled() {
+		return
+	}
+
+	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, msg,
+		slog.Uint64("id", id),
+		slog.Uint64("tick", w.tick),
+		slog.Uint64("end_tick", e.endTick),
+		slog.String("type", e.eventType.String()),
+		slog.String("commodity", e.commodity.String()),
+	)
+}
