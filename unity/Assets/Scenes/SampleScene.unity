@@ -271,6 +271,7 @@ GameObject:
   - component: {fileID: 536996321}
   - component: {fileID: 536996326}
   - component: {fileID: 536996327}
+  - component: {fileID: 536996328}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -380,9 +381,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Client.Music
   lobbyTrack: {fileID: 8300000, guid: 862d09e75bda403e8e80d8a7eab904fd, type: 3}
-  countdownTrack: {fileID: 8300000, guid: bd3dffd73a464d699011ca843b5f3baa, type: 3}
-  gameTrack: {fileID: 8300000, guid: 21c24e8e194c42eea3dfbb39ce3f124e, type: 3}
+  gameTrack: {fileID: 8300000, guid: e74bd33bff3e4baba65cd8b0ee54960f, type: 3}
   spectatorTrack: {fileID: 8300000, guid: 29546eb9d7864134bf8c2b9afdec8496, type: 3}
+--- !u!114 &536996328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536996320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca9a3f1b9b54aa8913e0792426545f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Client.CountdownBeep
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0

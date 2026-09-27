@@ -4,17 +4,15 @@ using UnityEngine;
 namespace Game.Client
 {
     /// <summary>
-    /// Loops one track while a game waits for players, plays a spoken countdown once as it counts
-    /// down, loops another once it runs, and a third while the training spectator is replaying.
-    /// The main menu and the recap-over screen are silent.
+    /// Loops one track while a game waits for players, another once it runs, and a third while the
+    /// training spectator is replaying. The main menu, the countdown and the recap-over screen are
+    /// silent.
     /// </summary>
     [RequireComponent(typeof(GameState))]
     public class Music : MonoBehaviour
     {
-        [Tooltip("Looped while a joined game waits for players.")]
+        [Tooltip("Looped while a joined game waits for players; stops for the countdown.")]
         [SerializeField] private AudioClip lobbyTrack;
-        [Tooltip("Played once when the countdown starts; the game track cuts it off.")]
-        [SerializeField] private AudioClip countdownTrack;
         [Tooltip("Looped once the round is running, through game over.")]
         [SerializeField] private AudioClip gameTrack;
         [Tooltip("Looped while spectating training, until the last snapshot has played.")]
@@ -30,6 +28,7 @@ namespace Game.Client
         {
             _state = GetComponent<GameState>();
             _source = gameObject.AddComponent<AudioSource>();
+            _source.loop = true;
             _source.playOnAwake = false;
         }
 
@@ -46,14 +45,13 @@ namespace Game.Client
             if (_state.PlaybackSpeed.HasValue) return _state.SpectatingOver ? null : spectatorTrack;
             return _state.Phase switch
             {
-                GamePhase.Countdown => countdownTrack,
+                GamePhase.Countdown => null, // the countdown beeps play alone
                 GamePhase.Running or GamePhase.Finished => gameTrack,
                 _ => lobbyTrack,
             };
         }
 
-        // Starts only when the track changes, so a status update doesn't rewind a track or replay
-        // the countdown after it has finished.
+        // Starts only when the track changes, so a status update doesn't rewind it.
         private void Refresh()
         {
             var wanted = Wanted();
@@ -61,7 +59,6 @@ namespace Game.Client
 
             _source.Stop();
             _source.clip = wanted;
-            _source.loop = wanted != countdownTrack;
             _source.volume = wanted == lobbyTrack ? volume * 0.5f : volume;
             if (wanted != null) _source.Play();
         }
