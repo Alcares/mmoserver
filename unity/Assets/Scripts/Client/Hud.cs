@@ -69,9 +69,16 @@ namespace Game.Client
         {
             _receiptOk = r.Success;
             _receiptUntil = Time.realtimeSinceStartup + ReceiptSeconds;
-            _receiptText = r.Success
-                ? $"{(r.Intent == OrderIntent.IntentBuy ? "Bought" : "Sold")} {r.UnitsTransacted} {GameState.Label(r.Commodity)} @ {GameState.MoneyCents(r.PriceCents)} = {GameState.MoneyCents(r.TotalBalanceChange)}"
-                : RejectionText(r.Rejection);
+            _receiptText = r.Success ? ReceiptText(r) : RejectionText(r.Rejection);
+        }
+
+        // A taxed order spells out the fee, since the total then isn't units times price:
+        // added to what a buy cost, taken off what a sell paid.
+        private static string ReceiptText(TradeReceipt r)
+        {
+            bool buy = r.Intent == OrderIntent.IntentBuy;
+            string fee = r.FeeCents == 0 ? "" : $" {(buy ? "+" : "-")} {GameState.MoneyCents(r.FeeCents)} tax";
+            return $"{(buy ? "Bought" : "Sold")} {r.UnitsTransacted} {GameState.Label(r.Commodity)} @ {GameState.MoneyCents(r.PriceCents)}{fee} = {GameState.MoneyCents(r.TotalBalanceChange)}";
         }
 
         private static string RejectionText(TradeRejection reason) => reason switch

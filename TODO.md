@@ -22,7 +22,12 @@
 # Gameplay
 - [ ] Add market moving events
 - [ ] Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
-- [ ] Add random events (trading stations swapping places)
+- Add random events
+  - [x] Station closed
+  - [x] Station taxed
+  - [ ] Supply flood
+  - [ ] Supply shortage
+- Increase the frequency of random events as game progresses (multiple can be on at the same time)
 
 # Training
 - [ ] Train on GPU instead of CPU 

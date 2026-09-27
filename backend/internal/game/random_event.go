@@ -6,8 +6,18 @@ import (
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 )
 
-const RandomEventDuration = time.Second * 15
+var EventDuration = map[pb.RandomCommodityEventType]time.Duration{
+	pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SANCTIONED: time.Second * 30,
+	pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED:     time.Second * 15,
+}
+
 const DelayBetweenEvents = time.Second * 15
+const ExchangeFeeBasisPoints = 1000 // 10%
+
+// exchangeFee is the exchange's cut of total, rounded up so it never undercharges
+func exchangeFee(total uint64) uint64 {
+	return (total*ExchangeFeeBasisPoints + 9_999) / 10_000
+}
 
 type RandomEvent struct {
 	commodity pb.CommodityType
@@ -23,9 +33,9 @@ func (w *World) chooseEvent() *RandomEvent {
 	// eventType := pb.RandomCommodityEventType(1 + rng.Intn(len(pb.RandomCommodityEventType_name)-1))
 
 	return &RandomEvent{
-		endTick:   w.tick + ticks(RandomEventDuration),
+		endTick:   w.tick + ticks(EventDuration[pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SANCTIONED]),
 		commodity: station.Commodity,
-		eventType: pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED,
+		eventType: pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SANCTIONED,
 	}
 }
 

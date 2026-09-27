@@ -81,9 +81,10 @@ message TradeReceipt {
   OrderIntent intent = 4;
   CommodityType commodity = 5;   // Unspecified if the player wasn't at a station
 
-  uint64 total_balance_change = 6; // Cash spent or gained (cents): units_transacted * price_cents
+  uint64 total_balance_change = 6; // Cash spent or gained (cents): units_transacted * price_cents, plus fee_cents on a buy or minus it on a sell
   uint64 units_transacted = 7;    // Whole units bought or sold
   uint64 price_cents = 8;         // Execution price per unit
+  uint64 fee_cents = 11;          // Exchange tax on this order (cents), 0 when untaxed
 
   uint64 new_cash_balance_cents = 9;
   uint64 new_holding_units = 10;

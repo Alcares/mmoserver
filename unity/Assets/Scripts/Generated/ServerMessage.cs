@@ -45,44 +45,44 @@ namespace Game.V1 {
             "dW5pdHMYAyABKA0SGQoRZG9taW5hbnRfd2hhbGVfaWQYBCABKA0SIwoGb3Jk",
             "ZXJzGAUgAygLMhMuZ2FtZS52MS5PcmRlclF1b3RlIk4KCk9yZGVyUXVvdGUS",
             "DQoFdW5pdHMYASABKA0SFwoPYnV5X3ByaWNlX2NlbnRzGAIgASgEEhgKEHNl",
-            "bGxfcHJpY2VfY2VudHMYAyABKAQiuQIKDFRyYWRlUmVjZWlwdBITCgtzZXF1",
+            "bGxfcHJpY2VfY2VudHMYAyABKAQizAIKDFRyYWRlUmVjZWlwdBITCgtzZXF1",
             "ZW5jZV9pZBgBIAEoDRIPCgdzdWNjZXNzGAIgASgIEioKCXJlamVjdGlvbhgD",
             "IAEoDjIXLmdhbWUudjEuVHJhZGVSZWplY3Rpb24SJAoGaW50ZW50GAQgASgO",
             "MhQuZ2FtZS52MS5PcmRlckludGVudBIpCgljb21tb2RpdHkYBSABKA4yFi5n",
             "YW1lLnYxLkNvbW1vZGl0eVR5cGUSHAoUdG90YWxfYmFsYW5jZV9jaGFuZ2UY",
             "BiABKAQSGAoQdW5pdHNfdHJhbnNhY3RlZBgHIAEoBBITCgtwcmljZV9jZW50",
-            "cxgIIAEoBBIeChZuZXdfY2FzaF9iYWxhbmNlX2NlbnRzGAkgASgEEhkKEW5l",
-            "d19ob2xkaW5nX3VuaXRzGAogASgEImAKDlRyYWRpbmdTdGF0aW9uEikKCWNv",
-            "bW1vZGl0eRgBIAEoDjIWLmdhbWUudjEuQ29tbW9kaXR5VHlwZRIJCgF4GAIg",
-            "ASgCEgkKAXkYAyABKAISDQoFbGFiZWwYBCABKAkirAEKEEluaXRpYWxHYW1l",
-            "U3RhdGUSLwoOc3RhdGlvbl9sYXlvdXQYASADKAsyFy5nYW1lLnYxLlRyYWRp",
-            "bmdTdGF0aW9uEg8KB2dhbWVfaWQYAiABKAkSEgoKd29ybGRfc2l6ZRgDIAEo",
-            "AhITCgt0cmFkZV9yYW5nZRgEIAEoAhIVCg1wbGF5ZXJfcmFkaXVzGAUgASgC",
-            "EhYKDnN0YXRpb25fcmFkaXVzGAYgASgCIjYKDEpvaW5SZWplY3RlZBImCgZy",
-            "ZWFzb24YASABKA4yFi5nYW1lLnYxLkpvaW5SZWplY3Rpb24iOwoIR2FtZU92",
-            "ZXISLwoJc3RhbmRpbmdzGAEgAygLMhwuZ2FtZS52MS5QbGF5ZXJGaW5hbFN0",
-            "YW5kaW5nInAKCkdhbWVTdGF0dXMSIQoFcGhhc2UYASABKA4yEi5nYW1lLnYx",
-            "LkdhbWVQaGFzZRIUCgxwbGF5ZXJfY291bnQYAiABKAUSEwoLbWluX3BsYXll",
-            "cnMYAyABKAUSFAoMcmVtYWluaW5nX21zGAQgASgFIv0FCg1TZXJ2ZXJNZXNz",
-            "YWdlEjAKDndvcmxkX3NuYXBzaG90GAEgASgLMhYuZ2FtZS52MS5Xb3JsZFNu",
-            "YXBzaG90SAASLAoMbWFya2V0X3N0YXRlGAIgASgLMhQuZ2FtZS52MS5NYXJr",
-            "ZXRTdGF0ZUgAEjMKEHBvd2VyX3VwX3NwYXduZWQYAyABKAsyFy5nYW1lLnYx",
-            "LlBvd2VyVXBTcGF3bmVkSAASNwoScG93ZXJfdXBfZGVzcGF3bmVkGAQgASgL",
-            "MhkuZ2FtZS52MS5Qb3dlclVwRGVzcGF3bmVkSAASPQoVcmFuZG9tX2V2ZW50",
-            "X29jY3VycmVkGA4gASgLMhwuZ2FtZS52MS5SYW5kb21FdmVudE9jY3VycmVk",
-            "SAASNwoScmFuZG9tX2V2ZW50X2VuZGVkGA8gASgLMhkuZ2FtZS52MS5SYW5k",
-            "b21FdmVudEVuZGVkSAASKgoLZ2FtZV9zdGF0dXMYCiABKAsyEy5nYW1lLnYx",
-            "LkdhbWVTdGF0dXNIABIyCg1pbml0aWFsX3N0YXRlGAUgASgLMhkuZ2FtZS52",
-            "MS5Jbml0aWFsR2FtZVN0YXRlSAASLgoNam9pbl9yZWplY3RlZBgIIAEoCzIV",
-            "LmdhbWUudjEuSm9pblJlamVjdGVkSAASJgoFdHJhZGUYBiABKAsyFS5nYW1l",
-            "LnYxLlRyYWRlUmVjZWlwdEgAEjQKEHBsYXllcl9pbnZlbnRvcnkYByABKAsy",
-            "GC5nYW1lLnYxLlBsYXllckludmVudG9yeUgAEiYKCWdhbWVfb3ZlchgJIAEo",
-            "CzIRLmdhbWUudjEuR2FtZU92ZXJIABIjCgdlcGlzb2RlGAsgASgLMhAuZ2Ft",
-            "ZS52MS5FcGlzb2RlSAASMAoOcGxheWJhY2tfc3BlZWQYDCABKAsyFi5nYW1l",
-            "LnYxLlBsYXliYWNrU3BlZWRIABIyCg9zcGVjdGF0aW5nX292ZXIYDSABKAsy",
-            "Fy5nYW1lLnYxLlNwZWN0YXRpbmdPdmVySABCBQoDbXNnQkZaOmdpdGh1Yi5j",
-            "b20vYWxjYXJlcy9tbW9zZXJ2ZXIvYmFja2VuZC9nZW4vZ28vZ2FtZS92MTtn",
-            "YW1ldjGqAgdHYW1lLlYxYgZwcm90bzM="));
+            "cxgIIAEoBBIRCglmZWVfY2VudHMYCyABKAQSHgoWbmV3X2Nhc2hfYmFsYW5j",
+            "ZV9jZW50cxgJIAEoBBIZChFuZXdfaG9sZGluZ191bml0cxgKIAEoBCJgCg5U",
+            "cmFkaW5nU3RhdGlvbhIpCgljb21tb2RpdHkYASABKA4yFi5nYW1lLnYxLkNv",
+            "bW1vZGl0eVR5cGUSCQoBeBgCIAEoAhIJCgF5GAMgASgCEg0KBWxhYmVsGAQg",
+            "ASgJIqwBChBJbml0aWFsR2FtZVN0YXRlEi8KDnN0YXRpb25fbGF5b3V0GAEg",
+            "AygLMhcuZ2FtZS52MS5UcmFkaW5nU3RhdGlvbhIPCgdnYW1lX2lkGAIgASgJ",
+            "EhIKCndvcmxkX3NpemUYAyABKAISEwoLdHJhZGVfcmFuZ2UYBCABKAISFQoN",
+            "cGxheWVyX3JhZGl1cxgFIAEoAhIWCg5zdGF0aW9uX3JhZGl1cxgGIAEoAiI2",
+            "CgxKb2luUmVqZWN0ZWQSJgoGcmVhc29uGAEgASgOMhYuZ2FtZS52MS5Kb2lu",
+            "UmVqZWN0aW9uIjsKCEdhbWVPdmVyEi8KCXN0YW5kaW5ncxgBIAMoCzIcLmdh",
+            "bWUudjEuUGxheWVyRmluYWxTdGFuZGluZyJwCgpHYW1lU3RhdHVzEiEKBXBo",
+            "YXNlGAEgASgOMhIuZ2FtZS52MS5HYW1lUGhhc2USFAoMcGxheWVyX2NvdW50",
+            "GAIgASgFEhMKC21pbl9wbGF5ZXJzGAMgASgFEhQKDHJlbWFpbmluZ19tcxgE",
+            "IAEoBSL9BQoNU2VydmVyTWVzc2FnZRIwCg53b3JsZF9zbmFwc2hvdBgBIAEo",
+            "CzIWLmdhbWUudjEuV29ybGRTbmFwc2hvdEgAEiwKDG1hcmtldF9zdGF0ZRgC",
+            "IAEoCzIULmdhbWUudjEuTWFya2V0U3RhdGVIABIzChBwb3dlcl91cF9zcGF3",
+            "bmVkGAMgASgLMhcuZ2FtZS52MS5Qb3dlclVwU3Bhd25lZEgAEjcKEnBvd2Vy",
+            "X3VwX2Rlc3Bhd25lZBgEIAEoCzIZLmdhbWUudjEuUG93ZXJVcERlc3Bhd25l",
+            "ZEgAEj0KFXJhbmRvbV9ldmVudF9vY2N1cnJlZBgOIAEoCzIcLmdhbWUudjEu",
+            "UmFuZG9tRXZlbnRPY2N1cnJlZEgAEjcKEnJhbmRvbV9ldmVudF9lbmRlZBgP",
+            "IAEoCzIZLmdhbWUudjEuUmFuZG9tRXZlbnRFbmRlZEgAEioKC2dhbWVfc3Rh",
+            "dHVzGAogASgLMhMuZ2FtZS52MS5HYW1lU3RhdHVzSAASMgoNaW5pdGlhbF9z",
+            "dGF0ZRgFIAEoCzIZLmdhbWUudjEuSW5pdGlhbEdhbWVTdGF0ZUgAEi4KDWpv",
+            "aW5fcmVqZWN0ZWQYCCABKAsyFS5nYW1lLnYxLkpvaW5SZWplY3RlZEgAEiYK",
+            "BXRyYWRlGAYgASgLMhUuZ2FtZS52MS5UcmFkZVJlY2VpcHRIABI0ChBwbGF5",
+            "ZXJfaW52ZW50b3J5GAcgASgLMhguZ2FtZS52MS5QbGF5ZXJJbnZlbnRvcnlI",
+            "ABImCglnYW1lX292ZXIYCSABKAsyES5nYW1lLnYxLkdhbWVPdmVySAASIwoH",
+            "ZXBpc29kZRgLIAEoCzIQLmdhbWUudjEuRXBpc29kZUgAEjAKDnBsYXliYWNr",
+            "X3NwZWVkGAwgASgLMhYuZ2FtZS52MS5QbGF5YmFja1NwZWVkSAASMgoPc3Bl",
+            "Y3RhdGluZ19vdmVyGA0gASgLMhcuZ2FtZS52MS5TcGVjdGF0aW5nT3ZlckgA",
+            "QgUKA21zZ0JGWjpnaXRodWIuY29tL2FsY2FyZXMvbW1vc2VydmVyL2JhY2tl",
+            "bmQvZ2VuL2dvL2dhbWUvdjE7Z2FtZXYxqgIHR2FtZS5WMWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, global::Game.V1.PlayerReflection.Descriptor, global::Game.V1.SpectatorReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -95,7 +95,7 @@ namespace Game.V1 {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.MarketState), global::Game.V1.MarketState.Parser, new[]{ "Tick", "Quotes" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.PriceQuote), global::Game.V1.PriceQuote.Parser, new[]{ "Commodity", "DeltaBasisPoints", "AvailablePoolUnits", "DominantWhaleId", "Orders" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.OrderQuote), global::Game.V1.OrderQuote.Parser, new[]{ "Units", "BuyPriceCents", "SellPriceCents" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeReceipt), global::Game.V1.TradeReceipt.Parser, new[]{ "SequenceId", "Success", "Rejection", "Intent", "Commodity", "TotalBalanceChange", "UnitsTransacted", "PriceCents", "NewCashBalanceCents", "NewHoldingUnits" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeReceipt), global::Game.V1.TradeReceipt.Parser, new[]{ "SequenceId", "Success", "Rejection", "Intent", "Commodity", "TotalBalanceChange", "UnitsTransacted", "PriceCents", "FeeCents", "NewCashBalanceCents", "NewHoldingUnits" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradingStation), global::Game.V1.TradingStation.Parser, new[]{ "Commodity", "X", "Y", "Label" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.InitialGameState), global::Game.V1.InitialGameState.Parser, new[]{ "StationLayout", "GameId", "WorldSize", "TradeRange", "PlayerRadius", "StationRadius" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.JoinRejected), global::Game.V1.JoinRejected.Parser, new[]{ "Reason" }, null, null, null, null),
@@ -2509,6 +2509,7 @@ namespace Game.V1 {
       totalBalanceChange_ = other.totalBalanceChange_;
       unitsTransacted_ = other.unitsTransacted_;
       priceCents_ = other.priceCents_;
+      feeCents_ = other.feeCents_;
       newCashBalanceCents_ = other.newCashBalanceCents_;
       newHoldingUnits_ = other.newHoldingUnits_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -2593,7 +2594,7 @@ namespace Game.V1 {
     public const int TotalBalanceChangeFieldNumber = 6;
     private ulong totalBalanceChange_;
     /// <summary>
-    /// Cash spent or gained (cents): units_transacted * price_cents
+    /// Cash spent or gained (cents): units_transacted * price_cents, plus fee_cents on a buy or minus it on a sell
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -2631,6 +2632,21 @@ namespace Game.V1 {
       get { return priceCents_; }
       set {
         priceCents_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "fee_cents" field.</summary>
+    public const int FeeCentsFieldNumber = 11;
+    private ulong feeCents_;
+    /// <summary>
+    /// Exchange tax on this order (cents), 0 when untaxed
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong FeeCents {
+      get { return feeCents_; }
+      set {
+        feeCents_ = value;
       }
     }
 
@@ -2681,6 +2697,7 @@ namespace Game.V1 {
       if (TotalBalanceChange != other.TotalBalanceChange) return false;
       if (UnitsTransacted != other.UnitsTransacted) return false;
       if (PriceCents != other.PriceCents) return false;
+      if (FeeCents != other.FeeCents) return false;
       if (NewCashBalanceCents != other.NewCashBalanceCents) return false;
       if (NewHoldingUnits != other.NewHoldingUnits) return false;
       return Equals(_unknownFields, other._unknownFields);
@@ -2698,6 +2715,7 @@ namespace Game.V1 {
       if (TotalBalanceChange != 0UL) hash ^= TotalBalanceChange.GetHashCode();
       if (UnitsTransacted != 0UL) hash ^= UnitsTransacted.GetHashCode();
       if (PriceCents != 0UL) hash ^= PriceCents.GetHashCode();
+      if (FeeCents != 0UL) hash ^= FeeCents.GetHashCode();
       if (NewCashBalanceCents != 0UL) hash ^= NewCashBalanceCents.GetHashCode();
       if (NewHoldingUnits != 0UL) hash ^= NewHoldingUnits.GetHashCode();
       if (_unknownFields != null) {
@@ -2758,6 +2776,10 @@ namespace Game.V1 {
         output.WriteRawTag(80);
         output.WriteUInt64(NewHoldingUnits);
       }
+      if (FeeCents != 0UL) {
+        output.WriteRawTag(88);
+        output.WriteUInt64(FeeCents);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2808,6 +2830,10 @@ namespace Game.V1 {
         output.WriteRawTag(80);
         output.WriteUInt64(NewHoldingUnits);
       }
+      if (FeeCents != 0UL) {
+        output.WriteRawTag(88);
+        output.WriteUInt64(FeeCents);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2841,6 +2867,9 @@ namespace Game.V1 {
       }
       if (PriceCents != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(PriceCents);
+      }
+      if (FeeCents != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(FeeCents);
       }
       if (NewCashBalanceCents != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(NewCashBalanceCents);
@@ -2883,6 +2912,9 @@ namespace Game.V1 {
       }
       if (other.PriceCents != 0UL) {
         PriceCents = other.PriceCents;
+      }
+      if (other.FeeCents != 0UL) {
+        FeeCents = other.FeeCents;
       }
       if (other.NewCashBalanceCents != 0UL) {
         NewCashBalanceCents = other.NewCashBalanceCents;
@@ -2949,6 +2981,10 @@ namespace Game.V1 {
             NewHoldingUnits = input.ReadUInt64();
             break;
           }
+          case 88: {
+            FeeCents = input.ReadUInt64();
+            break;
+          }
         }
       }
     #endif
@@ -3006,6 +3042,10 @@ namespace Game.V1 {
           }
           case 80: {
             NewHoldingUnits = input.ReadUInt64();
+            break;
+          }
+          case 88: {
+            FeeCents = input.ReadUInt64();
             break;
           }
         }

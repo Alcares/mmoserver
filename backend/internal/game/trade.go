@@ -29,7 +29,8 @@ func (w *World) nearestStation(pos geometry.Vec2f) *TradingStation {
 
 // executeTrade fills the whole order against the pool of the station the player stands at,
 // or rejects it and changes nothing. Every unit trades at the same per-unit price, so the
-// order moves exactly units*price cents. Must only be called from World.Run.
+// pool moves exactly units*price cents; a taxed order's fee comes on top of a buy and off a
+// sell. Must only be called from World.Run.
 func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 	receipt := &pb.TradeReceipt{
 		SequenceId: o.SequenceID,
@@ -64,7 +65,9 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 		return reject(pb.TradeRejection_TRADE_REJECTION_INVALID_ORDER)
 	}
 
-	var price, total uint64
+	taxed := w.eventOn(station.Commodity, pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SANCTIONED)
+
+	var price, total, fee uint64
 	switch o.Intent {
 	case pb.OrderIntent_INTENT_BUY:
 		price = pool.buyPrice(o.Units)
@@ -74,14 +77,19 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 		if price > o.PriceCents {
 			return reject(pb.TradeRejection_TRADE_REJECTION_PRICE_MOVED)
 		}
-		if player.balance < o.Units*price {
+		if taxed {
+			fee = exchangeFee(o.Units * price)
+		}
+		if player.balance < o.Units*price+fee {
 			return reject(pb.TradeRejection_TRADE_REJECTION_INSUFFICIENT_CASH)
 		}
+
 		total = pool.buy(o.Units)
-		player.balance -= total
+		player.balance -= total + fee
 		player.tradeVolume += total
 		player.commodities[station.Commodity] += o.Units
 		player.unitsTraded += o.Units
+		receipt.TotalBalanceChange = total + fee
 	case pb.OrderIntent_INTENT_SELL:
 		if player.commodities[station.Commodity] < o.Units {
 			return reject(pb.TradeRejection_TRADE_REJECTION_INSUFFICIENT_UNITS)
@@ -94,18 +102,24 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 			return reject(pb.TradeRejection_TRADE_REJECTION_PRICE_MOVED)
 		}
 		total = pool.sell(o.Units)
-		player.balance += total
+
+		if taxed {
+			fee = exchangeFee(total)
+		}
+
+		player.balance += total - fee
 		player.tradeVolume += total
 		player.commodities[station.Commodity] -= o.Units
 		player.unitsTraded += o.Units
+		receipt.TotalBalanceChange = total - fee
 	default:
 		return reject(pb.TradeRejection_TRADE_REJECTION_INVALID_ORDER)
 	}
 
+	receipt.FeeCents = fee
 	receipt.Success = true
 	receipt.PriceCents = price
 	receipt.UnitsTransacted = o.Units
-	receipt.TotalBalanceChange = total
 	receipt.NewCashBalanceCents = player.balance
 	receipt.NewHoldingUnits = player.commodities[station.Commodity]
 	w.logTrade(player, o, receipt, pool)

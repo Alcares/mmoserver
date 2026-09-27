@@ -14,6 +14,7 @@ namespace Game.Client
         private static string EventText(RandomEventOccurred e) => e.EventType switch
         {
             RandomCommodityEventType.RandomCommodityEventClosed => $"{GameState.Label(e.Commodity)} STATION CLOSED",
+            RandomCommodityEventType.RandomCommodityEventSanctioned => $"{GameState.Label(e.Commodity)} TRADES TAXED",
             _ => null,
         };
 

@@ -559,9 +559,10 @@ type TradeReceipt struct {
 	Rejection           TradeRejection         `protobuf:"varint,3,opt,name=rejection,proto3,enum=game.v1.TradeRejection" json:"rejection,omitempty"` // Why it failed; UNSPECIFIED on success
 	Intent              OrderIntent            `protobuf:"varint,4,opt,name=intent,proto3,enum=game.v1.OrderIntent" json:"intent,omitempty"`
 	Commodity           CommodityType          `protobuf:"varint,5,opt,name=commodity,proto3,enum=game.v1.CommodityType" json:"commodity,omitempty"`                    // Unspecified if the player wasn't at a station
-	TotalBalanceChange  uint64                 `protobuf:"varint,6,opt,name=total_balance_change,json=totalBalanceChange,proto3" json:"total_balance_change,omitempty"` // Cash spent or gained (cents): units_transacted * price_cents
+	TotalBalanceChange  uint64                 `protobuf:"varint,6,opt,name=total_balance_change,json=totalBalanceChange,proto3" json:"total_balance_change,omitempty"` // Cash spent or gained (cents): units_transacted * price_cents, plus fee_cents on a buy or minus it on a sell
 	UnitsTransacted     uint64                 `protobuf:"varint,7,opt,name=units_transacted,json=unitsTransacted,proto3" json:"units_transacted,omitempty"`            // Whole units bought or sold
 	PriceCents          uint64                 `protobuf:"varint,8,opt,name=price_cents,json=priceCents,proto3" json:"price_cents,omitempty"`                           // Execution price per unit
+	FeeCents            uint64                 `protobuf:"varint,11,opt,name=fee_cents,json=feeCents,proto3" json:"fee_cents,omitempty"`                                // Exchange tax on this order (cents), 0 when untaxed
 	NewCashBalanceCents uint64                 `protobuf:"varint,9,opt,name=new_cash_balance_cents,json=newCashBalanceCents,proto3" json:"new_cash_balance_cents,omitempty"`
 	NewHoldingUnits     uint64                 `protobuf:"varint,10,opt,name=new_holding_units,json=newHoldingUnits,proto3" json:"new_holding_units,omitempty"`
 	unknownFields       protoimpl.UnknownFields
@@ -650,6 +651,13 @@ func (x *TradeReceipt) GetUnitsTransacted() uint64 {
 func (x *TradeReceipt) GetPriceCents() uint64 {
 	if x != nil {
 		return x.PriceCents
+	}
+	return 0
+}
+
+func (x *TradeReceipt) GetFeeCents() uint64 {
+	if x != nil {
+		return x.FeeCents
 	}
 	return 0
 }
@@ -1315,7 +1323,7 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"OrderQuote\x12\x14\n" +
 	"\x05units\x18\x01 \x01(\rR\x05units\x12&\n" +
 	"\x0fbuy_price_cents\x18\x02 \x01(\x04R\rbuyPriceCents\x12(\n" +
-	"\x10sell_price_cents\x18\x03 \x01(\x04R\x0esellPriceCents\"\xc3\x03\n" +
+	"\x10sell_price_cents\x18\x03 \x01(\x04R\x0esellPriceCents\"\xe0\x03\n" +
 	"\fTradeReceipt\x12\x1f\n" +
 	"\vsequence_id\x18\x01 \x01(\rR\n" +
 	"sequenceId\x12\x18\n" +
@@ -1326,7 +1334,8 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\x14total_balance_change\x18\x06 \x01(\x04R\x12totalBalanceChange\x12)\n" +
 	"\x10units_transacted\x18\a \x01(\x04R\x0funitsTransacted\x12\x1f\n" +
 	"\vprice_cents\x18\b \x01(\x04R\n" +
-	"priceCents\x123\n" +
+	"priceCents\x12\x1b\n" +
+	"\tfee_cents\x18\v \x01(\x04R\bfeeCents\x123\n" +
 	"\x16new_cash_balance_cents\x18\t \x01(\x04R\x13newCashBalanceCents\x12*\n" +
 	"\x11new_holding_units\x18\n" +
 	" \x01(\x04R\x0fnewHoldingUnits\"x\n" +

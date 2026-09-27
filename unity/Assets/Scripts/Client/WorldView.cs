@@ -105,6 +105,7 @@ namespace Game.Client
             _client.OnEpisode += HandleEpisode;
             _state.PricesChanged += RefreshStationLabels;
             _state.EventChanged += RefreshStationEvents;
+            _state.EventChanged += RefreshStationLabels;
             _state.SessionChanged += RefreshStationStyle;
         }
 
@@ -115,6 +116,7 @@ namespace Game.Client
             _client.OnEpisode -= HandleEpisode;
             _state.PricesChanged -= RefreshStationLabels;
             _state.EventChanged -= RefreshStationEvents;
+            _state.EventChanged -= RefreshStationLabels;
             _state.SessionChanged -= RefreshStationStyle;
         }
 
@@ -451,12 +453,19 @@ namespace Game.Client
         private void RefreshStationLabels()
         {
             uint units = _input.OrderUnits;
+            var e = _state.ActiveEvent;
             foreach (var s in _stations)
             {
                 // Per-unit prices for the selected order size: E buys that many, Q sells that many.
-                s.Label.Text = _state.TryGetOrderQuote(s.Commodity, units, out var q) && q.BuyPriceCents > 0
+                string text = _state.TryGetOrderQuote(s.Commodity, units, out var q) && q.BuyPriceCents > 0
                     ? $"{s.Name} x{units} (E {GameState.MoneyCents(q.BuyPriceCents)} / Q {GameState.MoneyCents(q.SellPriceCents)})"
                     : s.Name;
+
+                // The quotes stay untaxed; the fee comes on top, so warn before the trade.
+                if (e != null && e.Commodity == s.Commodity
+                    && e.EventType == RandomCommodityEventType.RandomCommodityEventSanctioned)
+                    text += " +TAX";
+                s.Label.Text = text;
             }
         }
 
