@@ -32,8 +32,12 @@ func (w *World) setPhase(next pb.GamePhase, d time.Duration) {
 	w.statusDirty = true
 }
 
-// advancePhase runs the round's state machine; caller holds w.Mu
+// advancePhase runs the round's state machine; caller holds w.Mu.
 func (w *World) advancePhase() {
+	if w.config.CloseWhenEmpty && len(w.players)-w.countBots() == 0 && w.nextPlayerID > 1 {
+		w.finish() // everyone left
+		return
+	}
 	switch w.phase {
 	case pb.GamePhase_GAME_PHASE_WAITING:
 		if len(w.players) >= w.config.MinPlayers {
@@ -92,4 +96,14 @@ func (w *World) finish() {
 	w.sendToAll(&pb.ServerMessage{
 		Msg: &pb.ServerMessage_GameOver{GameOver: &pb.GameOver{Standings: standings}},
 	})
+}
+
+func (w *World) countBots() int {
+	n := 0
+	for _, player := range w.players {
+		if player.IsBot {
+			n++
+		}
+	}
+	return n
 }

@@ -100,6 +100,65 @@ func TestJoinRejectsWhenFull(t *testing.T) {
 	}
 }
 
+// With CloseWhenEmpty, the round ends once the last human leaves even though bots remain,
+// and the finished world turns away anyone who still holds a pointer to it
+func TestCloseWhenEmptyFinishesWhenHumansLeave(t *testing.T) {
+	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1)), MinPlayers: 3, CloseWhenEmpty: true})
+	grid := NewSpatialGrid()
+
+	human, err := w.Join(NewSendQueue(), "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	bot, err := w.Join(NewSendQueue(), "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	bot.IsBot = true
+
+	w.Tick(grid)
+	if w.phase != pb.GamePhase_GAME_PHASE_WAITING {
+		t.Fatalf("phase with a human in = %v, want WAITING", w.phase)
+	}
+
+	w.removePlayer(human.ID)
+	w.Tick(grid)
+	if w.phase != pb.GamePhase_GAME_PHASE_FINISHED {
+		t.Fatalf("phase after the last human left = %v, want FINISHED", w.phase)
+	}
+	if _, err := w.Join(NewSendQueue(), ""); !errors.Is(err, ErrGameInProgress) {
+		t.Errorf("Join after closing: got %v, want ErrGameInProgress", err)
+	}
+}
+
+// A new world has no players before its creator joins; that must not count as everyone leaving
+func TestCloseWhenEmptyWaitsForFirstJoin(t *testing.T) {
+	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1)), CloseWhenEmpty: true, MinPlayers: 1})
+	w.Tick(NewSpatialGrid())
+	if w.phase != pb.GamePhase_GAME_PHASE_WAITING {
+		t.Errorf("phase before anyone joined = %v, want WAITING", w.phase)
+	}
+}
+
+// Without CloseWhenEmpty a bot-only world keeps running; the sim depends on it
+func TestBotOnlyWorldRunsWithoutCloseWhenEmpty(t *testing.T) {
+	w := testWorld(t)
+	grid := NewSpatialGrid()
+
+	bot, err := w.Join(NewSendQueue(), "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	bot.IsBot = true
+
+	for range 3 {
+		w.Tick(grid)
+	}
+	if w.phase != pb.GamePhase_GAME_PHASE_RUNNING {
+		t.Errorf("bot-only world phase = %v, want RUNNING", w.phase)
+	}
+}
+
 // Unset or out-of-range MaxPlayers falls back to PlayerLimit
 func TestMaxPlayersDefaultsToLimit(t *testing.T) {
 	for _, maxPlayers := range []int{0, -1, PlayerLimit + 1} {

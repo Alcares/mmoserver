@@ -2,7 +2,7 @@ package game
 
 import (
 	"errors"
-	"log"
+	"log/slog"
 	"time"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
@@ -144,10 +144,8 @@ func (c *WebsocketClient) ReadPump(m *Master, cfg WorldConfig) {
 				// Buffer full
 			}
 		case *pb.ClientMessage_SpawnBot:
-			if _, err := c.World.SpawnBot(); err != nil {
-				log.Printf("Spawn bot: %v", err)
-				//c.rejectJoin(joinRejection(err))
-			}
+			// Refused once the lobby closes or fills up; SendSpawnBot documents that it does nothing then
+			_, _ = c.World.SpawnBot()
 		}
 
 	}
@@ -174,7 +172,7 @@ func (c *WebsocketClient) rejectJoin(reason pb.JoinRejection) {
 		Msg: &pb.ServerMessage_JoinRejected{JoinRejected: &pb.JoinRejected{Reason: reason}},
 	})
 	if err != nil {
-		log.Printf("Marshal error: %v", err)
+		slog.Error("marshal join rejection", "err", err)
 		return
 	}
 
@@ -197,7 +195,6 @@ func createConfig(defaults WorldConfig, req *pb.CreateGame) WorldConfig {
 func (c *WebsocketClient) joinWorld(world *World, playerName string) error {
 	player, err := world.Join(c, playerName)
 	if err != nil {
-		log.Printf("Rejected client: %v", err)
 		return err
 	}
 
@@ -208,7 +205,6 @@ func (c *WebsocketClient) joinWorld(world *World, playerName string) error {
 
 	c.ID = player.ID
 	c.World = world
-	log.Printf("Player %d (%s) joined at (%.1f, %.1f)", player.ID, player.Name, player.Pos.X, player.Pos.Y)
 
 	return nil
 }

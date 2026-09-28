@@ -44,6 +44,7 @@ func main() {
 		LobbyTTL:       game.DefaultLobbyTTL,
 		Logger:         slog.New(slog.NewJSONHandler(tradeLog, nil)),
 		RandomEvents:   true,
+		CloseWhenEmpty: true,
 	}
 
 	// One instance serves every bot: Act only reads the weights and allocates its own scratch.

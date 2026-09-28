@@ -58,6 +58,9 @@ type WorldConfig struct {
 	// real game uses; the sim swaps it to control what stands in a bot's way.
 	Layout       func(*rand.Rand) []*TradingStation
 	RandomEvents bool
+	// CloseWhenEmpty finishes the round once every human has left. Only the server sets it;
+	// the sim runs a bot-only world on purpose.
+	CloseWhenEmpty bool
 
 	BotPolicy bot.Policy
 }

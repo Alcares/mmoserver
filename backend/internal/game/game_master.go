@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"log/slog"
 	"math/rand"
 	"strings"
 	"sync"
@@ -56,11 +57,14 @@ func (m *Master) Create(config WorldConfig) (*World, error) {
 	world := NewWorld(id, config)
 	m.games[id] = world
 
+	slog.Info("game started", "game", id, "active_games", len(m.games))
+
 	go func() {
 		world.Run()
 		m.mu.Lock()
 		defer m.mu.Unlock()
 		delete(m.games, id)
+		slog.Info("game ended", "game", id, "active_games", len(m.games))
 	}()
 
 	return world, nil

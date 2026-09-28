@@ -92,6 +92,15 @@ func (w *World) loggerEnabled() bool {
 	return w.config.Logger.Enabled(context.Background(), slog.LevelInfo)
 }
 
+// log writes one game event, led by the tick and phase every record shares; caller holds w.Mu
+func (w *World) log(msg string, attrs ...slog.Attr) {
+	common := []slog.Attr{
+		slog.Uint64("tick", w.tick),
+		slog.String("phase", w.phase.String()),
+	}
+	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, msg, append(common, attrs...)...)
+}
+
 // logTrade records one order's outcome, filled or rejected. The pool's reserves are part of
 // the record so the price of any order size at that moment can be recomputed offline; pool is
 // nil when the order was rejected before a station was found.
@@ -101,7 +110,6 @@ func (w *World) logTrade(player *Player, o TradeOrder, receipt *pb.TradeReceipt,
 	}
 
 	attrs := []slog.Attr{
-		slog.Uint64("tick", w.tick),
 		slog.Uint64("player", uint64(player.ID)),
 		slog.String("intent", o.Intent.String()),
 		slog.String("commodity", receipt.Commodity.String()),
@@ -122,7 +130,7 @@ func (w *World) logTrade(player *Player, o TradeOrder, receipt *pb.TradeReceipt,
 		)
 	}
 
-	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "trade", attrs...)
+	w.log("trade", attrs...)
 }
 
 // logPoolTrade records a trade the market makes itself during an event, with no player behind it
@@ -131,8 +139,7 @@ func (w *World) logPoolTrade(eventID uint64, e *RandomEvent, intent pb.OrderInte
 		return
 	}
 
-	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "trade",
-		slog.Uint64("tick", w.tick),
+	w.log("trade",
 		slog.Uint64("event", eventID),
 		slog.String("intent", intent.String()),
 		slog.String("commodity", e.commodity.String()),
@@ -144,19 +151,17 @@ func (w *World) logPoolTrade(eventID uint64, e *RandomEvent, intent pb.OrderInte
 	)
 }
 
+// logPlayerJoin records a join or its refusal; player is nil when err is set
 func (w *World) logPlayerJoin(player *Player, err error) {
 	if !w.loggerEnabled() {
 		return
 	}
 
-	attrs := []slog.Attr{slog.String("phase", w.phase.String())}
 	if err != nil {
-		attrs = append(attrs, slog.String("refused", err.Error()))
+		w.log("join", slog.String("refused", err.Error()))
 	} else {
-		attrs = append(attrs, slog.Uint64("player", uint64(player.ID)))
+		w.log("join", slog.Uint64("player", uint64(player.ID)), slog.String("name", player.Name))
 	}
-
-	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "join", attrs...)
 }
 
 func (w *World) logPlayerLeave(player *Player) {
@@ -164,12 +169,7 @@ func (w *World) logPlayerLeave(player *Player) {
 		return
 	}
 
-	attrs := []slog.Attr{
-		slog.Uint64("player", uint64(player.ID)),
-		slog.String("phase", w.phase.String()),
-	}
-
-	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "leave", attrs...)
+	w.log("leave", slog.Uint64("player", uint64(player.ID)), slog.String("name", player.Name))
 }
 
 // logEvent records a random event starting or ending
@@ -178,9 +178,8 @@ func (w *World) logEvent(msg string, id uint64, e *RandomEvent) {
 		return
 	}
 
-	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, msg,
+	w.log(msg,
 		slog.Uint64("id", id),
-		slog.Uint64("tick", w.tick),
 		slog.Uint64("end_tick", e.endTick),
 		slog.String("type", e.eventType.String()),
 		slog.String("commodity", e.commodity.String()),

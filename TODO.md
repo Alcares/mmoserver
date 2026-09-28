@@ -3,13 +3,13 @@
   - [x] Log trades 
   - [x] Log players joining and leaving
   - [x] Log random events starting and ending
-  - [ ] Log game creation and game ending
+  - [x] Log game creation and game ending
 - Add monitoring
   - [ ] Loki
   - [ ] Grafana
 
 # Robustness
-- [ ] End the game when all players left
+- [x] End the game when all players left
 
 # UI
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
