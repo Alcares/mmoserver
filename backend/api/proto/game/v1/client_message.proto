@@ -14,10 +14,13 @@ message MovementCommand {
 }
 
 // TODO: add create game config params
-message CreateGame {}
+message CreateGame {
+  string player_name = 1;
+}
 
 message JoinGame {
-  string id = 1;
+  string game_id = 1;
+  string player_name = 2;
 }
 
 message SpawnBot {

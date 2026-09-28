@@ -105,17 +105,17 @@ func (c *WebsocketClient) ReadPump(m *Master, cfg WorldConfig) {
 					c.rejectJoin(joinRejection(err))
 					continue
 				}
-				if err := c.joinWorld(world); err != nil {
+				if err := c.joinWorld(world, cmd.CreateGame.PlayerName); err != nil {
 					c.rejectJoin(joinRejection(err))
 				}
 
 			case *pb.ClientMessage_JoinGame:
-				world, exists := m.Get(cmd.JoinGame.Id)
+				world, exists := m.Get(cmd.JoinGame.GameId)
 				if !exists {
 					c.rejectJoin(pb.JoinRejection_JOIN_REJECTION_GAME_NOT_FOUND)
 					continue
 				}
-				if err := c.joinWorld(world); err != nil {
+				if err := c.joinWorld(world, cmd.JoinGame.PlayerName); err != nil {
 					c.rejectJoin(joinRejection(err))
 				}
 			}
@@ -194,8 +194,8 @@ func createConfig(defaults WorldConfig, req *pb.CreateGame) WorldConfig {
 	return cfg
 }
 
-func (c *WebsocketClient) joinWorld(world *World) error {
-	player, err := world.Join(c)
+func (c *WebsocketClient) joinWorld(world *World, playerName string) error {
+	player, err := world.Join(c, playerName)
 	if err != nil {
 		log.Printf("Rejected client: %v", err)
 		return err

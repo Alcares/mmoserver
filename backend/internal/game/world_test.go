@@ -38,7 +38,7 @@ func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 	w := testWorld(t)
 	c := NewSendQueue()
 
-	if _, err := w.Join(c); err != nil {
+	if _, err := w.Join(c, ""); err != nil {
 		t.Fatal(err)
 	}
 	w.Tick(NewSpatialGrid())
@@ -71,7 +71,7 @@ func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 func TestJoinSpawnsAtCentre(t *testing.T) {
 	w := testWorld(t)
 	for range 3 {
-		player, err := w.Join(NewSendQueue())
+		player, err := w.Join(NewSendQueue(), "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -86,13 +86,13 @@ func TestJoinRejectsWhenFull(t *testing.T) {
 	const maxPlayers = 3
 	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1)), MaxPlayers: maxPlayers})
 	for range maxPlayers {
-		if _, err := w.Join(NewSendQueue()); err != nil {
+		if _, err := w.Join(NewSendQueue(), ""); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	c := NewSendQueue()
-	if _, err := w.Join(c); !errors.Is(err, ErrGameFull) {
+	if _, err := w.Join(c, ""); !errors.Is(err, ErrGameFull) {
 		t.Fatalf("Join with %d players already in: got %v, want ErrGameFull", maxPlayers, err)
 	}
 	if len(w.players) != maxPlayers || len(c.Send) != 0 {
@@ -122,7 +122,7 @@ func TestMovementDistanceTraveled(t *testing.T) {
 	w := testWorld(t)
 
 	c := NewSendQueue()
-	player, err := w.Join(c)
+	player, err := w.Join(c, "")
 	if err != nil {
 		t.Fatal(err)
 	}

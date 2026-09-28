@@ -1,15 +1,21 @@
 package game
 
-import pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+import (
+	"fmt"
+	"strings"
+	"unicode"
 
-func (w *World) addPlayer(client Client) (*Player, error) {
+	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+)
+
+func (w *World) addPlayer(client Client, name string) (*Player, error) {
 	if len(w.players) >= w.config.MaxPlayers {
 		return nil, ErrGameFull
 	}
 
 	playerID := w.nextPlayerID
 	w.nextPlayerID++
-	player := NewPlayer(playerID, SpawnPos)
+	player := NewPlayer(playerID, SpawnPos, sanitizePlayerName(name, playerID))
 	// Which client drives it is the only thing that makes a player a bot, and it is decided here.
 	_, player.IsBot = client.(*BotClient)
 
@@ -22,7 +28,7 @@ func (w *World) addPlayer(client Client) (*Player, error) {
 }
 
 // Join adds a player for c and queues its InitialGameState and PlayerInventory ahead of any WorldSnapshot
-func (w *World) Join(c Client) (*Player, error) {
+func (w *World) Join(c Client, name string) (*Player, error) {
 	w.Mu.Lock()
 	defer w.Mu.Unlock()
 
@@ -32,7 +38,7 @@ func (w *World) Join(c Client) (*Player, error) {
 		return nil, ErrGameInProgress
 	}
 
-	player, err := w.addPlayer(c)
+	player, err := w.addPlayer(c, name)
 	if err != nil {
 		w.logPlayerJoin(nil, err)
 		return nil, err
@@ -73,4 +79,25 @@ func (w *World) removePlayer(playerID uint32) {
 	delete(w.clients, playerID)
 
 	w.statusDirty = true
+}
+
+const maxNameRunes = 16
+const minNameRunes = 3
+
+// sanitizePlayerName guards against adversarial input. Proto wire guarantees that name will be a valid UTF-8 string.
+func sanitizePlayerName(name string, playerID uint32) string {
+	r := []rune(strings.TrimSpace(name))
+	if len(r) > maxNameRunes {
+		r = r[:maxNameRunes]
+	}
+	sanitized := make([]rune, 0, len(r))
+	for _, c := range r {
+		if !unicode.IsControl(c) && !unicode.Is(unicode.Cf, c) {
+			sanitized = append(sanitized, c)
+		}
+	}
+	if len(sanitized) < minNameRunes {
+		return fmt.Sprintf("Player %d", playerID)
+	}
+	return string(sanitized)
 }

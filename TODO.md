@@ -1,12 +1,16 @@
 # Logging
-- [x] Log trades 
-- [x] Log players joining and leaving
-- [x] Log random events starting and ending
-- [ ] Log game creation and game ending
+- Log events
+  - [x] Log trades 
+  - [x] Log players joining and leaving
+  - [x] Log random events starting and ending
+  - [ ] Log game creation and game ending
+- Add monitoring
+  - [ ] Loki
+  - [ ] Grafana
 
 # UI
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
-- [ ] Make support for players choosing a name
+- [x] Make support for players choosing a name
 
 # Soundtrack (see docs/royalty_free_assets.md)
 - Add sound effects for following actions

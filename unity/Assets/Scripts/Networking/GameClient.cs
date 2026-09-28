@@ -132,16 +132,16 @@ namespace Game.Networking
         }
 
         /// <summary>Asks the server for a new game; it answers with InitialGameState carrying the join code.</summary>
-        public void SendCreateGame()
+        public void SendCreateGame(string playerName)
         {
-            Connection?.Send(new ClientMessage { CreateGame = new CreateGame() });
+            Connection?.Send(new ClientMessage { CreateGame = new CreateGame { PlayerName = playerName } });
         }
 
         /// <summary>Joins an existing game by its code. The server trims and upper-cases it,
         /// and answers with either InitialGameState or JoinRejected.</summary>
-        public void SendJoinGame(string code)
+        public void SendJoinGame(string code, string playerName)
         {
-            Connection?.Send(new ClientMessage { JoinGame = new JoinGame { Id = code } });
+            Connection?.Send(new ClientMessage { JoinGame = new JoinGame { GameId = code, PlayerName = playerName } });
         }
 
         /// <summary>Asks the server to add a policy-driven bot to the game this client is in.

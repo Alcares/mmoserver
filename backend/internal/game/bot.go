@@ -15,6 +15,12 @@ import (
 // and giving up on a goal is the only recovery a bot has.
 const episodeTicks = 600
 
+var botNames = []string{
+	"Scrooge", "Mr. Burns", "Mr. Krabs", "Smaug", "Midas", "Gollum",
+	"Pennybags", "Rockefeller", "Littlefinger", "Ford", "Soros", "Du Pont", "Musk", "Rothschild", "Buffett",
+	"Gordon Ramsay", "Mentzen",
+}
+
 // BotClient is a Client driven by a policy instead of a socket.
 type BotClient struct {
 	*SendQueue
@@ -41,7 +47,7 @@ func (w *World) SpawnBot() (*BotClient, error) {
 		goalIdx:   -1,
 	}
 
-	player, err := w.Join(c)
+	player, err := w.Join(c, botNames[c.rng.Intn(len(botNames))])
 	if err != nil {
 		return nil, err
 	}

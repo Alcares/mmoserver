@@ -29,7 +29,7 @@ func oneStation(t *testing.T, pos geometry.Vec2f) (*World, *Player) {
 			return []*TradingStation{{Label: "TEST", Pos: pos}}
 		},
 	})
-	player, err := w.Join(NewSendQueue())
+	player, err := w.Join(NewSendQueue(), "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -112,7 +112,7 @@ func TestCollisionGlancingSlidesPast(t *testing.T) {
 // gates every trade, has to find that station from there.
 func TestCollisionEveryStationTradeableFromEverySide(t *testing.T) {
 	w := testWorld(t)
-	player, err := w.Join(NewSendQueue())
+	player, err := w.Join(NewSendQueue(), "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,7 +140,7 @@ func TestCollisionEveryStationTradeableFromEverySide(t *testing.T) {
 // station, so contacts from every angle are guaranteed rather than left to chance.
 func TestCollisionRandomWalkNeverEndsInsideStation(t *testing.T) {
 	w := testWorld(t)
-	player, err := w.Join(NewSendQueue())
+	player, err := w.Join(NewSendQueue(), "")
 	if err != nil {
 		t.Fatal(err)
 	}
