@@ -8,7 +8,7 @@ namespace Game.Client
     /// </summary>
     public class OutlinedLabel : MonoBehaviour
     {
-        private const float OutlineOffset = 0.035f;
+        private const float OutlineOffset = 0.0525f;
         private static readonly Color OutlineColor = new(15f / 255f, 23f / 255f, 42f / 255f, 0.9f);
         private static Font _font;
 
@@ -49,7 +49,7 @@ namespace Game.Client
                 mesh.font = _font;
                 mesh.fontStyle = FontStyle.Bold;
                 mesh.fontSize = 64;
-                mesh.characterSize = 0.06f;
+                mesh.characterSize = 0.09f;
                 mesh.anchor = TextAnchor.LowerCenter;
                 mesh.alignment = TextAlignment.Center;
                 mesh.color = i == offsets.Length - 1 ? fill : OutlineColor;
