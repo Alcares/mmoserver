@@ -14,7 +14,7 @@ Rules both the server and every client have to hold up:
 - Never edit `backend/gen/` or `unity/Assets/Scripts/Generated/` by hand; edit `backend/api/proto/` and run `make proto`
 - One `oneof` envelope per direction (`ClientMessage`, `ServerMessage`); add new messages as oneof members
 - A client's own player must stay first in its `WorldSnapshot.players`; the Unity client identifies itself that way
-- Trading: `TradeRequest` is `INTENT_BUY`/`INTENT_SELL` of whole `units` plus the per-unit `price_cents` the client saw; the whole order fills at one per-unit price or is rejected with a `TradeReceipt` reason
+- Trading: `TradeRequest` is `INTENT_BUY`/`INTENT_SELL` of whole `units` plus `price_cents`, the worst per-unit price the client accepts (its quote widened by a slippage allowance); the whole order fills at one per-unit price or is rejected with a `TradeReceipt` reason
 
 ## Domain
 - Cash is whole cents everywhere; only clients format it as dollars

@@ -8,12 +8,15 @@ import (
 )
 
 var EventDuration = map[pb.RandomCommodityEventType]time.Duration{
-	pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SANCTIONED: time.Second * 30,
-	pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED:     time.Second * 15,
+	pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SANCTIONED:   time.Second * 30,
+	pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED:       time.Second * 15,
+	pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD: time.Second * 20,
 }
 
-// eventCurve shapes the schedule: a round gets eventCurve-1 events, and a higher value spreads
-// them closer together
+const supplyFloodUnitsSold = 5 // price of commodity will move based on the total supply of that commodity
+const supplyFloodSellTickFrequency = 10
+
+// eventCurve shapes the schedule: a round gets eventCurve-1 events, and a higher value spreads them closer together
 const eventCurve = 14
 
 // EventTimes yields when each event of a round starts, measured from the round's start. The
@@ -46,8 +49,8 @@ type RandomEvent struct {
 func (w *World) chooseEvent() *RandomEvent {
 	rng := w.config.Rng
 
-	// The types after UNSPECIFIED that have an effect; the last two are not implemented yet
-	types := len(pb.RandomCommodityEventType_name) - 1 - 2
+	// The types after UNSPECIFIED that have an effect; the last one is not implemented yet
+	types := len(pb.RandomCommodityEventType_name) - 1 - 1
 	if len(w.activeEvents) >= len(w.Stations)*types {
 		return nil
 	}

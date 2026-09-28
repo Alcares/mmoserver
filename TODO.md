@@ -25,7 +25,7 @@
 - Add random events
   - [x] Station closed
   - [x] Station taxed
-  - [ ] Supply flood
+  - [x] Supply flood
   - [ ] Supply shortage
 - [x] Increase the frequency of random events as game progresses (multiple can be on at the same time)
 - [x] Allow for multiple events at the same time

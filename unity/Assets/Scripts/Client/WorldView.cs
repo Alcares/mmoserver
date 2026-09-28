@@ -72,6 +72,8 @@ namespace Game.Client
             public GameObject ClosedMark;
             /// <summary>The gold % coin at the station's corner while a SANCTIONED event taxes its commodity.</summary>
             public GameObject TaxMark;
+            /// <summary>The blue down-arrow badge at the station's left edge while a SUPPLY_FLOOD event runs on its commodity.</summary>
+            public GameObject FloodMark;
         }
 
         private GameClient _client;
@@ -326,11 +328,12 @@ namespace Game.Client
                 var label = OutlinedLabel.Create(go.transform, new Vector2(0f, labelHeight), Color.white, LabelOrder);
                 var closedMark = BuildClosedMark(go.transform, radius);
                 var taxMark = BuildTaxMark(go.transform, radius);
+                var floodMark = BuildFloodMark(go.transform, radius);
                 var rock = BuildRock(go.transform, radius, _stations.Count);
                 _stations.Add(new StationView
                 {
                     Commodity = st.Commodity, Name = st.Label, Label = label, Go = go,
-                    ClosedMark = closedMark, TaxMark = taxMark, Art = art, Rock = rock,
+                    ClosedMark = closedMark, TaxMark = taxMark, FloodMark = floodMark, Art = art, Rock = rock,
                 });
             }
 
@@ -439,6 +442,29 @@ namespace Game.Client
             return mark;
         }
 
+        // A blue badge with a white down arrow, pinned to the station's left edge opposite the tax
+        // coin, hidden until its commodity is flooded. The arrow is drawn large and scaled down,
+        // like the rocks, so the polygon texture has enough pixels.
+        private static GameObject BuildFloodMark(Transform station, float radius)
+        {
+            var mark = new GameObject("Flooded");
+            mark.transform.SetParent(station, false);
+            mark.transform.localPosition = new Vector3(-radius * 0.9f, -radius * 0.3f, 0f);
+            mark.AddComponent<SortingGroup>().sortingOrder = ClosedOrder;
+
+            AddShape(mark.transform, Shapes.Circle, Vector2.zero, new Vector2(1.5f, 1.5f), 0f, new Color32(0x0c, 0x2d, 0x5e, 0xff), 0);
+            AddShape(mark.transform, Shapes.Circle, Vector2.zero, new Vector2(1.3f, 1.3f), 0f, new Color32(0x38, 0xbd, 0xf8, 0xff), 1);
+            var arrow = Shapes.Polygon("floodArrow", new[]
+            {
+                new Vector2(-1.8f, 4.5f), new Vector2(1.8f, 4.5f), new Vector2(1.8f, -0.5f), new Vector2(4.5f, -0.5f),
+                new Vector2(0f, -5f), new Vector2(-4.5f, -0.5f), new Vector2(-1.8f, -0.5f),
+            });
+            AddShape(mark.transform, arrow, new Vector2(0f, 0.025f), new Vector2(0.1f, 0.1f), 0f, Color.white, 2);
+
+            mark.SetActive(false);
+            return mark;
+        }
+
         private static void AddShape(Transform parent, Sprite sprite, Vector2 position, Vector2 size, float angle, Color color, int order)
         {
             var shape = new GameObject("Shape").AddComponent<SpriteRenderer>();
@@ -452,13 +478,14 @@ namespace Game.Client
         }
 
         // Shows what the running events do to each station: an X while it is closed, a % coin
-        // while its trades are taxed. Both at once is possible.
+        // while its trades are taxed, a down arrow while it is flooded. Any combination is possible.
         private void RefreshStationEvents()
         {
             foreach (var s in _stations)
             {
                 s.ClosedMark.SetActive(_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventClosed));
                 s.TaxMark.SetActive(_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventSanctioned));
+                s.FloodMark.SetActive(_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventSupplyFlood));
             }
         }
 

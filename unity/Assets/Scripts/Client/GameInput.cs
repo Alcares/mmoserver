@@ -31,6 +31,10 @@ namespace Game.Client
         /// the spectator clamps to the same range.</summary>
         private static readonly float[] PlaybackSpeeds = { 0.25f, 0.5f, 1f, 2f, 4f, 8f, 16f, 32f };
 
+        /// <summary>How far past the shown quote an order still fills, so a price that moved while
+        /// the order was in flight doesn't reject it. 300 = 3%.</summary>
+        private const ulong SlippageBasisPoints = 300;
+
         private GameClient _client;
         private GameState _state;
         private Vector2 _sent;
@@ -115,8 +119,9 @@ namespace Game.Client
         }
 
         // Buys or sells exactly the selected number of units, sending the per-unit price shown at
-        // the station for that size. The server fills the whole order at one price or rejects it
-        // (not enough cash or units, or the price moved against us) and answers with a TradeReceipt.
+        // the station for that size, widened by SlippageBasisPoints as the worst it accepts. The
+        // server fills the whole order at one price, the pool's current one, or rejects it (not
+        // enough cash or units, or the price moved further than that) and answers with a TradeReceipt.
         private void TryTrade(OrderIntent intent)
         {
             if (!_state.TryGetNearbyStation(out var station)) return;
@@ -124,6 +129,11 @@ namespace Game.Client
 
             ulong price = intent == OrderIntent.IntentBuy ? quote.BuyPriceCents : quote.SellPriceCents;
             if (price == 0) return;
+
+            // Buys round the limit up and sells round it down, so the allowance never shrinks to nothing
+            price = intent == OrderIntent.IntentBuy
+                ? (price * (10_000 + SlippageBasisPoints) + 9_999) / 10_000
+                : price * (10_000 - SlippageBasisPoints) / 10_000;
 
             _client.SendTrade(new TradeRequest
             {

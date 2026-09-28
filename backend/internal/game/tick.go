@@ -16,6 +16,7 @@ func (w *World) Tick(grid *SpatialGrid) {
 
 	w.drainInputs()
 	w.stepMovement()
+	w.poolTrade() // pool after player trades - else player trade would be rejected
 	w.replicate(grid)
 	w.broadcastMarket()
 
@@ -193,6 +194,17 @@ func (w *World) randomEvents() {
 	for id, e := range w.activeEvents {
 		if w.tick >= e.endTick {
 			w.endEvent(id)
+		}
+	}
+}
+
+func (w *World) poolTrade() {
+	for id, e := range w.activeEvents {
+		if w.tick%supplyFloodSellTickFrequency == 0 && e.eventType == pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD {
+			total := w.Commodities[e.commodity].sell(supplyFloodUnitsSold)
+			if total > 0 {
+				w.logPoolTrade(id, e, pb.OrderIntent_INTENT_SELL, supplyFloodUnitsSold, total, w.Commodities[e.commodity])
+			}
 		}
 	}
 }

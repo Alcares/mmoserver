@@ -15,6 +15,7 @@ namespace Game.Client
         {
             RandomCommodityEventType.RandomCommodityEventClosed => $"{GameState.Label(e.Commodity)} STATION CLOSED",
             RandomCommodityEventType.RandomCommodityEventSanctioned => $"{GameState.Label(e.Commodity)} TRADES TAXED",
+            RandomCommodityEventType.RandomCommodityEventSupplyFlood => $"{GameState.Label(e.Commodity)} SUPPLY FLOOD",
             _ => null,
         };
 

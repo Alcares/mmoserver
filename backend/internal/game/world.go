@@ -125,6 +125,25 @@ func (w *World) logTrade(player *Player, o TradeOrder, receipt *pb.TradeReceipt,
 	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "trade", attrs...)
 }
 
+// logPoolTrade records a trade the market makes itself during an event, with no player behind it
+func (w *World) logPoolTrade(eventID uint64, e *RandomEvent, intent pb.OrderIntent, units, total uint64, pool *CommodityState) {
+	if !w.loggerEnabled() {
+		return
+	}
+
+	w.config.Logger.LogAttrs(context.Background(), slog.LevelInfo, "trade",
+		slog.Uint64("tick", w.tick),
+		slog.Uint64("event", eventID),
+		slog.String("intent", intent.String()),
+		slog.String("commodity", e.commodity.String()),
+		slog.Uint64("units", units),
+		slog.Uint64("price_cents", total/units),
+		slog.Uint64("total_cents", total),
+		slog.Uint64("pool_cash_cents", pool.cashReserve),
+		slog.Uint64("pool_units", pool.unitReserve),
+	)
+}
+
 func (w *World) logPlayerJoin(player *Player, err error) {
 	if !w.loggerEnabled() {
 		return
