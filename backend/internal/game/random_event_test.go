@@ -56,3 +56,104 @@ func TestEventsStartOnlyOnSchedule(t *testing.T) {
 		t.Fatal("no event started")
 	}
 }
+
+// Once every free slot conflicts with a running event, chooseEvent gives up instead of
+// retrying forever and hanging the tick.
+func TestChooseEventReturnsNilWhenOnlyConflictsRemain(t *testing.T) {
+	w := testWorld(t)
+	w.Stations = w.Stations[:1]
+	c := w.Stations[0].Commodity
+	w.activeEvents[1] = &RandomEvent{commodity: c, eventType: pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_CLOSED}
+	w.activeEvents[2] = &RandomEvent{commodity: c, eventType: pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE}
+
+	if e := w.chooseEvent(); e != nil {
+		t.Fatalf("chose %v, want nil: SANCTIONED conflicts with CLOSED and SUPPLY_FLOOD with SUPPLY_SHORTAGE", e.eventType)
+	}
+}
+
+// Conflicts hold in both orders: whichever of a pair runs first keeps the other from starting.
+func TestCanStartConflictsBothWays(t *testing.T) {
+	for _, pair := range conflicting {
+		for _, order := range [][2]pb.RandomCommodityEventType{{pair[0], pair[1]}, {pair[1], pair[0]}} {
+			w := testWorld(t)
+			c := w.Stations[0].Commodity
+			w.activeEvents[1] = &RandomEvent{commodity: c, eventType: order[0]}
+
+			if w.canStart(c, order[1]) {
+				t.Errorf("%v started while %v runs on the same commodity", order[1], order[0])
+			}
+		}
+	}
+}
+
+// poolEventTypes are the events that trade with the pool
+var poolEventTypes = []pb.RandomCommodityEventType{
+	pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD,
+	pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE,
+}
+
+// priceMove is how far now is from start, in basis points of start, either way
+func priceMove(start, now uint64) uint64 {
+	ratio := now * wholeBasisPoints / start
+	if ratio < wholeBasisPoints {
+		return wholeBasisPoints - ratio
+	}
+	return ratio - wholeBasisPoints
+}
+
+// Each flood or shortage rolls a cap inside its commodity's range, gets close to it by the time
+// the event ends, and never past it.
+func TestPoolTradeStopsAtItsCap(t *testing.T) {
+	for _, eventType := range poolEventTypes {
+		for _, c := range GetCommodityTypes() {
+			w := testWorld(t)
+			w.tick = 7
+			pool := w.Commodities[c]
+			start := pool.buyPrice(1)
+			e := newRandomEvent(c, eventType, w.tick, w.config.Rng)
+			if caps := capsFor(c); e.capBasisPoints < caps.min || e.capBasisPoints > caps.max {
+				t.Errorf("%v on %v: rolled a %d bp cap, outside %d-%d", eventType, c, e.capBasisPoints, caps.min, caps.max)
+			}
+			w.activeEvents[1] = e
+
+			// From the tick the event starts on, which need not be a trade tick, until it ends:
+			// the ticks Tick runs poolTrade on while the event is active
+			for ; w.tick < e.endTick; w.tick++ {
+				w.poolTrade()
+			}
+
+			moved := priceMove(start, pool.buyPrice(1))
+			if moved > e.capBasisPoints {
+				t.Errorf("%v on %v: price moved %d bp, past its %d bp cap", eventType, c, moved, e.capBasisPoints)
+			}
+			if moved < e.capBasisPoints*9/10 {
+				t.Errorf("%v on %v: price moved %d bp, short of its %d bp cap", eventType, c, moved, e.capBasisPoints)
+			}
+		}
+	}
+}
+
+// A flood or shortage makes most of its move the tick it starts, even off the drift schedule,
+// and about its front-loaded share of the cap.
+func TestPoolTradeFrontLoadsTheMove(t *testing.T) {
+	for _, eventType := range poolEventTypes {
+		for _, c := range GetCommodityTypes() {
+			w := testWorld(t)
+			w.tick = 7 // not a drift tick
+			pool := w.Commodities[c]
+			start := pool.buyPrice(1)
+			e := newRandomEvent(c, eventType, w.tick, w.config.Rng)
+			w.activeEvents[1] = e
+
+			w.poolTrade()
+
+			moved := priceMove(start, pool.buyPrice(1))
+			jump := e.capBasisPoints * frontLoadBasisPoints / wholeBasisPoints
+			// Quotes are whole cents and a unit's price rounds up, so on a ~$10 price the measured
+			// move can land a cent or two (10-20 bp) off the target the units were worked out for
+			if moved > jump+20 || moved < jump*85/100 {
+				t.Errorf("%v on %v: jumped %d bp, want close to %d bp and not past it", eventType, c, moved, jump)
+			}
+		}
+	}
+}

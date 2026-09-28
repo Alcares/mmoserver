@@ -198,13 +198,63 @@ func (w *World) randomEvents() {
 	}
 }
 
+// poolTrade makes the trades floods and shortages push through their pools, on the tick each
+// starts and at a fixed interval after, to keep their own move on target
 func (w *World) poolTrade() {
 	for id, e := range w.activeEvents {
-		if w.tick%supplyFloodSellTickFrequency == 0 && e.eventType == pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD {
-			total := w.Commodities[e.commodity].sell(supplyFloodUnitsSold)
-			if total > 0 {
-				w.logPoolTrade(id, e, pb.OrderIntent_INTENT_SELL, supplyFloodUnitsSold, total, w.Commodities[e.commodity])
-			}
+		var trade func(*CommodityState, uint64) uint64
+		var intent pb.OrderIntent
+
+		switch e.eventType {
+		case pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_FLOOD:
+			trade, intent = (*CommodityState).sell, pb.OrderIntent_INTENT_SELL
+		case pb.RandomCommodityEventType_RANDOM_COMMODITY_EVENT_SUPPLY_SHORTAGE:
+			trade, intent = (*CommodityState).buy, pb.OrderIntent_INTENT_BUY
+		default:
+			continue
 		}
+
+		if w.tick != e.startTick && w.tick%poolTradeTickFrequency != 0 {
+			continue
+		}
+
+		pool := w.Commodities[e.commodity]
+		soFar := float64(e.movedBasisPoints) / wholeBasisPoints
+		target := e.target(w.tick)
+		if math.Abs(target-1) <= math.Abs(soFar-1) {
+			continue // already as far as the schedule asks
+		}
+		// Less than a unit's worth waits: the gap grows until the next step covers it
+		units := unitsToward(pool.unitReserve, soFar, target)
+		if units == 0 {
+			continue
+		}
+
+		before := pool.buyPrice(1)
+		if before == 0 {
+			continue
+		}
+		next := *pool // dry run on a copy, so the step that would cross the cap never happens
+		if trade(&next, units) == 0 {
+			continue
+		}
+		// A pool left with a unit or less has no buy price; skip rather than zero the running move
+		after := next.buyPrice(1)
+		if after == 0 {
+			continue
+		}
+		// Rounded in the direction the price moves, so rounding drift never carries an event past its cap
+		moved := e.movedBasisPoints * after / before
+		if after > before {
+			moved = ceilDiv(e.movedBasisPoints*after, before)
+		}
+		// A flood only moves the price down and a shortage only up, so each meets just its own side
+		if moved < wholeBasisPoints-e.capBasisPoints || moved > wholeBasisPoints+e.capBasisPoints {
+			continue
+		}
+
+		total := trade(pool, units)
+		e.movedBasisPoints = moved
+		w.logPoolTrade(id, e, intent, units, total, pool)
 	}
 }

@@ -26,7 +26,7 @@
   - [x] Station closed
   - [x] Station taxed
   - [x] Supply flood
-  - [ ] Supply shortage
+  - [x] Supply shortage
 - [x] Increase the frequency of random events as game progresses (multiple can be on at the same time)
 - [x] Allow for multiple events at the same time
 - [ ] Add a warning countdown (5s) before next random event
