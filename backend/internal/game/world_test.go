@@ -1,6 +1,7 @@
 package game
 
 import (
+	"errors"
 	"math"
 	"math/rand"
 	"testing"
@@ -80,20 +81,40 @@ func TestJoinSpawnsAtCentre(t *testing.T) {
 	}
 }
 
+// A world takes MaxPlayers joins and refuses the next without queueing it anything
 func TestJoinRejectsWhenFull(t *testing.T) {
-	w := testWorld(t)
-	for range MaxPlayers {
+	const maxPlayers = 3
+	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1)), MaxPlayers: maxPlayers})
+	for range maxPlayers {
 		if _, err := w.Join(NewSendQueue()); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	c := NewSendQueue()
-	if _, err := w.Join(c); err == nil {
-		t.Fatal("Join with MaxPlayers already in: want error")
+	if _, err := w.Join(c); !errors.Is(err, ErrGameFull) {
+		t.Fatalf("Join with %d players already in: got %v, want ErrGameFull", maxPlayers, err)
 	}
-	if len(w.players) != MaxPlayers || len(c.Send) != 0 {
-		t.Errorf("rejected join left %d players and %d queued messages, want %d and none", len(w.players), len(c.Send), MaxPlayers)
+	if len(w.players) != maxPlayers || len(c.Send) != 0 {
+		t.Errorf("rejected join left %d players and %d queued messages, want %d and none", len(w.players), len(c.Send), maxPlayers)
+	}
+}
+
+// Unset or out-of-range MaxPlayers falls back to PlayerLimit
+func TestMaxPlayersDefaultsToLimit(t *testing.T) {
+	for _, maxPlayers := range []int{0, -1, PlayerLimit + 1} {
+		w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1)), MaxPlayers: maxPlayers})
+		if w.config.MaxPlayers != PlayerLimit {
+			t.Errorf("MaxPlayers %d became %d, want %d", maxPlayers, w.config.MaxPlayers, PlayerLimit)
+		}
+	}
+}
+
+// MaxPlayers below MinPlayers is raised to it, so the game can still fill up enough to start
+func TestMaxPlayersRaisedToMin(t *testing.T) {
+	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1)), MinPlayers: 3, MaxPlayers: 2})
+	if w.config.MaxPlayers != 3 {
+		t.Errorf("MaxPlayers 2 with MinPlayers 3 became %d, want 3", w.config.MaxPlayers)
 	}
 }
 

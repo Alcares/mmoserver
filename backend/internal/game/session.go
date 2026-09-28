@@ -3,7 +3,7 @@ package game
 import pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 
 func (w *World) addPlayer(client Client) (*Player, error) {
-	if len(w.players) >= MaxPlayers {
+	if len(w.players) >= w.config.MaxPlayers {
 		return nil, ErrGameFull
 	}
 

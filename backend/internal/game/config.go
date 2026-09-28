@@ -21,7 +21,7 @@ const (
 	TradeRange       = 4.0  // Max distance to a station a player can trade from. Have to be kept in sync with its mirrors
 	PlayerRadius     = 1.0
 	StationRadius    = 2.0
-	MaxPlayers       = 50
+	PlayerLimit      = 20 // the most players any game may be configured for
 )
 
 // Bounds every WorldConfig is clamped to, so client-supplied settings can't create
@@ -47,6 +47,7 @@ type WorldConfig struct {
 	StartCountdown time.Duration // Delay between reaching MinPlayers and the round starting
 	LobbyTTL       time.Duration // How long a game waits for MinPlayers before giving up
 	MinPlayers     int           // Players needed to start the countdown; 0 starts immediately
+	MaxPlayers     int           // Players a game accepts, bots included; 0 means PlayerLimit, raised to MinPlayers if below it
 	// Rng seeds the station layout. Master mints one per game and overwrites whatever is
 	// passed, so only direct NewWorld callers (tests, the sim) set it.
 	Rng *rand.Rand
@@ -74,8 +75,11 @@ func (cfg *WorldConfig) sanitize() {
 	if cfg.MinPlayers < 0 {
 		cfg.MinPlayers = 0
 	}
-	if cfg.MinPlayers > MaxPlayers {
-		cfg.MinPlayers = MaxPlayers
+	if cfg.MaxPlayers <= 0 || cfg.MaxPlayers > PlayerLimit {
+		cfg.MaxPlayers = PlayerLimit
+	}
+	if cfg.MaxPlayers < cfg.MinPlayers {
+		cfg.MaxPlayers = cfg.MinPlayers
 	}
 	if cfg.Rng == nil {
 		cfg.Rng = rand.New(rand.NewSource(time.Now().UnixNano()))
