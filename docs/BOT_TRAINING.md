@@ -327,7 +327,7 @@ Settled before the steps:
       between the same spots. Goals stay uniform over the map; one that lands inside a station
       is still reachable because of step 21's margin. The spectator runs `Env`, so it now shows
       random layouts too. Env throughput is unchanged at ~213k steps/s.
-- [ ] **26. Observation v2.** `[dx, dy, dist, ray₀…ray₇]`, `ObsSize` 5 → 11. Ray `i` points
+- [x] **26. Observation v2.** `[dx, dy, dist, ray₀…ray₇]`, `ObsSize` 5 → 11. Ray `i` points
       along action `i + 1` and gives the distance to the first station, inflated by
       `PlayerRadius` so the ray shows where the player's centre stops, or to the map edge.
       It is capped at `RayRange` (10 units, about 17 ticks) and divided by it, so 1 means clear.
@@ -340,13 +340,13 @@ Settled before the steps:
       also means `SnapshotPolicy.Reload` would skip the old snapshots one by one, so clear
       `rl-training/snapshots/` before the first v2 run. Re-check the Env benchmark (~223k steps/s); 8 rays against six
       circles should barely move it.
-- [ ] **27. Retrain and compare.** PPO on random layouts, evaluated on random layouts and on the
+- [x] **27. Retrain and compare.** PPO on random layouts, evaluated on random layouts and on the
       server's own ellipse, against the blind `ScriptedPolicy` from step 24. The rays earned
       their place if PPO's truncations fall below the blind control's. If PPO only matches it,
       the stations weren't in the way often enough to matter; the rays stay anyway, for many
       and moving stations. Re-set step 14's regression-test thresholds to the new measured
       numbers.
-- [ ] **28. Ship.** New `policy.pb` to the server, then a spectator recap of the v2 snapshots.
+- [x] **28. Ship.** New `policy.pb` to the server, then a spectator recap of the v2 snapshots.
       The spectator runs `Env`, so it shows the random layouts; the in-server bot shows the
       real one.
 
@@ -449,8 +449,6 @@ majority of one. Dedicated exploiter agents come last, if ever.
   production alike.
 - **Decision rate.** Should the bot decide every tick, or repeat each action for a few ticks
   (faster training, closer to human reaction time)?
-- **Observation encoding.** `[dx, dy]` gets tiny near the goal. `[dx/dist, dy/dist, dist]`
-  keeps the direction at full size; worth trying if the bot is imprecise when arriving.
 - **Where the league lives.** Settled that Python trains, but not which side holds the
   opponent pool. Snapshots are PyTorch checkpoints, so they are naturally Python-side; match
   scheduling - which bot occupies which agent slot in which world - is the sim server's job.

@@ -14,6 +14,10 @@
 # UI
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
 - [x] Make support for players choosing a name
+- [ ] Create a menu accessible on ESC press
+  - [ ] Resume (close the menu window)
+  - [ ] Back to start screen - should also show after game naturally ended
+  - [ ] Quick the game entirely (with confirmation)
 
 # Soundtrack (see docs/royalty_free_assets.md)
 - Add sound effects for following actions
