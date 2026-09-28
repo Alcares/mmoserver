@@ -1,8 +1,6 @@
 package game
 
 import (
-	"fmt"
-
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 	"github.com/alcares/mmoserver/backend/internal/geometry"
 )
@@ -25,7 +23,7 @@ type Player struct {
 	unitsTraded uint64
 }
 
-func NewPlayer(id uint32, pos geometry.Vec2f) *Player {
+func NewPlayer(id uint32, pos geometry.Vec2f, name string) *Player {
 	commodityTypes := GetCommodityTypes()
 
 	ownedCommodities := make(map[pb.CommodityType]uint64, len(commodityTypes))
@@ -35,7 +33,7 @@ func NewPlayer(id uint32, pos geometry.Vec2f) *Player {
 
 	return &Player{
 		ID:          id,
-		Name:        fmt.Sprintf("Player %d", id),
+		Name:        name,
 		Pos:         pos,
 		Speed:       MoveSpeed,
 		balance:     StartingBalance,

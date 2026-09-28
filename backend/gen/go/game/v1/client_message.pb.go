@@ -77,6 +77,7 @@ func (x *MovementCommand) GetVy() float32 {
 // TODO: add create game config params
 type CreateGame struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlayerName    string                 `protobuf:"bytes,1,opt,name=player_name,json=playerName,proto3" json:"player_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -111,9 +112,17 @@ func (*CreateGame) Descriptor() ([]byte, []int) {
 	return file_game_v1_client_message_proto_rawDescGZIP(), []int{1}
 }
 
+func (x *CreateGame) GetPlayerName() string {
+	if x != nil {
+		return x.PlayerName
+	}
+	return ""
+}
+
 type JoinGame struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	GameId        string                 `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	PlayerName    string                 `protobuf:"bytes,2,opt,name=player_name,json=playerName,proto3" json:"player_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -148,9 +157,16 @@ func (*JoinGame) Descriptor() ([]byte, []int) {
 	return file_game_v1_client_message_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *JoinGame) GetId() string {
+func (x *JoinGame) GetGameId() string {
 	if x != nil {
-		return x.Id
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *JoinGame) GetPlayerName() string {
+	if x != nil {
+		return x.PlayerName
 	}
 	return ""
 }
@@ -426,11 +442,15 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\x1cgame/v1/client_message.proto\x12\agame.v1\x1a\x14game/v1/common.proto\x1a\x17game/v1/spectator.proto\"1\n" +
 	"\x0fMovementCommand\x12\x0e\n" +
 	"\x02vx\x18\x01 \x01(\x02R\x02vx\x12\x0e\n" +
-	"\x02vy\x18\x02 \x01(\x02R\x02vy\"\f\n" +
+	"\x02vy\x18\x02 \x01(\x02R\x02vy\"-\n" +
 	"\n" +
-	"CreateGame\"\x1a\n" +
-	"\bJoinGame\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"\x1e\n" +
+	"CreateGame\x12\x1f\n" +
+	"\vplayer_name\x18\x01 \x01(\tR\n" +
+	"playerName\"D\n" +
+	"\bJoinGame\x12\x17\n" +
+	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12\x1f\n" +
+	"\vplayer_name\x18\x02 \x01(\tR\n" +
+	"playerName\"\x1e\n" +
 	"\bSpawnBot\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"\x94\x01\n" +
 	"\fTradeRequest\x12\x1f\n" +

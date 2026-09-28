@@ -20,6 +20,8 @@ const MaxSteps = 600
 // per commodity, so stations get in the way often enough for the rays to matter
 const layoutStations = 40
 
+const botName = "Timmy"
+
 // Reward shaping
 const (
 	progressScale = 1.0 / (game.MoveSpeed * game.TickDuration) // One tick of full-speed progress = +1
@@ -92,7 +94,7 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 	e.client = game.NewSendQueue()
 	e.observer = bot.Observer{}
 
-	player, err := e.world.Join(e.client)
+	player, err := e.world.Join(e.client, botName)
 	if err != nil {
 		return nil, err
 	}

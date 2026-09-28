@@ -620,8 +620,7 @@ namespace Game.Client
             }
 
             var label = OutlinedLabel.Create(go.transform, new Vector2(0f, avatar.LabelHeight), Color.white, LabelOrder);
-            label.Text = isMe && !state.IsBot ? "You"
-                : string.IsNullOrEmpty(state.Name) ? $"P{state.Id}" : state.Name;
+            label.Text = string.IsNullOrEmpty(state.Name) ? $"P{state.Id}" : state.Name;
 
             return new PlayerView { Go = go, Avatar = avatar, IsMe = isMe, IsBot = state.IsBot };
         }

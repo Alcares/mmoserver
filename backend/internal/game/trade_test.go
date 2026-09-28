@@ -13,7 +13,7 @@ func newTradeWorld() (*World, *Player, *TradingStation) {
 	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1))})
 	w.phase = pb.GamePhase_GAME_PHASE_RUNNING
 	station := w.Stations[0]
-	player := NewPlayer(1, station.Pos)
+	player := NewPlayer(1, station.Pos, "")
 	w.players[player.ID] = player
 	return w, player, station
 }
