@@ -16,6 +16,16 @@ namespace Game.EditorTools
         [MenuItem("Game/Build/macOS")]
         public static void BuildMac() => Exit(Build(BuildTarget.StandaloneOSX, "macOS/MMOClient.app"));
 
+        [MenuItem("Game/Build/Web")]
+        public static void BuildWeb()
+        {
+            // gzip, not Brotli: browsers only take Brotli over https, and gzip also works from a
+            // plain http localhost. The Go server sends the Content-Encoding the loader expects.
+            PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
+            PlayerSettings.WebGL.decompressionFallback = false;
+            Exit(Build(BuildTarget.WebGL, "Web"));
+        }
+
         [MenuItem("Game/Build/All")]
         public static void BuildAll()
         {
@@ -32,7 +42,7 @@ namespace Game.EditorTools
                 scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray(),
                 locationPathName = $"{Root}/{path}",
                 target = target,
-                targetGroup = BuildTargetGroup.Standalone,
+                targetGroup = BuildPipeline.GetBuildTargetGroup(target),
             };
 
             var summary = BuildPipeline.BuildPlayer(options).summary;

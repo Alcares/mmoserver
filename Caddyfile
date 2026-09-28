@@ -1,0 +1,6 @@
+# TLS in front of the game server, which a browser needs once the page is not on localhost:
+# Caddy gets the certificate for DOMAIN itself and proxies the web client and the /ws upgrade.
+# DOMAIN=game.example.com caddy run
+{$DOMAIN} {
+	reverse_proxy localhost:8080
+}
