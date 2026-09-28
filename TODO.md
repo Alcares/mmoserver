@@ -6,6 +6,7 @@
 
 # UI
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
+- [ ] Make support for players choosing a name
 
 # Soundtrack (see docs/royalty_free_assets.md)
 - Add sound effects for following actions
@@ -21,12 +22,13 @@
   - [ ] bot reached goal
 
 # Gameplay
+- [x] Cap max players
 - [ ] Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
 - Add random events
   - [x] Station closed
   - [x] Station taxed
   - [x] Supply flood
-  - [ ] Supply shortage
+  - [x] Supply shortage
 - [x] Increase the frequency of random events as game progresses (multiple can be on at the same time)
 - [x] Allow for multiple events at the same time
 - [ ] Add a warning countdown (5s) before next random event

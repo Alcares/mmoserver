@@ -56,7 +56,8 @@ func main() {
 	// Defaults for every game created on this server; a client's CreateGame may
 	// override them, within the bounds WorldConfig.sanitize enforces.
 	defaults := game.WorldConfig{
-		MinPlayers:     5,
+		MinPlayers:     2,
+		MaxPlayers:     3,
 		StartCountdown: 3 * time.Second,
 		Duration:       5 * time.Minute,
 		LobbyTTL:       game.DefaultLobbyTTL,

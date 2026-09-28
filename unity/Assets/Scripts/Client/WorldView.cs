@@ -28,6 +28,13 @@ namespace Game.Client
         // pixels to stay sharp once scaled down to the station.
         private const float RockPointRadius = 8f;
         private const int RockVariants = 4;
+        // How far the station name rides up over the bottom of the station art, in tiles.
+        private const float NameOverlap = 0.25f;
+        private static readonly Color NameColor = new Color32(0xfb, 0xbf, 0x24, 0xff);
+        // The station name is drawn this much larger than other labels, with an outline this wide
+        // (in the label's own units, so it grows with the scale too).
+        private const float NameScale = 1.5f;
+        private const float NameOutline = 0.09f;
 
         [Tooltip("Orthographic half-height the camera starts at, in tiles.")]
         [SerializeField] private float cameraSize = 12f;
@@ -61,8 +68,10 @@ namespace Game.Client
         private sealed class StationView
         {
             public CommodityType Commodity;
-            public string Name;
+            /// <summary>The buy and sell prices above the station, one per line.</summary>
             public OutlinedLabel Label;
+            /// <summary>The commodity's name in the display font, just under the station art.</summary>
+            public OutlinedLabel NameLabel;
             public GameObject Go;
             /// <summary>The commodity icon or disc a game station is drawn with.</summary>
             public GameObject Art;
@@ -74,6 +83,8 @@ namespace Game.Client
             public GameObject TaxMark;
             /// <summary>The blue down-arrow badge at the station's left edge while a SUPPLY_FLOOD event runs on its commodity.</summary>
             public GameObject FloodMark;
+            /// <summary>The orange up-arrow badge in the same spot while a SUPPLY_SHORTAGE event runs; the server never runs both at once.</summary>
+            public GameObject ShortageMark;
         }
 
         private GameClient _client;
@@ -90,6 +101,7 @@ namespace Game.Client
         private readonly List<StationView> _stations = new();
         private GameObject _goal;
         private float _playerRadius; // the server's collision radius, from InitialGameState
+        private Font _stationFont;
 
         private void Awake()
         {
@@ -97,6 +109,8 @@ namespace Game.Client
             _input = GetComponent<GameInput>();
             _state = GetComponent<GameState>();
             Application.runInBackground = true;
+
+            _stationFont = Resources.Load<Font>("Fonts/LuckiestGuy-Regular");
 
             SetupCamera();
             BuildBackground();
@@ -109,7 +123,6 @@ namespace Game.Client
             _client.OnEpisode += HandleEpisode;
             _state.PricesChanged += RefreshStationLabels;
             _state.EventChanged += RefreshStationEvents;
-            _state.EventChanged += RefreshStationLabels;
             _state.SessionChanged += RefreshStationStyle;
         }
 
@@ -120,7 +133,6 @@ namespace Game.Client
             _client.OnEpisode -= HandleEpisode;
             _state.PricesChanged -= RefreshStationLabels;
             _state.EventChanged -= RefreshStationEvents;
-            _state.EventChanged -= RefreshStationLabels;
             _state.SessionChanged -= RefreshStationStyle;
         }
 
@@ -309,13 +321,14 @@ namespace Game.Client
                 var body = art.AddComponent<SpriteRenderer>();
                 body.sortingOrder = StationOrder;
 
-                float labelHeight;
+                float labelHeight, artBottom;
                 if (icon != null)
                 {
                     body.sprite = icon;
                     float scale = radius * 2f / (icon.bounds.size.x * IconArtFill);
                     art.transform.localScale = Vector3.one * scale;
                     labelHeight = icon.bounds.extents.y * scale + 0.1f; // above the image, so tall art never covers it
+                    artBottom = icon.bounds.min.y * scale;
                 }
                 else
                 {
@@ -323,17 +336,25 @@ namespace Game.Client
                     body.sprite = Shapes.Circle;
                     body.color = new Color32(0xf5, 0x9e, 0x0b, 0xff);
                     labelHeight = radius + 0.2f;
+                    artBottom = -radius;
                 }
 
                 var label = OutlinedLabel.Create(go.transform, new Vector2(0f, labelHeight), Color.white, LabelOrder);
+                var nameLabel = OutlinedLabel.Create(go.transform, new Vector2(0f, artBottom + NameOverlap), NameColor,
+                    LabelOrder, _stationFont, TextAnchor.UpperCenter, NameOutline);
+                nameLabel.transform.localScale = Vector3.one * NameScale;
+                nameLabel.Text = st.Label.ToUpperInvariant();
                 var closedMark = BuildClosedMark(go.transform, radius);
                 var taxMark = BuildTaxMark(go.transform, radius);
-                var floodMark = BuildFloodMark(go.transform, radius);
+                var floodMark = BuildTrendMark(go.transform, radius, "Flooded", false,
+                    new Color32(0x0c, 0x2d, 0x5e, 0xff), new Color32(0x38, 0xbd, 0xf8, 0xff));
+                var shortageMark = BuildTrendMark(go.transform, radius, "Short", true,
+                    new Color32(0x7c, 0x2d, 0x12, 0xff), new Color32(0xfb, 0x92, 0x3c, 0xff));
                 var rock = BuildRock(go.transform, radius, _stations.Count);
                 _stations.Add(new StationView
                 {
-                    Commodity = st.Commodity, Name = st.Label, Label = label, Go = go,
-                    ClosedMark = closedMark, TaxMark = taxMark, FloodMark = floodMark, Art = art, Rock = rock,
+                    Commodity = st.Commodity, Label = label, NameLabel = nameLabel, Go = go,
+                    ClosedMark = closedMark, TaxMark = taxMark, FloodMark = floodMark, ShortageMark = shortageMark, Art = art, Rock = rock,
                 });
             }
 
@@ -353,6 +374,7 @@ namespace Game.Client
                 s.Art.SetActive(!spectating);
                 s.Rock.SetActive(spectating);
                 s.Label.gameObject.SetActive(!spectating);
+                s.NameLabel.gameObject.SetActive(!spectating);
             }
         }
 
@@ -442,24 +464,25 @@ namespace Game.Client
             return mark;
         }
 
-        // A blue badge with a white down arrow, pinned to the station's left edge opposite the tax
-        // coin, hidden until its commodity is flooded. The arrow is drawn large and scaled down,
-        // like the rocks, so the polygon texture has enough pixels.
-        private static GameObject BuildFloodMark(Transform station, float radius)
+        // A badge with a white arrow, pinned to the station's left edge opposite the tax coin,
+        // hidden until its event runs: down on blue for a flood, up on orange for a shortage. The
+        // arrow is drawn large and scaled down, like the rocks, so the polygon texture has enough pixels.
+        private static GameObject BuildTrendMark(Transform station, float radius, string name, bool up, Color ink, Color fill)
         {
-            var mark = new GameObject("Flooded");
+            var mark = new GameObject(name);
             mark.transform.SetParent(station, false);
             mark.transform.localPosition = new Vector3(-radius * 0.9f, -radius * 0.3f, 0f);
             mark.AddComponent<SortingGroup>().sortingOrder = ClosedOrder;
 
-            AddShape(mark.transform, Shapes.Circle, Vector2.zero, new Vector2(1.5f, 1.5f), 0f, new Color32(0x0c, 0x2d, 0x5e, 0xff), 0);
-            AddShape(mark.transform, Shapes.Circle, Vector2.zero, new Vector2(1.3f, 1.3f), 0f, new Color32(0x38, 0xbd, 0xf8, 0xff), 1);
-            var arrow = Shapes.Polygon("floodArrow", new[]
+            AddShape(mark.transform, Shapes.Circle, Vector2.zero, new Vector2(1.5f, 1.5f), 0f, ink, 0);
+            AddShape(mark.transform, Shapes.Circle, Vector2.zero, new Vector2(1.3f, 1.3f), 0f, fill, 1);
+            var arrow = Shapes.Polygon("trendArrow", new[]
             {
-                new Vector2(-1.8f, 4.5f), new Vector2(1.8f, 4.5f), new Vector2(1.8f, -0.5f), new Vector2(4.5f, -0.5f),
-                new Vector2(0f, -5f), new Vector2(-4.5f, -0.5f), new Vector2(-1.8f, -0.5f),
+                new Vector2(-1.8f, 4.75f), new Vector2(1.8f, 4.75f), new Vector2(1.8f, -0.25f), new Vector2(4.5f, -0.25f),
+                new Vector2(0f, -4.75f), new Vector2(-4.5f, -0.25f), new Vector2(-1.8f, -0.25f),
             });
-            AddShape(mark.transform, arrow, new Vector2(0f, 0.025f), new Vector2(0.1f, 0.1f), 0f, Color.white, 2);
+            // The outline points down, centred on its origin; turned half a circle it points up
+            AddShape(mark.transform, arrow, Vector2.zero, new Vector2(0.1f, 0.1f), up ? 180f : 0f, Color.white, 2);
 
             mark.SetActive(false);
             return mark;
@@ -478,7 +501,8 @@ namespace Game.Client
         }
 
         // Shows what the running events do to each station: an X while it is closed, a % coin
-        // while its trades are taxed, a down arrow while it is flooded. Any combination is possible.
+        // while its trades are taxed, a down arrow while it is flooded, an up arrow while supply is
+        // short. Any combination is possible except a flood with a shortage.
         private void RefreshStationEvents()
         {
             foreach (var s in _stations)
@@ -486,6 +510,7 @@ namespace Game.Client
                 s.ClosedMark.SetActive(_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventClosed));
                 s.TaxMark.SetActive(_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventSanctioned));
                 s.FloodMark.SetActive(_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventSupplyFlood));
+                s.ShortageMark.SetActive(_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventSupplyShortage));
             }
         }
 
@@ -524,15 +549,11 @@ namespace Game.Client
             uint units = _input.OrderUnits;
             foreach (var s in _stations)
             {
-                // Per-unit prices for the selected order size: E buys that many, Q sells that many.
-                string text = _state.TryGetOrderQuote(s.Commodity, units, out var q) && q.BuyPriceCents > 0
-                    ? $"{s.Name} x{units} (E {GameState.MoneyCents(q.BuyPriceCents)} / Q {GameState.MoneyCents(q.SellPriceCents)})"
-                    : s.Name;
-
-                // The quotes stay untaxed; the fee comes on top, so warn before the trade.
-                if (_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventSanctioned))
-                    text += " +TAX";
-                s.Label.Text = text;
+                // Per-unit prices for the selected order size, each after the key that trades at it.
+                // The name sits under the station, so without a quote there is nothing to show here.
+                s.Label.Text = _state.TryGetOrderQuote(s.Commodity, units, out var q) && q.BuyPriceCents > 0
+                    ? $"E buy {GameState.MoneyCents(q.BuyPriceCents)}\nQ sell {GameState.MoneyCents(q.SellPriceCents)}"
+                    : "";
             }
         }
 
