@@ -35,7 +35,7 @@ Close the unity editor first or it won't work.
 ```
 make client-linux   # or make client for linux + mac
 ```
-Build ends up in `unity/Builds/`. `make run` = start the server + open the linux build.
+Build ends up in `unity/Builds/`. `make client-web` builds the browser client; with the server running, open http://localhost:8080. `make run` = start the server + open the linux build.
 
 ### Play
 Open the client. Someone hits "create a new game" and gets a code, everyone else joins with the code. needs minPlayers to start, press B in the lobby to add bots if you have no friends.

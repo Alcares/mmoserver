@@ -23,7 +23,7 @@ BENCH_PROF_PKG ?= ./internal/sim
 UNITY_BATCH = LD_LIBRARY_PATH=$(HOME)/.local/lib/unity-compat:$$LD_LIBRARY_PATH $(UNITY) \
 	-batchmode -quit -projectPath $(UNITY_PROJECT) -logFile - -executeMethod
 
-.PHONY: proto proto-py clean server-start server-stop spectator test bench bench-profile hooks client client-linux client-mac all baseline train
+.PHONY: proto proto-py clean server-start server-stop spectator test bench bench-profile hooks client client-linux client-mac client-web all baseline train
 
 proto:
 	protoc \
@@ -121,6 +121,10 @@ client-linux:
 
 client-mac:
 	$(UNITY_BATCH) Game.EditorTools.ClientBuilder.BuildMac
+
+# The browser build; the server serves it at http://localhost:8080 once it exists.
+client-web:
+	$(UNITY_BATCH) Game.EditorTools.ClientBuilder.BuildWeb
 
 # Regenerates protos, runs the Go tests, restarts the server in the background, then builds the Unity client.
 all:

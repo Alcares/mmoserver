@@ -1,0 +1,8 @@
+<linker>
+  <!-- Protobuf reaches into itself and the generated Game.V1 messages by reflection, which
+       IL2CPP's stripping can't see; the web build is IL2CPP-only. -->
+  <assembly fullname="Google.Protobuf" preserve="all"/>
+  <assembly fullname="Assembly-CSharp">
+    <namespace fullname="Game.V1" preserve="all"/>
+  </assembly>
+</linker>

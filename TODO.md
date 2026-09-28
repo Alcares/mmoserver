@@ -8,6 +8,9 @@
   - [ ] Loki
   - [ ] Grafana
 
+# Robustness
+- [ ] End the game when all players left
+
 # UI
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
 - [x] Make support for players choosing a name
@@ -38,9 +41,9 @@
 - [ ] Add a warning countdown (5s) before next random event
 
 # Training
-- [ ] Train on GPU instead of CPU 
+- [ ] Train on GPU instead of CPU (only if the network grows in size enough to justify)
 - [ ] Output a graph showing how to training progressed (success rate vs the success rate of the scripted policy)
 - [ ] Train a trading model (BOT_TRAINING.md)
 
 # Accessibility
-- [ ] Make the game renderable on web
+- [x] Make the game playable on web

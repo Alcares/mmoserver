@@ -37,7 +37,19 @@ namespace Game.Networking
         /// <summary>Only the spectator sends this: every snapshot has played, and it hangs up next.</summary>
         public event Action<SpectatingOver> OnSpectatingOver;
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+        // A web build connects back to whatever served its page, over wss when the page is https.
+        private string Url
+        {
+            get
+            {
+                var page = new Uri(Application.absoluteURL);
+                return $"{(page.Scheme == "https" ? "wss" : "ws")}://{page.Authority}/ws";
+            }
+        }
+#else
         private string Url => $"ws://{host}:{port}/ws";
+#endif
 
         private async void Start()
         {

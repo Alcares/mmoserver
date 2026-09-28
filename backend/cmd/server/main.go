@@ -10,32 +10,13 @@ import (
 	"github.com/alcares/mmoserver/backend/internal/bot"
 	"github.com/alcares/mmoserver/backend/internal/game"
 	"github.com/alcares/mmoserver/backend/internal/logging"
-	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	// Allow browser connections from localhost during development
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-// handleWS upgrades the connection and hands it to the pumps. The client starts in the
-// lobby with no world; ReadPump joins it to one when a CreateGame or JoinGame arrives.
-func handleWS(master *game.Master, defaults game.WorldConfig, w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		slog.Error("upgrade failed", "err", err)
-		return
-	}
-	client := game.NewWebsocketClient(conn)
-
-	go client.WritePump()
-	go client.ReadPump(master, defaults)
-}
-
-// logPath is relative to the repo root the binary runs from.
-const logPath = "backend/server.log"
+// logPath and webClientDir are relative to the repo root the binary runs from.
+const (
+	logPath      = "backend/server.log"
+	webClientDir = "unity/Builds/Web"
+)
 
 func main() {
 	logger, logFile, err := logging.New(logPath)
@@ -75,9 +56,13 @@ func main() {
 	gameMaster := game.NewMaster(rand.New(rand.NewSource(time.Now().UnixNano())))
 	slog.Info("server initialized")
 
+	upgrader := newUpgrader()
+
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		handleWS(gameMaster, defaults, w, r)
+		handleWS(gameMaster, defaults, upgrader, w, r)
 	})
+	// Same origin as /ws, so the web client needs no CORS and no configured server address.
+	http.Handle("/", webClient(webClientDir))
 
 	slog.Info("listening", "url", "ws://localhost:8080/ws")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
