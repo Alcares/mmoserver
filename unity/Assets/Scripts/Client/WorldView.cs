@@ -28,6 +28,13 @@ namespace Game.Client
         // pixels to stay sharp once scaled down to the station.
         private const float RockPointRadius = 8f;
         private const int RockVariants = 4;
+        // How far the station name rides up over the bottom of the station art, in tiles.
+        private const float NameOverlap = 0.25f;
+        private static readonly Color NameColor = new Color32(0xfb, 0xbf, 0x24, 0xff);
+        // The station name is drawn this much larger than other labels, with an outline this wide
+        // (in the label's own units, so it grows with the scale too).
+        private const float NameScale = 1.5f;
+        private const float NameOutline = 0.09f;
 
         [Tooltip("Orthographic half-height the camera starts at, in tiles.")]
         [SerializeField] private float cameraSize = 12f;
@@ -61,8 +68,10 @@ namespace Game.Client
         private sealed class StationView
         {
             public CommodityType Commodity;
-            public string Name;
+            /// <summary>The buy and sell prices above the station, one per line.</summary>
             public OutlinedLabel Label;
+            /// <summary>The commodity's name in the display font, just under the station art.</summary>
+            public OutlinedLabel NameLabel;
             public GameObject Go;
             /// <summary>The commodity icon or disc a game station is drawn with.</summary>
             public GameObject Art;
@@ -92,6 +101,7 @@ namespace Game.Client
         private readonly List<StationView> _stations = new();
         private GameObject _goal;
         private float _playerRadius; // the server's collision radius, from InitialGameState
+        private Font _stationFont;
 
         private void Awake()
         {
@@ -99,6 +109,8 @@ namespace Game.Client
             _input = GetComponent<GameInput>();
             _state = GetComponent<GameState>();
             Application.runInBackground = true;
+
+            _stationFont = Resources.Load<Font>("Fonts/LuckiestGuy-Regular");
 
             SetupCamera();
             BuildBackground();
@@ -111,7 +123,6 @@ namespace Game.Client
             _client.OnEpisode += HandleEpisode;
             _state.PricesChanged += RefreshStationLabels;
             _state.EventChanged += RefreshStationEvents;
-            _state.EventChanged += RefreshStationLabels;
             _state.SessionChanged += RefreshStationStyle;
         }
 
@@ -122,7 +133,6 @@ namespace Game.Client
             _client.OnEpisode -= HandleEpisode;
             _state.PricesChanged -= RefreshStationLabels;
             _state.EventChanged -= RefreshStationEvents;
-            _state.EventChanged -= RefreshStationLabels;
             _state.SessionChanged -= RefreshStationStyle;
         }
 
@@ -311,13 +321,14 @@ namespace Game.Client
                 var body = art.AddComponent<SpriteRenderer>();
                 body.sortingOrder = StationOrder;
 
-                float labelHeight;
+                float labelHeight, artBottom;
                 if (icon != null)
                 {
                     body.sprite = icon;
                     float scale = radius * 2f / (icon.bounds.size.x * IconArtFill);
                     art.transform.localScale = Vector3.one * scale;
                     labelHeight = icon.bounds.extents.y * scale + 0.1f; // above the image, so tall art never covers it
+                    artBottom = icon.bounds.min.y * scale;
                 }
                 else
                 {
@@ -325,9 +336,14 @@ namespace Game.Client
                     body.sprite = Shapes.Circle;
                     body.color = new Color32(0xf5, 0x9e, 0x0b, 0xff);
                     labelHeight = radius + 0.2f;
+                    artBottom = -radius;
                 }
 
                 var label = OutlinedLabel.Create(go.transform, new Vector2(0f, labelHeight), Color.white, LabelOrder);
+                var nameLabel = OutlinedLabel.Create(go.transform, new Vector2(0f, artBottom + NameOverlap), NameColor,
+                    LabelOrder, _stationFont, TextAnchor.UpperCenter, NameOutline);
+                nameLabel.transform.localScale = Vector3.one * NameScale;
+                nameLabel.Text = st.Label.ToUpperInvariant();
                 var closedMark = BuildClosedMark(go.transform, radius);
                 var taxMark = BuildTaxMark(go.transform, radius);
                 var floodMark = BuildTrendMark(go.transform, radius, "Flooded", false,
@@ -337,7 +353,7 @@ namespace Game.Client
                 var rock = BuildRock(go.transform, radius, _stations.Count);
                 _stations.Add(new StationView
                 {
-                    Commodity = st.Commodity, Name = st.Label, Label = label, Go = go,
+                    Commodity = st.Commodity, Label = label, NameLabel = nameLabel, Go = go,
                     ClosedMark = closedMark, TaxMark = taxMark, FloodMark = floodMark, ShortageMark = shortageMark, Art = art, Rock = rock,
                 });
             }
@@ -358,6 +374,7 @@ namespace Game.Client
                 s.Art.SetActive(!spectating);
                 s.Rock.SetActive(spectating);
                 s.Label.gameObject.SetActive(!spectating);
+                s.NameLabel.gameObject.SetActive(!spectating);
             }
         }
 
@@ -532,15 +549,11 @@ namespace Game.Client
             uint units = _input.OrderUnits;
             foreach (var s in _stations)
             {
-                // Per-unit prices for the selected order size: E buys that many, Q sells that many.
-                string text = _state.TryGetOrderQuote(s.Commodity, units, out var q) && q.BuyPriceCents > 0
-                    ? $"{s.Name} x{units} (E {GameState.MoneyCents(q.BuyPriceCents)} / Q {GameState.MoneyCents(q.SellPriceCents)})"
-                    : s.Name;
-
-                // The quotes stay untaxed; the fee comes on top, so warn before the trade.
-                if (_state.EventOn(s.Commodity, RandomCommodityEventType.RandomCommodityEventSanctioned))
-                    text += " +TAX";
-                s.Label.Text = text;
+                // Per-unit prices for the selected order size, each after the key that trades at it.
+                // The name sits under the station, so without a quote there is nothing to show here.
+                s.Label.Text = _state.TryGetOrderQuote(s.Commodity, units, out var q) && q.BuyPriceCents > 0
+                    ? $"E buy {GameState.MoneyCents(q.BuyPriceCents)}\nQ sell {GameState.MoneyCents(q.SellPriceCents)}"
+                    : "";
             }
         }
 
