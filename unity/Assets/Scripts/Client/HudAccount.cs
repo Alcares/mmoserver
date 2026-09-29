@@ -157,7 +157,9 @@ namespace Game.Client
         private static string AccountRejectionText(AccountCreateRejection reason) => reason switch
         {
             AccountCreateRejection.UsernameTaken => "That username is taken",
-            AccountCreateRejection.UsernameInvalid => "That username isn't allowed",
+            AccountCreateRejection.UsernameTooShort => "Username is too short",
+            AccountCreateRejection.UsernameTooLong => "Username is too long",
+            AccountCreateRejection.UsernameInvalidCharacters => "Username has characters that aren't allowed",
             AccountCreateRejection.PasswordTooShort => "Password is too short",
             AccountCreateRejection.PasswordTooLong => "Password is too long",
             AccountCreateRejection.PasswordTooCommon => "Password is too common",

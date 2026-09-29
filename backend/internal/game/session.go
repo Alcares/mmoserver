@@ -1,11 +1,8 @@
 package game
 
 import (
-	"fmt"
-	"strings"
 	"sync"
 	"time"
-	"unicode"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 	"github.com/google/uuid"
@@ -19,7 +16,7 @@ func (w *World) addPlayer(client Client, name string) (*Player, error) {
 
 	playerID := w.nextPlayerID
 	w.nextPlayerID++
-	player := NewPlayer(playerID, SpawnPos, sanitizePlayerName(name, playerID))
+	player := NewPlayer(playerID, SpawnPos, name)
 	// Which client drives it is the only thing that makes a player a bot, and it is decided here.
 	_, player.IsBot = client.(*BotClient)
 
@@ -83,27 +80,6 @@ func (w *World) removePlayer(playerID uint32) {
 	delete(w.clients, playerID)
 
 	w.statusDirty = true
-}
-
-const maxNameRunes = 16
-const minNameRunes = 3
-
-// sanitizePlayerName guards against adversarial input. Proto wire guarantees that name will be a valid UTF-8 string.
-func sanitizePlayerName(name string, playerID uint32) string {
-	r := []rune(strings.TrimSpace(name))
-	if len(r) > maxNameRunes {
-		r = r[:maxNameRunes]
-	}
-	sanitized := make([]rune, 0, len(r))
-	for _, c := range r {
-		if !unicode.IsControl(c) && !unicode.Is(unicode.Cf, c) {
-			sanitized = append(sanitized, c)
-		}
-	}
-	if len(sanitized) < minNameRunes {
-		return fmt.Sprintf("Player %d", playerID)
-	}
-	return string(sanitized)
 }
 
 type Sessions struct {

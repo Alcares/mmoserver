@@ -143,14 +143,20 @@ namespace Game.Client
             DrawTrainingProgress(speedRect);
             if (_state.SpectatingOver) DrawSpectatingOver(screenW, screenH);
 
-            if (_state.Position == null) return;
+            if (_state.Position != null)
+            {
+                DrawStats();
+                DrawHotbar(screenW, screenH);
+                DrawMultiplier(screenW, screenH);
+                DrawReceipt(screenW, screenH);
 
-            DrawStats();
-            DrawHotbar(screenW, screenH);
-            DrawMultiplier(screenW, screenH);
-            DrawReceipt(screenW, screenH);
+                // Not under the menu: both sit in the middle and their buttons would overlap.
+                if (_state.Standings != null && !_input.MenuOpen) DrawStandings(screenW, screenH);
+            }
 
-            if (_state.Standings != null) DrawStandings(screenW, screenH);
+            // Last, so it draws over everything else.
+            if (_input.MenuOpen) DrawMenu(screenW, screenH);
+            else _confirmQuit = false; // a reopened menu asks again
         }
 
         // The last trade's result, centered above the order-size row, until it expires.

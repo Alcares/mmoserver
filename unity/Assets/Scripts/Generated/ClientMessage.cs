@@ -32,15 +32,16 @@ namespace Game.V1 {
             "ZV9pZBgBIAEoDRIkCgZpbnRlbnQYAiABKA4yFC5nYW1lLnYxLk9yZGVySW50",
             "ZW50Eg0KBXVuaXRzGAMgASgNEhMKC3ByaWNlX2NlbnRzGAQgASgEIi8KDUNy",
             "ZWF0ZUFjY291bnQSDAoEbmFtZRgBIAEoCRIQCghwYXNzd29yZBgCIAEoCSIn",
-            "CgVMb2dpbhIMCgRuYW1lGAEgASgJEhAKCHBhc3N3b3JkGAIgASgJIu4CCg1D",
-            "bGllbnRNZXNzYWdlEikKBWlucHV0GAEgASgLMhguZ2FtZS52MS5Nb3ZlbWVu",
-            "dENvbW1hbmRIABImCgV0cmFkZRgCIAEoCzIVLmdhbWUudjEuVHJhZGVSZXF1",
-            "ZXN0SAASKgoLY3JlYXRlX2dhbWUYAyABKAsyEy5nYW1lLnYxLkNyZWF0ZUdh",
-            "bWVIABImCglqb2luX2dhbWUYBCABKAsyES5nYW1lLnYxLkpvaW5HYW1lSAAS",
-            "JgoJc3Bhd25fYm90GAUgASgLMhEuZ2FtZS52MS5TcGF3bkJvdEgAEjQKEnNl",
-            "dF9wbGF5YmFja19zcGVlZBgGIAEoCzIWLmdhbWUudjEuUGxheWJhY2tTcGVl",
-            "ZEgAEjAKDmNyZWF0ZV9hY2NvdW50GAcgASgLMhYuZ2FtZS52MS5DcmVhdGVB",
-            "Y2NvdW50SAASHwoFbG9naW4YCCABKAsyDi5nYW1lLnYxLkxvZ2luSABCBQoD",
+            "CgVMb2dpbhIMCgRuYW1lGAEgASgJEhAKCHBhc3N3b3JkGAIgASgJIggKBkxv",
+            "Z291dCKRAwoNQ2xpZW50TWVzc2FnZRIpCgVpbnB1dBgBIAEoCzIYLmdhbWUu",
+            "djEuTW92ZW1lbnRDb21tYW5kSAASJgoFdHJhZGUYAiABKAsyFS5nYW1lLnYx",
+            "LlRyYWRlUmVxdWVzdEgAEioKC2NyZWF0ZV9nYW1lGAMgASgLMhMuZ2FtZS52",
+            "MS5DcmVhdGVHYW1lSAASJgoJam9pbl9nYW1lGAQgASgLMhEuZ2FtZS52MS5K",
+            "b2luR2FtZUgAEiYKCXNwYXduX2JvdBgFIAEoCzIRLmdhbWUudjEuU3Bhd25C",
+            "b3RIABI0ChJzZXRfcGxheWJhY2tfc3BlZWQYBiABKAsyFi5nYW1lLnYxLlBs",
+            "YXliYWNrU3BlZWRIABIwCg5jcmVhdGVfYWNjb3VudBgHIAEoCzIWLmdhbWUu",
+            "djEuQ3JlYXRlQWNjb3VudEgAEh8KBWxvZ2luGAggASgLMg4uZ2FtZS52MS5M",
+            "b2dpbkgAEiEKBmxvZ291dBgJIAEoCzIPLmdhbWUudjEuTG9nb3V0SABCBQoD",
             "Y21kQkZaOmdpdGh1Yi5jb20vYWxjYXJlcy9tbW9zZXJ2ZXIvYmFja2VuZC9n",
             "ZW4vZ28vZ2FtZS92MTtnYW1ldjGqAgdHYW1lLlYxYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
@@ -53,7 +54,8 @@ namespace Game.V1 {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.TradeRequest), global::Game.V1.TradeRequest.Parser, new[]{ "SequenceId", "Intent", "Units", "PriceCents" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.CreateAccount), global::Game.V1.CreateAccount.Parser, new[]{ "Name", "Password" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.Login), global::Game.V1.Login.Parser, new[]{ "Name", "Password" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ClientMessage), global::Game.V1.ClientMessage.Parser, new[]{ "Input", "Trade", "CreateGame", "JoinGame", "SpawnBot", "SetPlaybackSpeed", "CreateAccount", "Login" }, new[]{ "Cmd" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.Logout), global::Game.V1.Logout.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ClientMessage), global::Game.V1.ClientMessage.Parser, new[]{ "Input", "Trade", "CreateGame", "JoinGame", "SpawnBot", "SetPlaybackSpeed", "CreateAccount", "Login", "Logout" }, new[]{ "Cmd" }, null, null, null)
           }));
     }
     #endregion
@@ -1651,6 +1653,167 @@ namespace Game.V1 {
 
   }
 
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class Logout : pb::IMessage<Logout>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<Logout> _parser = new pb::MessageParser<Logout>(() => new Logout());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<Logout> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Game.V1.ClientMessageReflection.Descriptor.MessageTypes[7]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Logout() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Logout(Logout other) : this() {
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Logout Clone() {
+      return new Logout(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as Logout);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(Logout other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(Logout other) {
+      if (other == null) {
+        return;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+        }
+      }
+    }
+    #endif
+
+  }
+
   /// <summary>
   /// Client -> Server: Discriminated wrapper for all client commands.
   /// </summary>
@@ -1669,7 +1832,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ClientMessageReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Game.V1.ClientMessageReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1713,6 +1876,9 @@ namespace Game.V1 {
           break;
         case CmdOneofCase.Login:
           Login = other.Login.Clone();
+          break;
+        case CmdOneofCase.Logout:
+          Logout = other.Logout.Clone();
           break;
       }
 
@@ -1824,6 +1990,18 @@ namespace Game.V1 {
       }
     }
 
+    /// <summary>Field number for the "logout" field.</summary>
+    public const int LogoutFieldNumber = 9;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.Logout Logout {
+      get { return cmdCase_ == CmdOneofCase.Logout ? (global::Game.V1.Logout) cmd_ : null; }
+      set {
+        cmd_ = value;
+        cmdCase_ = value == null ? CmdOneofCase.None : CmdOneofCase.Logout;
+      }
+    }
+
     private object cmd_;
     /// <summary>Enum of possible cases for the "cmd" oneof.</summary>
     public enum CmdOneofCase {
@@ -1836,6 +2014,7 @@ namespace Game.V1 {
       SetPlaybackSpeed = 6,
       CreateAccount = 7,
       Login = 8,
+      Logout = 9,
     }
     private CmdOneofCase cmdCase_ = CmdOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1874,6 +2053,7 @@ namespace Game.V1 {
       if (!object.Equals(SetPlaybackSpeed, other.SetPlaybackSpeed)) return false;
       if (!object.Equals(CreateAccount, other.CreateAccount)) return false;
       if (!object.Equals(Login, other.Login)) return false;
+      if (!object.Equals(Logout, other.Logout)) return false;
       if (CmdCase != other.CmdCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -1890,6 +2070,7 @@ namespace Game.V1 {
       if (cmdCase_ == CmdOneofCase.SetPlaybackSpeed) hash ^= SetPlaybackSpeed.GetHashCode();
       if (cmdCase_ == CmdOneofCase.CreateAccount) hash ^= CreateAccount.GetHashCode();
       if (cmdCase_ == CmdOneofCase.Login) hash ^= Login.GetHashCode();
+      if (cmdCase_ == CmdOneofCase.Logout) hash ^= Logout.GetHashCode();
       hash ^= (int) cmdCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -1941,6 +2122,10 @@ namespace Game.V1 {
         output.WriteRawTag(66);
         output.WriteMessage(Login);
       }
+      if (cmdCase_ == CmdOneofCase.Logout) {
+        output.WriteRawTag(74);
+        output.WriteMessage(Logout);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1983,6 +2168,10 @@ namespace Game.V1 {
         output.WriteRawTag(66);
         output.WriteMessage(Login);
       }
+      if (cmdCase_ == CmdOneofCase.Logout) {
+        output.WriteRawTag(74);
+        output.WriteMessage(Logout);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -2016,6 +2205,9 @@ namespace Game.V1 {
       }
       if (cmdCase_ == CmdOneofCase.Login) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Login);
+      }
+      if (cmdCase_ == CmdOneofCase.Logout) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Logout);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2077,6 +2269,12 @@ namespace Game.V1 {
             Login = new global::Game.V1.Login();
           }
           Login.MergeFrom(other.Login);
+          break;
+        case CmdOneofCase.Logout:
+          if (Logout == null) {
+            Logout = new global::Game.V1.Logout();
+          }
+          Logout.MergeFrom(other.Logout);
           break;
       }
 
@@ -2171,6 +2369,15 @@ namespace Game.V1 {
             Login = subBuilder;
             break;
           }
+          case 74: {
+            global::Game.V1.Logout subBuilder = new global::Game.V1.Logout();
+            if (cmdCase_ == CmdOneofCase.Logout) {
+              subBuilder.MergeFrom(Logout);
+            }
+            input.ReadMessage(subBuilder);
+            Logout = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -2260,6 +2467,15 @@ namespace Game.V1 {
             }
             input.ReadMessage(subBuilder);
             Login = subBuilder;
+            break;
+          }
+          case 74: {
+            global::Game.V1.Logout subBuilder = new global::Game.V1.Logout();
+            if (cmdCase_ == CmdOneofCase.Logout) {
+              subBuilder.MergeFrom(Logout);
+            }
+            input.ReadMessage(subBuilder);
+            Logout = subBuilder;
             break;
           }
         }

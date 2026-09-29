@@ -12,6 +12,8 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/alcares/mmoserver/backend/gen/go/db"
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
@@ -47,6 +49,9 @@ func Open(path string) (*sql.DB, error) {
 	}
 	return conn, nil
 }
+
+//go:embed common_passwords.txt
+var commonPasswordsFile string
 
 //go:embed migrations/*.sql
 var migrations embed.FS
@@ -147,10 +152,12 @@ func (a *Accounts) Login(ctx context.Context, username, password string) (*Sessi
 }
 
 func (a *Accounts) CreateNewAccount(ctx context.Context, username, password string) (*Session, pb.AccountCreateRejection) {
+	username = strings.TrimSpace(username)
+
 	if reason := validateUsername(username); reason != pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED {
 		return nil, reason
 	}
-	if reason := validatePassword(password); reason != pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED {
+	if reason := validatePassword(username, password); reason != pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED {
 		return nil, reason
 	}
 
@@ -194,10 +201,75 @@ func (a *Accounts) CreateNewAccount(ctx context.Context, username, password stri
 	}, pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED
 }
 
-func validatePassword(password string) pb.AccountCreateRejection {
+const (
+	passwordMinLength       = 8
+	passwordMaxLength       = 72
+	passwordMinNumbers      = 1
+	passwordMinSpecialChars = 1
+
+	usernameMinLength = 2
+	usernameMaxLength = 20
+)
+
+// commonPasswords holds the embedded list, lowercased, built once at startup
+var commonPasswords = func() map[string]struct{} {
+	m := make(map[string]struct{})
+	for line := range strings.SplitSeq(commonPasswordsFile, "\n") {
+		if p := strings.TrimSpace(line); p != "" {
+			m[strings.ToLower(p)] = struct{}{}
+		}
+	}
+	return m
+}()
+
+func validatePassword(username, password string) pb.AccountCreateRejection {
+	switch {
+	case utf8.RuneCountInString(password) < passwordMinLength:
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT
+	case len(password) > passwordMaxLength: // bcrypt's limit is 72 bytes
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG
+	}
+
+	lower := strings.ToLower(password)
+	if _, common := commonPasswords[lower]; common || strings.Contains(lower, strings.ToLower(username)) {
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON
+	}
+
+	var numbers, specialChars int
+	r := []rune(password)
+	for _, c := range r {
+		if unicode.IsNumber(c) {
+			numbers++
+		}
+		if unicode.IsSymbol(c) || unicode.IsPunct(c) {
+			specialChars++
+		}
+	}
+
+	switch {
+	case numbers < passwordMinNumbers:
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_NUMBERS
+	case specialChars < passwordMinSpecialChars:
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_SPECIAL_CHARACTERS
+	}
+
 	return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED
 }
 
 func validateUsername(username string) pb.AccountCreateRejection {
+	switch {
+	case utf8.RuneCountInString(username) < usernameMinLength:
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT
+	case utf8.RuneCountInString(username) > usernameMaxLength:
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TOO_LONG
+	}
+
+	r := []rune(username)
+	for _, c := range r {
+		if !unicode.IsLetter(c) && !unicode.IsNumber(c) && c != ' ' {
+			return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_INVALID_CHARACTERS
+		}
+	}
+
 	return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED
 }

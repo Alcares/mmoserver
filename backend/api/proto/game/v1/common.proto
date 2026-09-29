@@ -55,15 +55,17 @@ enum JoinRejection {
 }
 
 enum AccountCreateRejection {
-  ACCOUNT_CREATE_REJECTION_UNSPECIFIED            = 0; // Not rejected: the account was created
-  ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN         = 1;
-  ACCOUNT_CREATE_REJECTION_USERNAME_INVALID       = 2; // Wrong length or characters
-  ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT     = 3;
-  ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG      = 4; // bcrypt's 72-byte limit
-  ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON    = 5;
+  ACCOUNT_CREATE_REJECTION_UNSPECIFIED                         = 0; // Not rejected: the account was created
+  ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN                      = 1;
+  ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT                  = 2; // Wrong length or characters
+  ACCOUNT_CREATE_REJECTION_USERNAME_TOO_LONG                   = 9; // Wrong length or characters
+  ACCOUNT_CREATE_REJECTION_USERNAME_INVALID_CHARACTERS         = 10; // Wrong length or characters
+  ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT                  = 3;
+  ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG                   = 4; // bcrypt's 72-byte limit
+  ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON                 = 5;
   ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_NUMBERS            = 6;
   ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_SPECIAL_CHARACTERS = 7;
-  ACCOUNT_CREATE_REJECTION_SERVER_ERROR           = 8; // Not the player's fault; try again later
+  ACCOUNT_CREATE_REJECTION_SERVER_ERROR                        = 8; // Not the player's fault; try again later
 }
 
 enum LoginRejection {

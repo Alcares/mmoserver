@@ -375,6 +375,42 @@ func (x *Login) GetPassword() string {
 	return ""
 }
 
+type Logout struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Logout) Reset() {
+	*x = Logout{}
+	mi := &file_game_v1_client_message_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Logout) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Logout) ProtoMessage() {}
+
+func (x *Logout) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_client_message_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Logout.ProtoReflect.Descriptor instead.
+func (*Logout) Descriptor() ([]byte, []int) {
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{7}
+}
+
 // Client -> Server: Discriminated wrapper for all client commands.
 type ClientMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -388,6 +424,7 @@ type ClientMessage struct {
 	//	*ClientMessage_SetPlaybackSpeed
 	//	*ClientMessage_CreateAccount
 	//	*ClientMessage_Login
+	//	*ClientMessage_Logout
 	Cmd           isClientMessage_Cmd `protobuf_oneof:"cmd"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -395,7 +432,7 @@ type ClientMessage struct {
 
 func (x *ClientMessage) Reset() {
 	*x = ClientMessage{}
-	mi := &file_game_v1_client_message_proto_msgTypes[7]
+	mi := &file_game_v1_client_message_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -407,7 +444,7 @@ func (x *ClientMessage) String() string {
 func (*ClientMessage) ProtoMessage() {}
 
 func (x *ClientMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_client_message_proto_msgTypes[7]
+	mi := &file_game_v1_client_message_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -420,7 +457,7 @@ func (x *ClientMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientMessage.ProtoReflect.Descriptor instead.
 func (*ClientMessage) Descriptor() ([]byte, []int) {
-	return file_game_v1_client_message_proto_rawDescGZIP(), []int{7}
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ClientMessage) GetCmd() isClientMessage_Cmd {
@@ -502,6 +539,15 @@ func (x *ClientMessage) GetLogin() *Login {
 	return nil
 }
 
+func (x *ClientMessage) GetLogout() *Logout {
+	if x != nil {
+		if x, ok := x.Cmd.(*ClientMessage_Logout); ok {
+			return x.Logout
+		}
+	}
+	return nil
+}
+
 type isClientMessage_Cmd interface {
 	isClientMessage_Cmd()
 }
@@ -539,6 +585,10 @@ type ClientMessage_Login struct {
 	Login *Login `protobuf:"bytes,8,opt,name=login,proto3,oneof"`
 }
 
+type ClientMessage_Logout struct {
+	Logout *Logout `protobuf:"bytes,9,opt,name=logout,proto3,oneof"`
+}
+
 func (*ClientMessage_Input) isClientMessage_Cmd() {}
 
 func (*ClientMessage_Trade) isClientMessage_Cmd() {}
@@ -554,6 +604,8 @@ func (*ClientMessage_SetPlaybackSpeed) isClientMessage_Cmd() {}
 func (*ClientMessage_CreateAccount) isClientMessage_Cmd() {}
 
 func (*ClientMessage_Login) isClientMessage_Cmd() {}
+
+func (*ClientMessage_Logout) isClientMessage_Cmd() {}
 
 var File_game_v1_client_message_proto protoreflect.FileDescriptor
 
@@ -581,7 +633,8 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"7\n" +
 	"\x05Login\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"\xc4\x03\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"\b\n" +
+	"\x06Logout\"\xef\x03\n" +
 	"\rClientMessage\x120\n" +
 	"\x05input\x18\x01 \x01(\v2\x18.game.v1.MovementCommandH\x00R\x05input\x12-\n" +
 	"\x05trade\x18\x02 \x01(\v2\x15.game.v1.TradeRequestH\x00R\x05trade\x126\n" +
@@ -591,7 +644,8 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\tspawn_bot\x18\x05 \x01(\v2\x11.game.v1.SpawnBotH\x00R\bspawnBot\x12F\n" +
 	"\x12set_playback_speed\x18\x06 \x01(\v2\x16.game.v1.PlaybackSpeedH\x00R\x10setPlaybackSpeed\x12?\n" +
 	"\x0ecreate_account\x18\a \x01(\v2\x16.game.v1.CreateAccountH\x00R\rcreateAccount\x12&\n" +
-	"\x05login\x18\b \x01(\v2\x0e.game.v1.LoginH\x00R\x05loginB\x05\n" +
+	"\x05login\x18\b \x01(\v2\x0e.game.v1.LoginH\x00R\x05login\x12)\n" +
+	"\x06logout\x18\t \x01(\v2\x0f.game.v1.LogoutH\x00R\x06logoutB\x05\n" +
 	"\x03cmdBFZ:github.com/alcares/mmoserver/backend/gen/go/game/v1;gamev1\xaa\x02\aGame.V1b\x06proto3"
 
 var (
@@ -606,7 +660,7 @@ func file_game_v1_client_message_proto_rawDescGZIP() []byte {
 	return file_game_v1_client_message_proto_rawDescData
 }
 
-var file_game_v1_client_message_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_game_v1_client_message_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_game_v1_client_message_proto_goTypes = []any{
 	(*MovementCommand)(nil), // 0: game.v1.MovementCommand
 	(*CreateGame)(nil),      // 1: game.v1.CreateGame
@@ -615,25 +669,27 @@ var file_game_v1_client_message_proto_goTypes = []any{
 	(*TradeRequest)(nil),    // 4: game.v1.TradeRequest
 	(*CreateAccount)(nil),   // 5: game.v1.CreateAccount
 	(*Login)(nil),           // 6: game.v1.Login
-	(*ClientMessage)(nil),   // 7: game.v1.ClientMessage
-	(OrderIntent)(0),        // 8: game.v1.OrderIntent
-	(*PlaybackSpeed)(nil),   // 9: game.v1.PlaybackSpeed
+	(*Logout)(nil),          // 7: game.v1.Logout
+	(*ClientMessage)(nil),   // 8: game.v1.ClientMessage
+	(OrderIntent)(0),        // 9: game.v1.OrderIntent
+	(*PlaybackSpeed)(nil),   // 10: game.v1.PlaybackSpeed
 }
 var file_game_v1_client_message_proto_depIdxs = []int32{
-	8, // 0: game.v1.TradeRequest.intent:type_name -> game.v1.OrderIntent
-	0, // 1: game.v1.ClientMessage.input:type_name -> game.v1.MovementCommand
-	4, // 2: game.v1.ClientMessage.trade:type_name -> game.v1.TradeRequest
-	1, // 3: game.v1.ClientMessage.create_game:type_name -> game.v1.CreateGame
-	2, // 4: game.v1.ClientMessage.join_game:type_name -> game.v1.JoinGame
-	3, // 5: game.v1.ClientMessage.spawn_bot:type_name -> game.v1.SpawnBot
-	9, // 6: game.v1.ClientMessage.set_playback_speed:type_name -> game.v1.PlaybackSpeed
-	5, // 7: game.v1.ClientMessage.create_account:type_name -> game.v1.CreateAccount
-	6, // 8: game.v1.ClientMessage.login:type_name -> game.v1.Login
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	9,  // 0: game.v1.TradeRequest.intent:type_name -> game.v1.OrderIntent
+	0,  // 1: game.v1.ClientMessage.input:type_name -> game.v1.MovementCommand
+	4,  // 2: game.v1.ClientMessage.trade:type_name -> game.v1.TradeRequest
+	1,  // 3: game.v1.ClientMessage.create_game:type_name -> game.v1.CreateGame
+	2,  // 4: game.v1.ClientMessage.join_game:type_name -> game.v1.JoinGame
+	3,  // 5: game.v1.ClientMessage.spawn_bot:type_name -> game.v1.SpawnBot
+	10, // 6: game.v1.ClientMessage.set_playback_speed:type_name -> game.v1.PlaybackSpeed
+	5,  // 7: game.v1.ClientMessage.create_account:type_name -> game.v1.CreateAccount
+	6,  // 8: game.v1.ClientMessage.login:type_name -> game.v1.Login
+	7,  // 9: game.v1.ClientMessage.logout:type_name -> game.v1.Logout
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_client_message_proto_init() }
@@ -643,7 +699,7 @@ func file_game_v1_client_message_proto_init() {
 	}
 	file_game_v1_common_proto_init()
 	file_game_v1_spectator_proto_init()
-	file_game_v1_client_message_proto_msgTypes[7].OneofWrappers = []any{
+	file_game_v1_client_message_proto_msgTypes[8].OneofWrappers = []any{
 		(*ClientMessage_Input)(nil),
 		(*ClientMessage_Trade)(nil),
 		(*ClientMessage_CreateGame)(nil),
@@ -652,6 +708,7 @@ func file_game_v1_client_message_proto_init() {
 		(*ClientMessage_SetPlaybackSpeed)(nil),
 		(*ClientMessage_CreateAccount)(nil),
 		(*ClientMessage_Login)(nil),
+		(*ClientMessage_Logout)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -659,7 +716,7 @@ func file_game_v1_client_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_client_message_proto_rawDesc), len(file_game_v1_client_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

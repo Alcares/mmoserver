@@ -45,6 +45,8 @@ message Login {
   string password = 2;
 }
 
+message Logout {}
+
 // Client -> Server: Discriminated wrapper for all client commands.
 message ClientMessage {
   oneof cmd {
@@ -59,5 +61,6 @@ message ClientMessage {
 
     CreateAccount create_account = 7;
     Login login = 8;
+    Logout logout = 9;
   }
 }
