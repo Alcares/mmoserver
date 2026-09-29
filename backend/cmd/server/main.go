@@ -10,12 +10,14 @@ import (
 	"github.com/alcares/mmoserver/backend/internal/bot"
 	"github.com/alcares/mmoserver/backend/internal/game"
 	"github.com/alcares/mmoserver/backend/internal/logging"
+	"github.com/alcares/mmoserver/backend/internal/store"
 )
 
 // logPath and webClientDir are relative to the repo root the binary runs from.
 const (
 	logPath      = "backend/server.log"
 	webClientDir = "unity/Builds/Web"
+	dbFile       = "db.sql"
 )
 
 func main() {
@@ -54,13 +56,23 @@ func main() {
 		defaults.BotPolicy = policy
 	}
 
+	sessions := game.NewSessions()
 	gameMaster := game.NewMaster(rand.New(rand.NewSource(time.Now().UnixNano())))
+
+	c, err := store.Open(dbFile)
+	if err != nil {
+		slog.Error("open DB connection", "err", err)
+		os.Exit(1)
+	}
+	defer c.Close()
+	accounts := store.NewAccounts(c)
+
 	slog.Info("server initialized")
 
 	upgrader := newUpgrader()
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		handleWS(gameMaster, defaults, upgrader, w, r)
+		handleWS(gameMaster, accounts, sessions, defaults, upgrader, w, r)
 	})
 	// Same origin as /ws, so the web client needs no CORS and no configured server address.
 	http.Handle("/", webClient(webClientDir))

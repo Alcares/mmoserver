@@ -14,6 +14,8 @@ Rules both the server and every client have to hold up:
 - Never edit `backend/gen/` or `unity/Assets/Scripts/Generated/` by hand; edit `backend/api/proto/` and run `make proto`
 - One `oneof` envelope per direction (`ClientMessage`, `ServerMessage`); add new messages as oneof members
 - A client's own player must stay first in its `WorldSnapshot.players`; the Unity client identifies itself that way
+- A connection must log in (`Login` or `CreateAccount`) before anything else is accepted; each gets one `LoginResult` / `AccountCreateResult` whose `rejection` is `UNSPECIFIED` on success. The player's name is the account username, so clients never send one
+- A newer login for the same account closes the old connection with WebSocket close code `4001`; clients must not reconnect automatically on it. See `docs/ACCOUNTS.md`
 - Trading: `TradeRequest` is `INTENT_BUY`/`INTENT_SELL` of whole `units` plus `price_cents`, the worst per-unit price the client accepts (its quote widened by a slippage allowance); the whole order fills at one per-unit price or is rejected with a `TradeReceipt` reason
 
 ## Domain

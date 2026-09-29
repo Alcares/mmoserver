@@ -11,8 +11,10 @@ import (
 // ErrServerFull means this server already hosts maxGames games
 var ErrServerFull = errors.New("server is hosting the maximum number of games")
 
-const codeAlphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
-const maxGames = 5
+const (
+	codeAlphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+	maxGames     = 5
+)
 
 type Master struct {
 	mu       sync.Mutex

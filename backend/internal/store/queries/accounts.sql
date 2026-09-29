@@ -3,8 +3,8 @@ SELECT * FROM accounts
 WHERE name = ?;
 
 -- name: CreateAccount :one
-INSERT INTO accounts (id, name, password_hash, rating)
-VALUES (?, ?, ?, ?)
+INSERT INTO accounts (id, name, password_hash)
+VALUES (?, ?, ?)
 RETURNING *;
 
 -- name: TouchLastSeen :exec

@@ -10,8 +10,8 @@ import (
 )
 
 const createAccount = `-- name: CreateAccount :one
-INSERT INTO accounts (id, name, password_hash, rating)
-VALUES (?, ?, ?, ?)
+INSERT INTO accounts (id, name, password_hash)
+VALUES (?, ?, ?)
 RETURNING id, name, password_hash, rating, games_played, created_at, last_seen
 `
 
@@ -19,16 +19,10 @@ type CreateAccountParams struct {
 	ID           []byte
 	Name         string
 	PasswordHash []byte
-	Rating       float64
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error) {
-	row := q.db.QueryRowContext(ctx, createAccount,
-		arg.ID,
-		arg.Name,
-		arg.PasswordHash,
-		arg.Rating,
-	)
+	row := q.db.QueryRowContext(ctx, createAccount, arg.ID, arg.Name, arg.PasswordHash)
 	var i Account
 	err := row.Scan(
 		&i.ID,

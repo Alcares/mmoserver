@@ -1,11 +1,13 @@
 package game
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"time"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/alcares/mmoserver/backend/internal/store"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 )
@@ -38,9 +40,10 @@ func (q *SendQueue) Enqueue(payload []byte) {
 // WebsocketClient represents an active WebSocket connection
 type WebsocketClient struct {
 	*SendQueue
-	ID    uint32
-	Conn  *websocket.Conn
-	World *World
+	ID      uint32
+	Conn    *websocket.Conn
+	World   *World
+	Session *store.Session
 }
 
 // NewWebsocketClient takes no ID: the world assigns one on join, and JoinWorld records it.
@@ -65,17 +68,8 @@ func (c *WebsocketClient) WritePump() {
 	_ = c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 }
 
-// TODO: I dont like that readpump has this dual identity, we should split it
-func (c *WebsocketClient) ReadPump(m *Master, cfg WorldConfig) {
-	defer func() {
-		if c.World != nil {
-			c.World.Mu.Lock()
-			c.World.removePlayer(c.ID)
-			c.World.Mu.Unlock()
-		}
-		close(c.Send)
-		c.Conn.Close()
-	}()
+func (c *WebsocketClient) ReadPump(m *Master, a *store.Accounts, s *Sessions, cfg WorldConfig) {
+	defer c.closeConnection(s)
 
 	err := c.Conn.SetReadDeadline(time.Now().Add(LobbyHandshakeTimeout))
 	if err != nil {
@@ -97,57 +91,112 @@ func (c *WebsocketClient) ReadPump(m *Master, cfg WorldConfig) {
 			continue
 		}
 
+		if c.Session == nil {
+			c.ReadSession(s, a, &msg)
+			continue
+		}
+
 		if c.World == nil {
-			switch cmd := msg.Cmd.(type) {
-			case *pb.ClientMessage_CreateGame:
-				world, err := m.Create(createConfig(cfg, cmd.CreateGame))
-				if err != nil {
-					c.rejectJoin(joinRejection(err))
-					continue
-				}
-				if err := c.joinWorld(world, cmd.CreateGame.PlayerName); err != nil {
-					c.rejectJoin(joinRejection(err))
-				}
-
-			case *pb.ClientMessage_JoinGame:
-				world, exists := m.Get(cmd.JoinGame.GameId)
-				if !exists {
-					c.rejectJoin(pb.JoinRejection_JOIN_REJECTION_GAME_NOT_FOUND)
-					continue
-				}
-				if err := c.joinWorld(world, cmd.JoinGame.PlayerName); err != nil {
-					c.rejectJoin(joinRejection(err))
-				}
-			}
-			continue // to avoid falling back the next switch statement
+			c.ReadWorld(m, cfg, &msg)
+			continue
 		}
 
-		switch cmd := msg.Cmd.(type) {
-		case *pb.ClientMessage_Input:
-			c.World.EnqueueMovement(PlayerMovementInput{
-				PlayerID: c.ID,
-				Vx:       float64(cmd.Input.GetVx()),
-				Vy:       float64(cmd.Input.GetVy()),
-			})
-		case *pb.ClientMessage_Trade:
-			o := TradeOrder{
-				PlayerID:   c.ID,
-				SequenceID: cmd.Trade.GetSequenceId(),
-				Intent:     cmd.Trade.GetIntent(),
-				Units:      uint64(cmd.Trade.GetUnits()),
-				PriceCents: cmd.Trade.GetPriceCents(),
-			}
+		// Commands are listed to only after session and world had been created
+		c.ReadCommand(&msg)
 
-			select {
-			case c.World.tradeQueue <- o:
-			default:
-				// Buffer full
-			}
-		case *pb.ClientMessage_SpawnBot:
-			// Refused once the lobby closes or fills up; SendSpawnBot documents that it does nothing then
-			_, _ = c.World.SpawnBot()
+	}
+}
+
+func (c *WebsocketClient) closeConnection(s *Sessions) {
+	if c.World != nil {
+		c.World.Mu.Lock()
+		c.World.removePlayer(c.ID)
+		c.World.Mu.Unlock()
+	}
+
+	if c.Session != nil {
+		s.remove(c.Session.AccountID, c)
+	}
+	close(c.Send)
+	c.Conn.Close()
+}
+
+func (c *WebsocketClient) ReadSession(s *Sessions, a *store.Accounts, msg *pb.ClientMessage) {
+	var session *store.Session
+
+	switch cmd := msg.Cmd.(type) {
+	case *pb.ClientMessage_CreateAccount:
+		var reason pb.AccountCreateRejection
+		session, reason = a.CreateNewAccount(context.Background(), cmd.CreateAccount.Name, cmd.CreateAccount.Password)
+		c.sendMsg(&pb.ServerMessage{
+			Msg: &pb.ServerMessage_AccountCreateResult{
+				AccountCreateResult: &pb.AccountCreateResult{Rejection: reason},
+			},
+		})
+	case *pb.ClientMessage_Login:
+		var reason pb.LoginRejection
+		session, reason = a.Login(context.Background(), cmd.Login.Name, cmd.Login.Password)
+		c.sendMsg(&pb.ServerMessage{
+			Msg: &pb.ServerMessage_LoginResult{
+				LoginResult: &pb.LoginResult{Rejection: reason},
+			},
+		})
+	}
+
+	if session != nil {
+		s.replace(session.AccountID, c)
+		c.Session = session
+	}
+}
+
+func (c *WebsocketClient) ReadWorld(m *Master, cfg WorldConfig, msg *pb.ClientMessage) {
+	switch cmd := msg.Cmd.(type) {
+	case *pb.ClientMessage_CreateGame:
+		world, err := m.Create(createConfig(cfg, cmd.CreateGame))
+		if err != nil {
+			c.rejectJoin(joinRejection(err))
+			return
+		}
+		if err := c.joinWorld(world); err != nil {
+			c.rejectJoin(joinRejection(err))
+		}
+	case *pb.ClientMessage_JoinGame:
+		world, exists := m.Get(cmd.JoinGame.GameId)
+		if !exists {
+			c.rejectJoin(pb.JoinRejection_JOIN_REJECTION_GAME_NOT_FOUND)
+			return
+		}
+		if err := c.joinWorld(world); err != nil {
+			c.rejectJoin(joinRejection(err))
+		}
+	}
+}
+
+func (c *WebsocketClient) ReadCommand(msg *pb.ClientMessage) {
+	switch cmd := msg.Cmd.(type) {
+	case *pb.ClientMessage_Input:
+		c.World.EnqueueMovement(PlayerMovementInput{
+			PlayerID: c.ID,
+			Vx:       float64(cmd.Input.GetVx()),
+			Vy:       float64(cmd.Input.GetVy()),
+		})
+	case *pb.ClientMessage_Trade:
+		o := TradeOrder{
+			PlayerID:   c.ID,
+			SequenceID: cmd.Trade.GetSequenceId(),
+			Intent:     cmd.Trade.GetIntent(),
+			Units:      uint64(cmd.Trade.GetUnits()),
+			PriceCents: cmd.Trade.GetPriceCents(),
 		}
 
+		select {
+		case c.World.tradeQueue <- o:
+		default:
+			// Buffer full
+		}
+	case *pb.ClientMessage_SpawnBot:
+		// Refused once the lobby closes or fills up; SendSpawnBot documents that it does nothing then
+		_, _ = c.World.SpawnBot()
 	}
 }
 
@@ -168,11 +217,13 @@ func joinRejection(err error) pb.JoinRejection {
 // rejectJoin tells the client why it isn't in a game; the connection stays open in the
 // lobby so it can retry, for instance after a mistyped code
 func (c *WebsocketClient) rejectJoin(reason pb.JoinRejection) {
-	payload, err := proto.Marshal(&pb.ServerMessage{
-		Msg: &pb.ServerMessage_JoinRejected{JoinRejected: &pb.JoinRejected{Reason: reason}},
-	})
+	c.sendMsg(&pb.ServerMessage{Msg: &pb.ServerMessage_JoinRejected{JoinRejected: &pb.JoinRejected{Reason: reason}}})
+}
+
+func (c *WebsocketClient) sendMsg(data *pb.ServerMessage) {
+	payload, err := proto.Marshal(data)
 	if err != nil {
-		slog.Error("marshal join rejection", "err", err)
+		slog.Error("marshall failed", "err", err)
 		return
 	}
 
@@ -192,8 +243,8 @@ func createConfig(defaults WorldConfig, req *pb.CreateGame) WorldConfig {
 	return cfg
 }
 
-func (c *WebsocketClient) joinWorld(world *World, playerName string) error {
-	player, err := world.Join(c, playerName)
+func (c *WebsocketClient) joinWorld(world *World) error {
+	player, err := world.Join(c, c.Session.Name)
 	if err != nil {
 		return err
 	}
