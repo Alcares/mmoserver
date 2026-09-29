@@ -61,9 +61,21 @@ namespace Game.Client
             _input = GetComponent<GameInput>();
         }
 
-        private void OnEnable() => _client.OnTradeReceipt += OnReceipt;
+        private void OnEnable()
+        {
+            _client.OnTradeReceipt += OnReceipt;
+            _client.OnLoginResult += OnLoginResult;
+            _client.OnAccountCreateResult += OnAccountCreateResult;
+            _client.OnLoggedOut += OnLoggedOut;
+        }
 
-        private void OnDisable() => _client.OnTradeReceipt -= OnReceipt;
+        private void OnDisable()
+        {
+            _client.OnTradeReceipt -= OnReceipt;
+            _client.OnLoginResult -= OnLoginResult;
+            _client.OnAccountCreateResult -= OnAccountCreateResult;
+            _client.OnLoggedOut -= OnLoggedOut;
+        }
 
         private void OnReceipt(TradeReceipt r)
         {
@@ -116,10 +128,12 @@ namespace Game.Client
             var statusRect = new Rect(screenW - topWidth - EdgeMargin, EdgeMargin, topWidth, TopBoxHeight);
             DrawTopBox(statusRect, status, Color.white);
 
-            // In the lobby there is no game to draw yet, only the create/join panel.
+            // In the lobby there is no game to draw yet: the account panel until this connection
+            // is logged in, then the create/join panel.
             if (!_state.Joined)
             {
-                DrawLobby(screenW, screenH);
+                if (_client.LoggedIn) DrawLobby(screenW, screenH);
+                else DrawAccount(screenW, screenH);
                 return;
             }
 

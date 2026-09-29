@@ -11,12 +11,28 @@ namespace Game.Networking
     /// </summary>
     public class GameClient : MonoBehaviour
     {
+        private const string UsernameKey = "account.username";
+
         [SerializeField] private string host = "127.0.0.1";
         [SerializeField] private int port = 8080;
         [SerializeField] private bool connectOnStart = true;
 
         public GameConnection Connection { get; private set; }
         public bool IsConnected => Connection != null && Connection.CurrentState == GameConnection.State.Connected;
+
+        /// <summary>Whether this connection is logged in. The server ties a login to one
+        /// connection, so every new connection starts logged out.</summary>
+        public bool LoggedIn { get; private set; }
+        /// <summary>The account last logged in to, kept across launches so the login form can
+        /// offer it. Empty until the first successful login or sign-up.</summary>
+        public string Username { get; private set; } = "";
+        /// <summary>True between sending a login or sign-up and the server's answer.</summary>
+        public bool AwaitingAccountReply { get; private set; }
+
+        // The password stays in memory only, never on disk: it lets Reconnect log the new
+        // connection in again. A failed login forgets it.
+        private string _pendingUsername;
+        private string _password;
 
         public event Action<WorldSnapshot> OnWorldSnapshot;
         public event Action<MarketState> OnMarketState;
@@ -36,6 +52,10 @@ namespace Game.Networking
         public event Action<PlaybackSpeed> OnPlaybackSpeed;
         /// <summary>Only the spectator sends this: every snapshot has played, and it hangs up next.</summary>
         public event Action<SpectatingOver> OnSpectatingOver;
+        public event Action<LoginResult> OnLoginResult;
+        public event Action<AccountCreateResult> OnAccountCreateResult;
+        /// <summary>Raised by LogOut, so the account panel can start over.</summary>
+        public event Action OnLoggedOut;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         // A web build connects back to whatever served its page, over wss when the page is https.
@@ -51,6 +71,11 @@ namespace Game.Networking
         private string Url => $"ws://{host}:{port}/ws";
 #endif
 
+        private void Awake()
+        {
+            Username = PlayerPrefs.GetString(UsernameKey, "");
+        }
+
         private async void Start()
         {
             Connection = NewConnection();
@@ -65,12 +90,27 @@ namespace Game.Networking
         /// in the lobby: the server binds a connection to one game for its whole lifetime
         /// (nothing clears WebsocketClient.World), so CreateGame on the old socket is ignored.
         /// Messages still queued on the old connection go with it, since Update only drains
-        /// whichever connection this field points at.</summary>
+        /// whichever connection this field points at. The login goes with the old connection
+        /// too, so the new one logs in again with the password from this launch.</summary>
         public async void Reconnect()
         {
             Connection?.Dispose();
             Connection = NewConnection();
+            LoggedIn = false;
+            AwaitingAccountReply = false;
             await Connection.ConnectAsync(Url);
+
+            if (_password != null) SendLogin(Username, _password);
+        }
+
+        /// <summary>Logs out by dropping the connection, the only way the server ends a login, and
+        /// forgets the password so the new connection stays logged out. The username stays
+        /// remembered for the login form.</summary>
+        public void LogOut()
+        {
+            _password = null;
+            Reconnect();
+            OnLoggedOut?.Invoke();
         }
 
         private GameConnection NewConnection()
@@ -140,20 +180,69 @@ namespace Game.Networking
                 case ServerMessage.MsgOneofCase.SpectatingOver:
                     OnSpectatingOver?.Invoke(message.SpectatingOver);
                     break;
+                case ServerMessage.MsgOneofCase.LoginResult:
+                    SettleAccountReply(message.LoginResult.Rejection == LoginRejection.Unspecified);
+                    OnLoginResult?.Invoke(message.LoginResult);
+                    break;
+                case ServerMessage.MsgOneofCase.AccountCreateResult:
+                    SettleAccountReply(message.AccountCreateResult.Rejection == AccountCreateRejection.Unspecified);
+                    OnAccountCreateResult?.Invoke(message.AccountCreateResult);
+                    break;
             }
         }
 
-        /// <summary>Asks the server for a new game; it answers with InitialGameState carrying the join code.</summary>
-        public void SendCreateGame(string playerName)
+        // A success logs this connection in and remembers the name for the next launch; a
+        // failure forgets the password so Reconnect doesn't retry it.
+        private void SettleAccountReply(bool ok)
         {
-            Connection?.Send(new ClientMessage { CreateGame = new CreateGame { PlayerName = playerName } });
+            AwaitingAccountReply = false;
+            LoggedIn = ok;
+            if (!ok)
+            {
+                _password = null;
+                return;
+            }
+
+            Username = _pendingUsername;
+            PlayerPrefs.SetString(UsernameKey, Username);
+            PlayerPrefs.Save();
+        }
+
+        /// <summary>Logs this connection in; the server answers with LoginResult.</summary>
+        public void SendLogin(string username, string password)
+        {
+            if (!IsConnected) return;
+            BeginAccountRequest(username, password);
+            Connection.Send(new ClientMessage { Login = new Login { Name = username, Password = password } });
+        }
+
+        /// <summary>Creates an account and logs this connection in to it; the server answers
+        /// with AccountCreateResult.</summary>
+        public void SendCreateAccount(string username, string password)
+        {
+            if (!IsConnected) return;
+            BeginAccountRequest(username, password);
+            Connection.Send(new ClientMessage { CreateAccount = new CreateAccount { Name = username, Password = password } });
+        }
+
+        private void BeginAccountRequest(string username, string password)
+        {
+            _pendingUsername = username;
+            _password = password;
+            AwaitingAccountReply = true;
+        }
+
+        /// <summary>Asks the server for a new game; it answers with InitialGameState carrying the join code.</summary>
+        public void SendCreateGame()
+        {
+            Connection?.Send(new ClientMessage { CreateGame = new CreateGame() });
         }
 
         /// <summary>Joins an existing game by its code. The server trims and upper-cases it,
         /// and answers with either InitialGameState or JoinRejected.</summary>
-        public void SendJoinGame(string code, string playerName)
+        public void SendJoinGame(string code)
         {
-            Connection?.Send(new ClientMessage { JoinGame = new JoinGame { GameId = code, PlayerName = playerName } });
+            Connection?.Send(new ClientMessage { JoinGame = new JoinGame { GameId = code } });
         }
 
         /// <summary>Asks the server to add a policy-driven bot to the game this client is in.

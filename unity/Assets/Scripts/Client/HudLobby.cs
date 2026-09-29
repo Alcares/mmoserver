@@ -23,19 +23,18 @@ namespace Game.Client
         private const float UnitsColumn = 56f;
 
         private string _codeInput = "";
-        private string _nameInput = "";
         private GUIStyle _title, _lobbyText, _codeField, _button;
 
         private static readonly Color Dim = new Color32(0xa1, 0xa1, 0xaa, 0xff);
         private static readonly Color Bad = new Color32(0xf8, 0x71, 0x71, 0xff);
 
-        // Pick a name, then create a game or join one by its code. Drawn until the server confirms
-        // a join, and a rejection leaves the panel up so the code can be retyped on the same connection.
+        // Create a game or join one by its code, as the logged-in account. Drawn until the server
+        // confirms a join, and a rejection leaves the panel up so the code can be retyped on the same connection.
         private void DrawLobby(float screenW, float screenH)
         {
             if (_title == null) CreateLobbyStyles();
 
-            float height = LobbyRowHeight * 7f + 58f;
+            float height = LobbyRowHeight * 6f + 46f;
             var rect = new Rect((screenW - LobbyWidth) / 2f, (screenH - height) / 2f, LobbyWidth, height);
 
             GUI.color = Color.white;
@@ -58,19 +57,12 @@ namespace Game.Client
             }
 
             _lobbyText.normal.textColor = Dim;
-            GUI.Label(new Rect(x, y, width, LobbyRowHeight), "your name", _lobbyText);
+            GUI.Label(new Rect(x, y, width, LobbyRowHeight), $"playing as {_client.Username}  (Esc logs out)", _lobbyText);
             y += LobbyRowHeight;
-
-            _nameInput = GUI.TextField(new Rect(x, y, width, LobbyRowHeight), _nameInput, NameLength, _codeField);
-            y += LobbyRowHeight + 12f;
-
-            // Neither button works without a name the server would keep; it replaces shorter ones.
-            string playerName = _nameInput.Trim();
-            GUI.enabled = playerName.Length >= MinNameLength;
 
             if (GUI.Button(new Rect(x, y, width, LobbyRowHeight), "Create a new game", _button))
             {
-                _client.SendCreateGame(playerName);
+                _client.SendCreateGame();
             }
             y += LobbyRowHeight + 12f;
 
@@ -83,16 +75,14 @@ namespace Game.Client
             _codeInput = GUI.TextField(new Rect(x, y, codeWidth, LobbyRowHeight), _codeInput, CodeLength, _codeField)
                 .ToUpperInvariant();
 
-            bool submit = GUI.enabled
-                          && Event.current.type == EventType.KeyDown
+            bool submit = Event.current.type == EventType.KeyDown
                           && Event.current.keyCode == KeyCode.Return
                           && GUI.GetNameOfFocusedControl() == "joinCode";
 
             if (GUI.Button(new Rect(x + codeWidth + 8f, y, width - codeWidth - 8f, LobbyRowHeight), "Join", _button) || submit)
             {
-                if (_codeInput.Length > 0) _client.SendJoinGame(_codeInput, playerName);
+                if (_codeInput.Length > 0) _client.SendJoinGame(_codeInput);
             }
-            GUI.enabled = true;
             y += LobbyRowHeight + 10f;
 
             if (_state.LastRejection.HasValue)

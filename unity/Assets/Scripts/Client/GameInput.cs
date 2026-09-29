@@ -9,7 +9,8 @@ namespace Game.Client
 {
     /// <summary>
     /// Keyboard input: WASD/arrows move, E buys and Q sells at the nearby station, T cycles the
-    /// order size, B asks the server for a bot, Ctrl+R leaves for the create/join screen.
+    /// order size, B asks the server for a bot, Ctrl+R leaves for the create/join screen, and
+    /// Escape on the create/join screen logs out to the login screen.
     /// Watching a spectator, comma and period step the playback speed down and up.
     /// Movement is only sent when the vector changes (including back to zero on release), since
     /// the server keeps moving the player along the last direction it received.
@@ -51,6 +52,13 @@ namespace Game.Client
         {
             var kb = Keyboard.current;
             if (kb == null) return;
+
+            if (!_state.Joined && _client.LoggedIn && kb.escapeKey.wasPressedThisFrame)
+            {
+                _state.LeaveGame(); // drops a join rejection still on the panel
+                _client.LogOut();
+                return;
+            }
 
             // While the lobby panel is up the keyboard belongs to it: typing a join code
             // must not walk the player around or fire trades.
