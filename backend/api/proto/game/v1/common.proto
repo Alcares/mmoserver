@@ -54,6 +54,24 @@ enum JoinRejection {
   JOIN_REJECTION_SERVER_FULL      = 4; // This server already hosts its maximum number of games
 }
 
+enum AccountCreateRejection {
+  ACCOUNT_CREATE_REJECTION_UNSPECIFIED            = 0; // Not rejected: the account was created
+  ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN         = 1;
+  ACCOUNT_CREATE_REJECTION_USERNAME_INVALID       = 2; // Wrong length or characters
+  ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT     = 3;
+  ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG      = 4; // bcrypt's 72-byte limit
+  ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON    = 5;
+  ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_NUMBERS            = 6;
+  ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_SPECIAL_CHARACTERS = 7;
+  ACCOUNT_CREATE_REJECTION_SERVER_ERROR           = 8; // Not the player's fault; try again later
+}
+
+enum LoginRejection {
+  LOGIN_REJECTION_UNSPECIFIED = 0;
+  LOGIN_REJECTION_INVALID_CREDENTIALS = 1;
+  LOGIN_REJECTION_SERVER_ERROR = 2; // Not the player's fault; try again later
+}
+
 enum GamePhase {
   GAME_PHASE_UNSPECIFIED = 0;
   GAME_PHASE_WAITING     = 1;  // fewer than MinPlayers connected

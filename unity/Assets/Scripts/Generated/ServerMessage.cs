@@ -64,25 +64,31 @@ namespace Game.V1 {
             "bWUudjEuUGxheWVyRmluYWxTdGFuZGluZyJwCgpHYW1lU3RhdHVzEiEKBXBo",
             "YXNlGAEgASgOMhIuZ2FtZS52MS5HYW1lUGhhc2USFAoMcGxheWVyX2NvdW50",
             "GAIgASgFEhMKC21pbl9wbGF5ZXJzGAMgASgFEhQKDHJlbWFpbmluZ19tcxgE",
-            "IAEoBSL9BQoNU2VydmVyTWVzc2FnZRIwCg53b3JsZF9zbmFwc2hvdBgBIAEo",
-            "CzIWLmdhbWUudjEuV29ybGRTbmFwc2hvdEgAEiwKDG1hcmtldF9zdGF0ZRgC",
-            "IAEoCzIULmdhbWUudjEuTWFya2V0U3RhdGVIABIzChBwb3dlcl91cF9zcGF3",
-            "bmVkGAMgASgLMhcuZ2FtZS52MS5Qb3dlclVwU3Bhd25lZEgAEjcKEnBvd2Vy",
-            "X3VwX2Rlc3Bhd25lZBgEIAEoCzIZLmdhbWUudjEuUG93ZXJVcERlc3Bhd25l",
-            "ZEgAEj0KFXJhbmRvbV9ldmVudF9vY2N1cnJlZBgOIAEoCzIcLmdhbWUudjEu",
-            "UmFuZG9tRXZlbnRPY2N1cnJlZEgAEjcKEnJhbmRvbV9ldmVudF9lbmRlZBgP",
-            "IAEoCzIZLmdhbWUudjEuUmFuZG9tRXZlbnRFbmRlZEgAEioKC2dhbWVfc3Rh",
-            "dHVzGAogASgLMhMuZ2FtZS52MS5HYW1lU3RhdHVzSAASMgoNaW5pdGlhbF9z",
-            "dGF0ZRgFIAEoCzIZLmdhbWUudjEuSW5pdGlhbEdhbWVTdGF0ZUgAEi4KDWpv",
-            "aW5fcmVqZWN0ZWQYCCABKAsyFS5nYW1lLnYxLkpvaW5SZWplY3RlZEgAEiYK",
-            "BXRyYWRlGAYgASgLMhUuZ2FtZS52MS5UcmFkZVJlY2VpcHRIABI0ChBwbGF5",
-            "ZXJfaW52ZW50b3J5GAcgASgLMhguZ2FtZS52MS5QbGF5ZXJJbnZlbnRvcnlI",
-            "ABImCglnYW1lX292ZXIYCSABKAsyES5nYW1lLnYxLkdhbWVPdmVySAASIwoH",
-            "ZXBpc29kZRgLIAEoCzIQLmdhbWUudjEuRXBpc29kZUgAEjAKDnBsYXliYWNr",
-            "X3NwZWVkGAwgASgLMhYuZ2FtZS52MS5QbGF5YmFja1NwZWVkSAASMgoPc3Bl",
-            "Y3RhdGluZ19vdmVyGA0gASgLMhcuZ2FtZS52MS5TcGVjdGF0aW5nT3ZlckgA",
-            "QgUKA21zZ0JGWjpnaXRodWIuY29tL2FsY2FyZXMvbW1vc2VydmVyL2JhY2tl",
-            "bmQvZ2VuL2dvL2dhbWUvdjE7Z2FtZXYxqgIHR2FtZS5WMWIGcHJvdG8z"));
+            "IAEoBSJJChNBY2NvdW50Q3JlYXRlUmVzdWx0EjIKCXJlamVjdGlvbhgBIAEo",
+            "DjIfLmdhbWUudjEuQWNjb3VudENyZWF0ZVJlamVjdGlvbiI5CgtMb2dpblJl",
+            "c3VsdBIqCglyZWplY3Rpb24YASABKA4yFy5nYW1lLnYxLkxvZ2luUmVqZWN0",
+            "aW9uIuoGCg1TZXJ2ZXJNZXNzYWdlEjAKDndvcmxkX3NuYXBzaG90GAEgASgL",
+            "MhYuZ2FtZS52MS5Xb3JsZFNuYXBzaG90SAASLAoMbWFya2V0X3N0YXRlGAIg",
+            "ASgLMhQuZ2FtZS52MS5NYXJrZXRTdGF0ZUgAEjMKEHBvd2VyX3VwX3NwYXdu",
+            "ZWQYAyABKAsyFy5nYW1lLnYxLlBvd2VyVXBTcGF3bmVkSAASNwoScG93ZXJf",
+            "dXBfZGVzcGF3bmVkGAQgASgLMhkuZ2FtZS52MS5Qb3dlclVwRGVzcGF3bmVk",
+            "SAASPQoVcmFuZG9tX2V2ZW50X29jY3VycmVkGA4gASgLMhwuZ2FtZS52MS5S",
+            "YW5kb21FdmVudE9jY3VycmVkSAASNwoScmFuZG9tX2V2ZW50X2VuZGVkGA8g",
+            "ASgLMhkuZ2FtZS52MS5SYW5kb21FdmVudEVuZGVkSAASKgoLZ2FtZV9zdGF0",
+            "dXMYCiABKAsyEy5nYW1lLnYxLkdhbWVTdGF0dXNIABIyCg1pbml0aWFsX3N0",
+            "YXRlGAUgASgLMhkuZ2FtZS52MS5Jbml0aWFsR2FtZVN0YXRlSAASLgoNam9p",
+            "bl9yZWplY3RlZBgIIAEoCzIVLmdhbWUudjEuSm9pblJlamVjdGVkSAASPQoV",
+            "YWNjb3VudF9jcmVhdGVfcmVzdWx0GBAgASgLMhwuZ2FtZS52MS5BY2NvdW50",
+            "Q3JlYXRlUmVzdWx0SAASLAoMbG9naW5fcmVzdWx0GBEgASgLMhQuZ2FtZS52",
+            "MS5Mb2dpblJlc3VsdEgAEiYKBXRyYWRlGAYgASgLMhUuZ2FtZS52MS5UcmFk",
+            "ZVJlY2VpcHRIABI0ChBwbGF5ZXJfaW52ZW50b3J5GAcgASgLMhguZ2FtZS52",
+            "MS5QbGF5ZXJJbnZlbnRvcnlIABImCglnYW1lX292ZXIYCSABKAsyES5nYW1l",
+            "LnYxLkdhbWVPdmVySAASIwoHZXBpc29kZRgLIAEoCzIQLmdhbWUudjEuRXBp",
+            "c29kZUgAEjAKDnBsYXliYWNrX3NwZWVkGAwgASgLMhYuZ2FtZS52MS5QbGF5",
+            "YmFja1NwZWVkSAASMgoPc3BlY3RhdGluZ19vdmVyGA0gASgLMhcuZ2FtZS52",
+            "MS5TcGVjdGF0aW5nT3ZlckgAQgUKA21zZ0JGWjpnaXRodWIuY29tL2FsY2Fy",
+            "ZXMvbW1vc2VydmVyL2JhY2tlbmQvZ2VuL2dvL2dhbWUvdjE7Z2FtZXYxqgIH",
+            "R2FtZS5WMWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Game.V1.CommonReflection.Descriptor, global::Game.V1.PlayerReflection.Descriptor, global::Game.V1.SpectatorReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -101,7 +107,9 @@ namespace Game.V1 {
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.JoinRejected), global::Game.V1.JoinRejected.Parser, new[]{ "Reason" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.GameOver), global::Game.V1.GameOver.Parser, new[]{ "Standings" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.GameStatus), global::Game.V1.GameStatus.Parser, new[]{ "Phase", "PlayerCount", "MinPlayers", "RemainingMs" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ServerMessage), global::Game.V1.ServerMessage.Parser, new[]{ "WorldSnapshot", "MarketState", "PowerUpSpawned", "PowerUpDespawned", "RandomEventOccurred", "RandomEventEnded", "GameStatus", "InitialState", "JoinRejected", "Trade", "PlayerInventory", "GameOver", "Episode", "PlaybackSpeed", "SpectatingOver" }, new[]{ "Msg" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.AccountCreateResult), global::Game.V1.AccountCreateResult.Parser, new[]{ "Rejection" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.LoginResult), global::Game.V1.LoginResult.Parser, new[]{ "Rejection" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Game.V1.ServerMessage), global::Game.V1.ServerMessage.Parser, new[]{ "WorldSnapshot", "MarketState", "PowerUpSpawned", "PowerUpDespawned", "RandomEventOccurred", "RandomEventEnded", "GameStatus", "InitialState", "JoinRejected", "AccountCreateResult", "LoginResult", "Trade", "PlayerInventory", "GameOver", "Episode", "PlaybackSpeed", "SpectatingOver" }, new[]{ "Msg" }, null, null, null)
           }));
     }
     #endregion
@@ -4430,6 +4438,402 @@ namespace Game.V1 {
 
   }
 
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class AccountCreateResult : pb::IMessage<AccountCreateResult>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<AccountCreateResult> _parser = new pb::MessageParser<AccountCreateResult>(() => new AccountCreateResult());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<AccountCreateResult> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[15]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AccountCreateResult() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AccountCreateResult(AccountCreateResult other) : this() {
+      rejection_ = other.rejection_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public AccountCreateResult Clone() {
+      return new AccountCreateResult(this);
+    }
+
+    /// <summary>Field number for the "rejection" field.</summary>
+    public const int RejectionFieldNumber = 1;
+    private global::Game.V1.AccountCreateRejection rejection_ = global::Game.V1.AccountCreateRejection.Unspecified;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.AccountCreateRejection Rejection {
+      get { return rejection_; }
+      set {
+        rejection_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as AccountCreateResult);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(AccountCreateResult other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Rejection != other.Rejection) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Rejection != global::Game.V1.AccountCreateRejection.Unspecified) hash ^= Rejection.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Rejection != global::Game.V1.AccountCreateRejection.Unspecified) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) Rejection);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Rejection != global::Game.V1.AccountCreateRejection.Unspecified) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) Rejection);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Rejection != global::Game.V1.AccountCreateRejection.Unspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Rejection);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(AccountCreateResult other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Rejection != global::Game.V1.AccountCreateRejection.Unspecified) {
+        Rejection = other.Rejection;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Rejection = (global::Game.V1.AccountCreateRejection) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Rejection = (global::Game.V1.AccountCreateRejection) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
+  public sealed partial class LoginResult : pb::IMessage<LoginResult>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<LoginResult> _parser = new pb::MessageParser<LoginResult>(() => new LoginResult());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<LoginResult> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[16]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public LoginResult() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public LoginResult(LoginResult other) : this() {
+      rejection_ = other.rejection_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public LoginResult Clone() {
+      return new LoginResult(this);
+    }
+
+    /// <summary>Field number for the "rejection" field.</summary>
+    public const int RejectionFieldNumber = 1;
+    private global::Game.V1.LoginRejection rejection_ = global::Game.V1.LoginRejection.Unspecified;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.LoginRejection Rejection {
+      get { return rejection_; }
+      set {
+        rejection_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as LoginResult);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(LoginResult other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Rejection != other.Rejection) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Rejection != global::Game.V1.LoginRejection.Unspecified) hash ^= Rejection.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Rejection != global::Game.V1.LoginRejection.Unspecified) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) Rejection);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Rejection != global::Game.V1.LoginRejection.Unspecified) {
+        output.WriteRawTag(8);
+        output.WriteEnum((int) Rejection);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Rejection != global::Game.V1.LoginRejection.Unspecified) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Rejection);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(LoginResult other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Rejection != global::Game.V1.LoginRejection.Unspecified) {
+        Rejection = other.Rejection;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Rejection = (global::Game.V1.LoginRejection) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+      if ((tag & 7) == 4) {
+        // Abort on any end group tag.
+        return;
+      }
+      switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Rejection = (global::Game.V1.LoginRejection) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
   /// <summary>
   /// Discriminated wrapper for all server messages.
   /// Add new server message types as new oneof members.
@@ -4449,7 +4853,7 @@ namespace Game.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[15]; }
+      get { return global::Game.V1.ServerMessageReflection.Descriptor.MessageTypes[17]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4496,6 +4900,12 @@ namespace Game.V1 {
           break;
         case MsgOneofCase.JoinRejected:
           JoinRejected = other.JoinRejected.Clone();
+          break;
+        case MsgOneofCase.AccountCreateResult:
+          AccountCreateResult = other.AccountCreateResult.Clone();
+          break;
+        case MsgOneofCase.LoginResult:
+          LoginResult = other.LoginResult.Clone();
           break;
         case MsgOneofCase.Trade:
           Trade = other.Trade.Clone();
@@ -4643,6 +5053,33 @@ namespace Game.V1 {
       }
     }
 
+    /// <summary>Field number for the "account_create_result" field.</summary>
+    public const int AccountCreateResultFieldNumber = 16;
+    /// <summary>
+    /// Account
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.AccountCreateResult AccountCreateResult {
+      get { return msgCase_ == MsgOneofCase.AccountCreateResult ? (global::Game.V1.AccountCreateResult) msg_ : null; }
+      set {
+        msg_ = value;
+        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.AccountCreateResult;
+      }
+    }
+
+    /// <summary>Field number for the "login_result" field.</summary>
+    public const int LoginResultFieldNumber = 17;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Game.V1.LoginResult LoginResult {
+      get { return msgCase_ == MsgOneofCase.LoginResult ? (global::Game.V1.LoginResult) msg_ : null; }
+      set {
+        msg_ = value;
+        msgCase_ = value == null ? MsgOneofCase.None : MsgOneofCase.LoginResult;
+      }
+    }
+
     /// <summary>Field number for the "trade" field.</summary>
     public const int TradeFieldNumber = 6;
     /// <summary>
@@ -4737,6 +5174,8 @@ namespace Game.V1 {
       GameStatus = 10,
       InitialState = 5,
       JoinRejected = 8,
+      AccountCreateResult = 16,
+      LoginResult = 17,
       Trade = 6,
       PlayerInventory = 7,
       GameOver = 9,
@@ -4782,6 +5221,8 @@ namespace Game.V1 {
       if (!object.Equals(GameStatus, other.GameStatus)) return false;
       if (!object.Equals(InitialState, other.InitialState)) return false;
       if (!object.Equals(JoinRejected, other.JoinRejected)) return false;
+      if (!object.Equals(AccountCreateResult, other.AccountCreateResult)) return false;
+      if (!object.Equals(LoginResult, other.LoginResult)) return false;
       if (!object.Equals(Trade, other.Trade)) return false;
       if (!object.Equals(PlayerInventory, other.PlayerInventory)) return false;
       if (!object.Equals(GameOver, other.GameOver)) return false;
@@ -4805,6 +5246,8 @@ namespace Game.V1 {
       if (msgCase_ == MsgOneofCase.GameStatus) hash ^= GameStatus.GetHashCode();
       if (msgCase_ == MsgOneofCase.InitialState) hash ^= InitialState.GetHashCode();
       if (msgCase_ == MsgOneofCase.JoinRejected) hash ^= JoinRejected.GetHashCode();
+      if (msgCase_ == MsgOneofCase.AccountCreateResult) hash ^= AccountCreateResult.GetHashCode();
+      if (msgCase_ == MsgOneofCase.LoginResult) hash ^= LoginResult.GetHashCode();
       if (msgCase_ == MsgOneofCase.Trade) hash ^= Trade.GetHashCode();
       if (msgCase_ == MsgOneofCase.PlayerInventory) hash ^= PlayerInventory.GetHashCode();
       if (msgCase_ == MsgOneofCase.GameOver) hash ^= GameOver.GetHashCode();
@@ -4890,6 +5333,14 @@ namespace Game.V1 {
         output.WriteRawTag(122);
         output.WriteMessage(RandomEventEnded);
       }
+      if (msgCase_ == MsgOneofCase.AccountCreateResult) {
+        output.WriteRawTag(130, 1);
+        output.WriteMessage(AccountCreateResult);
+      }
+      if (msgCase_ == MsgOneofCase.LoginResult) {
+        output.WriteRawTag(138, 1);
+        output.WriteMessage(LoginResult);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -4960,6 +5411,14 @@ namespace Game.V1 {
         output.WriteRawTag(122);
         output.WriteMessage(RandomEventEnded);
       }
+      if (msgCase_ == MsgOneofCase.AccountCreateResult) {
+        output.WriteRawTag(130, 1);
+        output.WriteMessage(AccountCreateResult);
+      }
+      if (msgCase_ == MsgOneofCase.LoginResult) {
+        output.WriteRawTag(138, 1);
+        output.WriteMessage(LoginResult);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -4996,6 +5455,12 @@ namespace Game.V1 {
       }
       if (msgCase_ == MsgOneofCase.JoinRejected) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(JoinRejected);
+      }
+      if (msgCase_ == MsgOneofCase.AccountCreateResult) {
+        size += 2 + pb::CodedOutputStream.ComputeMessageSize(AccountCreateResult);
+      }
+      if (msgCase_ == MsgOneofCase.LoginResult) {
+        size += 2 + pb::CodedOutputStream.ComputeMessageSize(LoginResult);
       }
       if (msgCase_ == MsgOneofCase.Trade) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Trade);
@@ -5081,6 +5546,18 @@ namespace Game.V1 {
             JoinRejected = new global::Game.V1.JoinRejected();
           }
           JoinRejected.MergeFrom(other.JoinRejected);
+          break;
+        case MsgOneofCase.AccountCreateResult:
+          if (AccountCreateResult == null) {
+            AccountCreateResult = new global::Game.V1.AccountCreateResult();
+          }
+          AccountCreateResult.MergeFrom(other.AccountCreateResult);
+          break;
+        case MsgOneofCase.LoginResult:
+          if (LoginResult == null) {
+            LoginResult = new global::Game.V1.LoginResult();
+          }
+          LoginResult.MergeFrom(other.LoginResult);
           break;
         case MsgOneofCase.Trade:
           if (Trade == null) {
@@ -5274,6 +5751,24 @@ namespace Game.V1 {
             RandomEventEnded = subBuilder;
             break;
           }
+          case 130: {
+            global::Game.V1.AccountCreateResult subBuilder = new global::Game.V1.AccountCreateResult();
+            if (msgCase_ == MsgOneofCase.AccountCreateResult) {
+              subBuilder.MergeFrom(AccountCreateResult);
+            }
+            input.ReadMessage(subBuilder);
+            AccountCreateResult = subBuilder;
+            break;
+          }
+          case 138: {
+            global::Game.V1.LoginResult subBuilder = new global::Game.V1.LoginResult();
+            if (msgCase_ == MsgOneofCase.LoginResult) {
+              subBuilder.MergeFrom(LoginResult);
+            }
+            input.ReadMessage(subBuilder);
+            LoginResult = subBuilder;
+            break;
+          }
         }
       }
     #endif
@@ -5426,6 +5921,24 @@ namespace Game.V1 {
             }
             input.ReadMessage(subBuilder);
             RandomEventEnded = subBuilder;
+            break;
+          }
+          case 130: {
+            global::Game.V1.AccountCreateResult subBuilder = new global::Game.V1.AccountCreateResult();
+            if (msgCase_ == MsgOneofCase.AccountCreateResult) {
+              subBuilder.MergeFrom(AccountCreateResult);
+            }
+            input.ReadMessage(subBuilder);
+            AccountCreateResult = subBuilder;
+            break;
+          }
+          case 138: {
+            global::Game.V1.LoginResult subBuilder = new global::Game.V1.LoginResult();
+            if (msgCase_ == MsgOneofCase.LoginResult) {
+              subBuilder.MergeFrom(LoginResult);
+            }
+            input.ReadMessage(subBuilder);
+            LoginResult = subBuilder;
             break;
           }
         }
