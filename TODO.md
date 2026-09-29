@@ -19,6 +19,7 @@
   - [ ] Resume (close the menu window)
   - [ ] Back to start screen - should also show after game naturally ended
   - [ ] Quick the game entirely (with confirmation)
+  - [ ] Log out
 
 # Soundtrack (see docs/royalty_free_assets.md)
 - Add sound effects for following actions
@@ -53,6 +54,7 @@
 # Accessibility
 - [x] Make the game playable on web
 - [ ] Elo & Leaderboard (Compare every player against every other player exactly once (matrix of duels))
+- [ ] Matchmaking once ELO is there
 
 
 # Persistence (docs/ACCOUNTS.md)

@@ -4,3 +4,6 @@ backend/bin/
 backend/events.jsonl
 backend/server.log
 backend/server.pid
+/backend/mmo.db
+/backend/mmo.db-wal
+/backend/mmo.db-shm

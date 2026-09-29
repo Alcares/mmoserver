@@ -3,10 +3,15 @@ package store
 import (
 	"context"
 	"database/sql"
-	_ "embed"
+	"embed"
 	"errors"
+	"fmt"
+	"io/fs"
 	"log/slog"
 	"net/url"
+	"path"
+	"strconv"
+	"strings"
 
 	"github.com/alcares/mmoserver/backend/gen/go/db"
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
@@ -35,7 +40,63 @@ func Open(path string) (*sql.DB, error) {
 		conn.Close()
 		return nil, err
 	}
+
+	if err := migrate(conn); err != nil {
+		conn.Close()
+		return nil, fmt.Errorf("migrate: %w", err)
+	}
 	return conn, nil
+}
+
+//go:embed migrations/*.sql
+var migrations embed.FS
+
+// migrate applies every migration newer than the database's user_version, each in its own transaction
+func migrate(conn *sql.DB) error {
+	var version int
+	if err := conn.QueryRow("PRAGMA user_version").Scan(&version); err != nil {
+		return err
+	}
+
+	files, err := fs.Glob(migrations, "migrations/*.sql") // sorted by name
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		n, err := strconv.Atoi(strings.SplitN(path.Base(file), "_", 2)[0])
+		if err != nil {
+			return fmt.Errorf("%s: name must start with a number", file)
+		}
+		if n <= version {
+			continue
+		}
+
+		body, err := migrations.ReadFile(file)
+		if err != nil {
+			return err
+		}
+
+		tx, err := conn.Begin()
+		if err != nil {
+			return err
+		}
+		if _, err := tx.Exec(string(body)); err != nil {
+			tx.Rollback()
+			return fmt.Errorf("%s: %w", file, err)
+		}
+		// PRAGMA takes no ? parameters; n is an int parsed above, so Sprintf is safe
+		if _, err := tx.Exec(fmt.Sprintf("PRAGMA user_version = %d", n)); err != nil {
+			tx.Rollback()
+			return err
+		}
+		if err := tx.Commit(); err != nil {
+			return err
+		}
+		slog.Info("applied migration", "file", file)
+		version = n
+	}
+	return nil
 }
 
 // Accounts creates and authenticates player accounts

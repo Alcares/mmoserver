@@ -17,7 +17,7 @@ import (
 const (
 	logPath      = "backend/server.log"
 	webClientDir = "unity/Builds/Web"
-	dbFile       = "db.sql"
+	dbFile       = "backend/mmo.db"
 )
 
 func main() {

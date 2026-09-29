@@ -8,6 +8,9 @@
 /backend/server.log
 /backend/spectator.log
 /backend/*.jsonl
+/backend/mmo.db
+/backend/mmo.db-wal
+/backend/mmo.db-shm
 # Benchmark profiles
 /backend/bench-cpu.out
 /backend/*.test
