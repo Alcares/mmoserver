@@ -51,3 +51,10 @@
 
 # Accessibility
 - [x] Make the game playable on web
+- [ ] Elo & Leaderboard (Compare every player against every other player exactly once (matrix of duels))
+
+
+# Persistence
+- [ ] github.com/sqlc-dev/sqlc for code gen
+- [ ] SQLite DB
+- [ ] Account creation proto wiring (email + password + display name)
