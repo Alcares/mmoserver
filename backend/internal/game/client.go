@@ -14,7 +14,15 @@ import (
 
 // SendBufferSize is how many outgoing messages a client can have queued before new ones are dropped
 const SendBufferSize = 32
-const LobbyHandshakeTimeout = 30 * time.Second
+
+// PongWait is how long a connection may go without a pong before it counts as dead; pings go out
+// every PingPeriod, so a live client always answers in time however long it sits idle
+const PongWait = 30 * time.Second
+const PingPeriod = PongWait * 9 / 10
+
+// MaxMessageSize caps an incoming frame in bytes; every ClientMessage is far smaller, so a bigger
+// one closes the connection
+const MaxMessageSize = 4096
 
 // Client is all the world needs from a participant: somewhere to put outgoing frames.
 type Client interface {
@@ -57,24 +65,41 @@ func (c *WebsocketClient) WritePump() {
 		}
 	}(c.Conn)
 
-	for msg := range c.Send {
-		if err := c.Conn.WriteMessage(websocket.BinaryMessage, msg); err != nil {
-			return
+	ping := time.NewTicker(PingPeriod)
+	defer ping.Stop()
+
+	for {
+		select {
+		case msg, ok := <-c.Send:
+			if !ok {
+				// cmd/spectator closes Send on a healthy socket when the recap ends; a close frame lets the
+				// client see a clean close instead of an error. The game server only closes Send after the
+				// socket has died, where this write just fails.
+				_ = c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+				return
+			}
+			if err := c.Conn.WriteMessage(websocket.BinaryMessage, msg); err != nil {
+				return
+			}
+		case <-ping.C:
+			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
 		}
 	}
-	// cmd/spectator closes Send on a healthy socket when the recap ends; a close frame lets the
-	// client see a clean close instead of an error. The game server only closes Send after the
-	// socket has died, where this write just fails.
-	_ = c.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 }
 
 func (c *WebsocketClient) ReadPump(m *Master, a *store.Accounts, s *Sessions, cfg WorldConfig) {
 	defer c.closeConnection(s)
 
-	err := c.Conn.SetReadDeadline(time.Now().Add(LobbyHandshakeTimeout))
+	c.Conn.SetReadLimit(MaxMessageSize)
+	err := c.Conn.SetReadDeadline(time.Now().Add(PongWait))
 	if err != nil {
 		return
 	}
+	c.Conn.SetPongHandler(func(string) error {
+		return c.Conn.SetReadDeadline(time.Now().Add(PongWait))
+	})
 
 	for {
 		messageType, payload, err := c.Conn.ReadMessage()
@@ -245,11 +270,6 @@ func createConfig(defaults WorldConfig, req *pb.CreateGame) WorldConfig {
 
 func (c *WebsocketClient) joinWorld(world *World) error {
 	player, err := world.Join(c, c.Session.Name)
-	if err != nil {
-		return err
-	}
-
-	err = c.Conn.SetReadDeadline(time.Time{})
 	if err != nil {
 		return err
 	}
