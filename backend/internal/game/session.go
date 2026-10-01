@@ -1,11 +1,12 @@
 package game
 
 import (
-	"fmt"
-	"strings"
-	"unicode"
+	"sync"
+	"time"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 )
 
 func (w *World) addPlayer(client Client, name string) (*Player, error) {
@@ -15,7 +16,7 @@ func (w *World) addPlayer(client Client, name string) (*Player, error) {
 
 	playerID := w.nextPlayerID
 	w.nextPlayerID++
-	player := NewPlayer(playerID, SpawnPos, sanitizePlayerName(name, playerID))
+	player := NewPlayer(playerID, SpawnPos, name)
 	// Which client drives it is the only thing that makes a player a bot, and it is decided here.
 	_, player.IsBot = client.(*BotClient)
 
@@ -81,23 +82,37 @@ func (w *World) removePlayer(playerID uint32) {
 	w.statusDirty = true
 }
 
-const maxNameRunes = 16
-const minNameRunes = 3
+type Sessions struct {
+	mu     sync.Mutex
+	active map[uuid.UUID]*WebsocketClient // key: string(accountID)
+}
 
-// sanitizePlayerName guards against adversarial input. Proto wire guarantees that name will be a valid UTF-8 string.
-func sanitizePlayerName(name string, playerID uint32) string {
-	r := []rune(strings.TrimSpace(name))
-	if len(r) > maxNameRunes {
-		r = r[:maxNameRunes]
+func NewSessions() *Sessions {
+	return &Sessions{
+		active: make(map[uuid.UUID]*WebsocketClient),
 	}
-	sanitized := make([]rune, 0, len(r))
-	for _, c := range r {
-		if !unicode.IsControl(c) && !unicode.Is(unicode.Cf, c) {
-			sanitized = append(sanitized, c)
-		}
+}
+
+// replace makes c the account's session and disconnects the one it replaces
+func (s *Sessions) replace(id uuid.UUID, c *WebsocketClient) {
+	s.mu.Lock()
+	old := s.active[id]
+	s.active[id] = c
+	s.mu.Unlock()
+
+	if old != nil {
+		old.Conn.WriteControl(websocket.CloseMessage,
+			websocket.FormatCloseMessage(4001, "logged in elsewhere"),
+			time.Now().Add(time.Second))
+		old.Conn.Close()
 	}
-	if len(sanitized) < minNameRunes {
-		return fmt.Sprintf("Player %d", playerID)
+}
+
+// remove forgets c's session unless a newer login has already replaced it
+func (s *Sessions) remove(id uuid.UUID, c *WebsocketClient) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.active[id] == c {
+		delete(s.active, id)
 	}
-	return string(sanitized)
 }

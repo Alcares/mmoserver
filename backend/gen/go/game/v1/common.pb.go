@@ -355,6 +355,131 @@ func (JoinRejection) EnumDescriptor() ([]byte, []int) {
 	return file_game_v1_common_proto_rawDescGZIP(), []int{5}
 }
 
+type AccountCreateRejection int32
+
+const (
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED                         AccountCreateRejection = 0 // Not rejected: the account was created
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN                      AccountCreateRejection = 1
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT                  AccountCreateRejection = 2  // Wrong length or characters
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TOO_LONG                   AccountCreateRejection = 9  // Wrong length or characters
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_INVALID_CHARACTERS         AccountCreateRejection = 10 // Wrong length or characters
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_SURROUNDING_WHITESPACE     AccountCreateRejection = 11 // Starts or ends with a space
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT                  AccountCreateRejection = 3
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG                   AccountCreateRejection = 4 // bcrypt's 72-byte limit
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON                 AccountCreateRejection = 5
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_NUMBERS            AccountCreateRejection = 6
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_SPECIAL_CHARACTERS AccountCreateRejection = 7
+	AccountCreateRejection_ACCOUNT_CREATE_REJECTION_SERVER_ERROR                        AccountCreateRejection = 8 // Not the player's fault; try again later
+)
+
+// Enum value maps for AccountCreateRejection.
+var (
+	AccountCreateRejection_name = map[int32]string{
+		0:  "ACCOUNT_CREATE_REJECTION_UNSPECIFIED",
+		1:  "ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN",
+		2:  "ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT",
+		9:  "ACCOUNT_CREATE_REJECTION_USERNAME_TOO_LONG",
+		10: "ACCOUNT_CREATE_REJECTION_USERNAME_INVALID_CHARACTERS",
+		11: "ACCOUNT_CREATE_REJECTION_USERNAME_SURROUNDING_WHITESPACE",
+		3:  "ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT",
+		4:  "ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG",
+		5:  "ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON",
+		6:  "ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_NUMBERS",
+		7:  "ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_SPECIAL_CHARACTERS",
+		8:  "ACCOUNT_CREATE_REJECTION_SERVER_ERROR",
+	}
+	AccountCreateRejection_value = map[string]int32{
+		"ACCOUNT_CREATE_REJECTION_UNSPECIFIED":                         0,
+		"ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN":                      1,
+		"ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT":                  2,
+		"ACCOUNT_CREATE_REJECTION_USERNAME_TOO_LONG":                   9,
+		"ACCOUNT_CREATE_REJECTION_USERNAME_INVALID_CHARACTERS":         10,
+		"ACCOUNT_CREATE_REJECTION_USERNAME_SURROUNDING_WHITESPACE":     11,
+		"ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT":                  3,
+		"ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG":                   4,
+		"ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON":                 5,
+		"ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_NUMBERS":            6,
+		"ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_SPECIAL_CHARACTERS": 7,
+		"ACCOUNT_CREATE_REJECTION_SERVER_ERROR":                        8,
+	}
+)
+
+func (x AccountCreateRejection) Enum() *AccountCreateRejection {
+	p := new(AccountCreateRejection)
+	*p = x
+	return p
+}
+
+func (x AccountCreateRejection) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AccountCreateRejection) Descriptor() protoreflect.EnumDescriptor {
+	return file_game_v1_common_proto_enumTypes[6].Descriptor()
+}
+
+func (AccountCreateRejection) Type() protoreflect.EnumType {
+	return &file_game_v1_common_proto_enumTypes[6]
+}
+
+func (x AccountCreateRejection) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AccountCreateRejection.Descriptor instead.
+func (AccountCreateRejection) EnumDescriptor() ([]byte, []int) {
+	return file_game_v1_common_proto_rawDescGZIP(), []int{6}
+}
+
+type LoginRejection int32
+
+const (
+	LoginRejection_LOGIN_REJECTION_UNSPECIFIED         LoginRejection = 0
+	LoginRejection_LOGIN_REJECTION_INVALID_CREDENTIALS LoginRejection = 1
+	LoginRejection_LOGIN_REJECTION_SERVER_ERROR        LoginRejection = 2 // Not the player's fault; try again later
+)
+
+// Enum value maps for LoginRejection.
+var (
+	LoginRejection_name = map[int32]string{
+		0: "LOGIN_REJECTION_UNSPECIFIED",
+		1: "LOGIN_REJECTION_INVALID_CREDENTIALS",
+		2: "LOGIN_REJECTION_SERVER_ERROR",
+	}
+	LoginRejection_value = map[string]int32{
+		"LOGIN_REJECTION_UNSPECIFIED":         0,
+		"LOGIN_REJECTION_INVALID_CREDENTIALS": 1,
+		"LOGIN_REJECTION_SERVER_ERROR":        2,
+	}
+)
+
+func (x LoginRejection) Enum() *LoginRejection {
+	p := new(LoginRejection)
+	*p = x
+	return p
+}
+
+func (x LoginRejection) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (LoginRejection) Descriptor() protoreflect.EnumDescriptor {
+	return file_game_v1_common_proto_enumTypes[7].Descriptor()
+}
+
+func (LoginRejection) Type() protoreflect.EnumType {
+	return &file_game_v1_common_proto_enumTypes[7]
+}
+
+func (x LoginRejection) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use LoginRejection.Descriptor instead.
+func (LoginRejection) EnumDescriptor() ([]byte, []int) {
+	return file_game_v1_common_proto_rawDescGZIP(), []int{7}
+}
+
 type GamePhase int32
 
 const (
@@ -394,11 +519,11 @@ func (x GamePhase) String() string {
 }
 
 func (GamePhase) Descriptor() protoreflect.EnumDescriptor {
-	return file_game_v1_common_proto_enumTypes[6].Descriptor()
+	return file_game_v1_common_proto_enumTypes[8].Descriptor()
 }
 
 func (GamePhase) Type() protoreflect.EnumType {
-	return &file_game_v1_common_proto_enumTypes[6]
+	return &file_game_v1_common_proto_enumTypes[8]
 }
 
 func (x GamePhase) Number() protoreflect.EnumNumber {
@@ -407,7 +532,7 @@ func (x GamePhase) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GamePhase.Descriptor instead.
 func (GamePhase) EnumDescriptor() ([]byte, []int) {
-	return file_game_v1_common_proto_rawDescGZIP(), []int{6}
+	return file_game_v1_common_proto_rawDescGZIP(), []int{8}
 }
 
 var File_game_v1_common_proto protoreflect.FileDescriptor
@@ -452,7 +577,25 @@ const file_game_v1_common_proto_rawDesc = "" +
 	"\x1dJOIN_REJECTION_GAME_NOT_FOUND\x10\x01\x12\x1c\n" +
 	"\x18JOIN_REJECTION_GAME_FULL\x10\x02\x12#\n" +
 	"\x1fJOIN_REJECTION_GAME_IN_PROGRESS\x10\x03\x12\x1e\n" +
-	"\x1aJOIN_REJECTION_SERVER_FULL\x10\x04*\x8a\x01\n" +
+	"\x1aJOIN_REJECTION_SERVER_FULL\x10\x04*\xff\x04\n" +
+	"\x16AccountCreateRejection\x12(\n" +
+	"$ACCOUNT_CREATE_REJECTION_UNSPECIFIED\x10\x00\x12+\n" +
+	"'ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN\x10\x01\x12/\n" +
+	"+ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT\x10\x02\x12.\n" +
+	"*ACCOUNT_CREATE_REJECTION_USERNAME_TOO_LONG\x10\t\x128\n" +
+	"4ACCOUNT_CREATE_REJECTION_USERNAME_INVALID_CHARACTERS\x10\n" +
+	"\x12<\n" +
+	"8ACCOUNT_CREATE_REJECTION_USERNAME_SURROUNDING_WHITESPACE\x10\v\x12/\n" +
+	"+ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT\x10\x03\x12.\n" +
+	"*ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG\x10\x04\x120\n" +
+	",ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON\x10\x05\x125\n" +
+	"1ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_NUMBERS\x10\x06\x12@\n" +
+	"<ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_SPECIAL_CHARACTERS\x10\a\x12)\n" +
+	"%ACCOUNT_CREATE_REJECTION_SERVER_ERROR\x10\b*|\n" +
+	"\x0eLoginRejection\x12\x1f\n" +
+	"\x1bLOGIN_REJECTION_UNSPECIFIED\x10\x00\x12'\n" +
+	"#LOGIN_REJECTION_INVALID_CREDENTIALS\x10\x01\x12 \n" +
+	"\x1cLOGIN_REJECTION_SERVER_ERROR\x10\x02*\x8a\x01\n" +
 	"\tGamePhase\x12\x1a\n" +
 	"\x16GAME_PHASE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12GAME_PHASE_WAITING\x10\x01\x12\x18\n" +
@@ -472,7 +615,7 @@ func file_game_v1_common_proto_rawDescGZIP() []byte {
 	return file_game_v1_common_proto_rawDescData
 }
 
-var file_game_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
+var file_game_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 9)
 var file_game_v1_common_proto_goTypes = []any{
 	(PowerUpType)(0),              // 0: game.v1.PowerUpType
 	(RandomCommodityEventType)(0), // 1: game.v1.RandomCommodityEventType
@@ -480,7 +623,9 @@ var file_game_v1_common_proto_goTypes = []any{
 	(OrderIntent)(0),              // 3: game.v1.OrderIntent
 	(TradeRejection)(0),           // 4: game.v1.TradeRejection
 	(JoinRejection)(0),            // 5: game.v1.JoinRejection
-	(GamePhase)(0),                // 6: game.v1.GamePhase
+	(AccountCreateRejection)(0),   // 6: game.v1.AccountCreateRejection
+	(LoginRejection)(0),           // 7: game.v1.LoginRejection
+	(GamePhase)(0),                // 8: game.v1.GamePhase
 }
 var file_game_v1_common_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -500,7 +645,7 @@ func file_game_v1_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_common_proto_rawDesc), len(file_game_v1_common_proto_rawDesc)),
-			NumEnums:      7,
+			NumEnums:      9,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,

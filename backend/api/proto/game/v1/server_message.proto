@@ -122,6 +122,14 @@ message GameStatus {
   int32 remaining_ms = 4;
 }
 
+message AccountCreateResult {
+  AccountCreateRejection rejection = 1;
+}
+
+message LoginResult {
+  LoginRejection rejection = 1;
+}
+
 // Discriminated wrapper for all server messages.
 // Add new server message types as new oneof members.
 message ServerMessage {
@@ -140,6 +148,10 @@ message ServerMessage {
     // Initial join/reconnect
     InitialGameState initial_state      = 5;
     JoinRejected join_rejected = 8;
+
+    // Account
+    AccountCreateResult account_create_result = 16;
+    LoginResult login_result = 17;
 
     // Private inventory updates (sent only to owning player)
     TradeReceipt trade                  = 6;

@@ -10,6 +10,7 @@ namespace Game.Client
     /// <summary>
     /// Keyboard input: WASD/arrows move, E buys and Q sells at the nearby station, T cycles the
     /// order size, B asks the server for a bot, Ctrl+R leaves for the create/join screen.
+    /// Escape opens the in-game menu, or on the create/join screen logs out to the login screen.
     /// Watching a spectator, comma and period step the playback speed down and up.
     /// Movement is only sent when the vector changes (including back to zero on release), since
     /// the server keeps moving the player along the last direction it received.
@@ -23,6 +24,9 @@ namespace Game.Client
         /// <summary>Order sizes T cycles through, in whole units; the server's quoted sizes.</summary>
         public IReadOnlyList<uint> Multipliers => _state.OrderSizes;
         public int MultiplierIndex { get; private set; }
+
+        /// <summary>Whether the Escape menu is open over the game. The player stops meanwhile.</summary>
+        public bool MenuOpen { get; private set; }
 
         /// <summary>Units in the selected order; 0 before the first MarketState.</summary>
         public uint OrderUnits => Multipliers.Count == 0 ? 0 : Multipliers[Math.Min(MultiplierIndex, Multipliers.Count - 1)];
@@ -53,12 +57,23 @@ namespace Game.Client
             if (kb == null) return;
 
             // While the lobby panel is up the keyboard belongs to it: typing a join code
-            // must not walk the player around or fire trades.
-            if (!_state.Joined) return;
+            // must not walk the player around or fire trades. Only Escape, to log out.
+            if (!_state.Joined)
+            {
+                if (_client.LoggedIn && kb.escapeKey.wasPressedThisFrame) LogOut();
+                return;
+            }
 
             if (kb.rKey.wasPressedThisFrame && (kb.leftCtrlKey.isPressed || kb.rightCtrlKey.isPressed))
             {
                 Restart();
+                return;
+            }
+
+            if (kb.escapeKey.wasPressedThisFrame) MenuOpen = !MenuOpen;
+            if (MenuOpen)
+            {
+                StopMoving();
                 return;
             }
 
@@ -105,17 +120,43 @@ namespace Game.Client
 
         /// <summary>Leaves the current game for the create/join screen. The socket goes too:
         /// GameClient.Reconnect has the reason the server cannot put this connection back in the
-        /// lobby. Shared with the Play again button on the standings panel.</summary>
+        /// lobby. Shared with the Play again button on the standings panel and the Escape menu.</summary>
         public void Restart()
         {
             _state.LeaveGame();
             _client.Reconnect();
+            ResetInput();
+        }
 
-            // Forget what was last sent, so a direction still held when the new player spawns is
-            // sent again rather than mistaken for a vector the server already has.
+        /// <summary>Leaves any game and logs out, back to the login screen. The dropped socket
+        /// is the logout: the server ends a login with its connection.</summary>
+        public void LogOut()
+        {
+            _state.LeaveGame();
+            _client.LogOut();
+            ResetInput();
+        }
+
+        public void CloseMenu() => MenuOpen = false;
+
+        // Forget what was last sent, so a direction still held when the new player spawns is
+        // sent again rather than mistaken for a vector the server already has.
+        private void ResetInput()
+        {
             Move = Vector2.zero;
             _sent = Vector2.zero;
             MultiplierIndex = 0;
+            MenuOpen = false;
+        }
+
+        // The server keeps moving the player along the last direction it got, so an open menu
+        // has to send the stop itself.
+        private void StopMoving()
+        {
+            Move = Vector2.zero;
+            if (_sent == Vector2.zero || !_client.IsConnected) return;
+            _client.SendMovement(0f, 0f);
+            _sent = Vector2.zero;
         }
 
         // Buys or sells exactly the selected number of units, sending the per-unit price shown at

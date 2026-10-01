@@ -23,7 +23,7 @@ BENCH_PROF_PKG ?= ./internal/sim
 UNITY_BATCH = LD_LIBRARY_PATH=$(HOME)/.local/lib/unity-compat:$$LD_LIBRARY_PATH $(UNITY) \
 	-batchmode -quit -projectPath $(UNITY_PROJECT) -logFile - -executeMethod
 
-.PHONY: proto proto-py clean server-start server-stop spectator test bench bench-profile hooks client client-linux client-mac client-web all baseline train
+.PHONY: proto proto-py sqlc clean server-start server-stop spectator test bench bench-profile hooks client client-linux client-mac client-web all baseline train
 
 proto:
 	protoc \
@@ -60,6 +60,9 @@ proto-py:
 		--pyi_out=$(SIM_PY_ROOT) \
 		--grpc_python_out=$(SIM_PY_ROOT) \
 		$(PROTO_DIR)/sim/v1/*.proto $(PROTO_DIR)/bot/v1/*.proto
+
+sqlc:
+	go -C $(BACKEND) tool sqlc generate
 
 # Baselines through the Python wrapper: scripted should reproduce the ~1.05 steps/optimal that
 # internal/sim measures in Go. If it doesn't, the wrapper is wrong, not the policy.
@@ -129,6 +132,7 @@ client-web:
 # Regenerates protos, runs the Go tests, restarts the server in the background, then builds the Unity client.
 all:
 	$(MAKE) proto
+	$(MAKE) sqlc
 	$(MAKE) test
 	$(MAKE) client-linux
 

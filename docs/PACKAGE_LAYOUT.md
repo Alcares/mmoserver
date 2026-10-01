@@ -15,7 +15,7 @@ still in package `game`:
 | `config.go` | world dimensions, tick rate, limits, `WorldConfig` and its clamps |
 | `tick.go` | `Tick` and its four stages: `drainInputs`, `stepMovement`, `replicate`, `broadcastMarket` |
 | `phase.go` | the round state machine: `setPhase`, `advancePhase`, `finish`, `netWorth` |
-| `session.go` | `Join`, `addPlayer`, `removePlayer`, `initialState` |
+| `session.go` | `Join`, `addPlayer`, `removePlayer`, `initialState`; also `Sessions`, the login registry (see `ACCOUNTS.md`) |
 | `send.go` | `sendTo`, `sendToAll` — the non-blocking send rule lives here |
 
 ## The boundary that actually exists

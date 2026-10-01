@@ -14,8 +14,9 @@ namespace Game.Client
         private const float LobbyWidth = 320f;
         private const float LobbyRowHeight = 30f;
         private const int CodeLength = 6;
-        private const int NameLength = 16;
-        private const int MinNameLength = 3;
+        // Username limits, copies of usernameMinLength/usernameMaxLength in backend/internal/store/store.go.
+        private const int NameLength = 20;
+        private const int MinNameLength = 2;
 
         // The standings table is wider than the lobby panel: it carries three numeric columns.
         private const float StandingsWidth = 440f;
@@ -23,19 +24,18 @@ namespace Game.Client
         private const float UnitsColumn = 56f;
 
         private string _codeInput = "";
-        private string _nameInput = "";
         private GUIStyle _title, _lobbyText, _codeField, _button;
 
         private static readonly Color Dim = new Color32(0xa1, 0xa1, 0xaa, 0xff);
         private static readonly Color Bad = new Color32(0xf8, 0x71, 0x71, 0xff);
 
-        // Pick a name, then create a game or join one by its code. Drawn until the server confirms
-        // a join, and a rejection leaves the panel up so the code can be retyped on the same connection.
+        // Create a game or join one by its code, as the logged-in account. Drawn until the server
+        // confirms a join, and a rejection leaves the panel up so the code can be retyped on the same connection.
         private void DrawLobby(float screenW, float screenH)
         {
             if (_title == null) CreateLobbyStyles();
 
-            float height = LobbyRowHeight * 7f + 58f;
+            float height = LobbyRowHeight * 6f + 46f;
             var rect = new Rect((screenW - LobbyWidth) / 2f, (screenH - height) / 2f, LobbyWidth, height);
 
             GUI.color = Color.white;
@@ -58,19 +58,12 @@ namespace Game.Client
             }
 
             _lobbyText.normal.textColor = Dim;
-            GUI.Label(new Rect(x, y, width, LobbyRowHeight), "your name", _lobbyText);
+            GUI.Label(new Rect(x, y, width, LobbyRowHeight), $"playing as {_client.Username}  (Esc logs out)", _lobbyText);
             y += LobbyRowHeight;
-
-            _nameInput = GUI.TextField(new Rect(x, y, width, LobbyRowHeight), _nameInput, NameLength, _codeField);
-            y += LobbyRowHeight + 12f;
-
-            // Neither button works without a name the server would keep; it replaces shorter ones.
-            string playerName = _nameInput.Trim();
-            GUI.enabled = playerName.Length >= MinNameLength;
 
             if (GUI.Button(new Rect(x, y, width, LobbyRowHeight), "Create a new game", _button))
             {
-                _client.SendCreateGame(playerName);
+                _client.SendCreateGame();
             }
             y += LobbyRowHeight + 12f;
 
@@ -83,16 +76,14 @@ namespace Game.Client
             _codeInput = GUI.TextField(new Rect(x, y, codeWidth, LobbyRowHeight), _codeInput, CodeLength, _codeField)
                 .ToUpperInvariant();
 
-            bool submit = GUI.enabled
-                          && Event.current.type == EventType.KeyDown
+            bool submit = Event.current.type == EventType.KeyDown
                           && Event.current.keyCode == KeyCode.Return
                           && GUI.GetNameOfFocusedControl() == "joinCode";
 
             if (GUI.Button(new Rect(x + codeWidth + 8f, y, width - codeWidth - 8f, LobbyRowHeight), "Join", _button) || submit)
             {
-                if (_codeInput.Length > 0) _client.SendJoinGame(_codeInput, playerName);
+                if (_codeInput.Length > 0) _client.SendJoinGame(_codeInput);
             }
-            GUI.enabled = true;
             y += LobbyRowHeight + 10f;
 
             if (_state.LastRejection.HasValue)
@@ -207,6 +198,72 @@ namespace Game.Client
                 : "Watched every snapshot";
             _lobbyText.normal.textColor = Dim;
             GUI.Label(new Rect(x, rect.y + 14f + LobbyRowHeight, width, LobbyRowHeight), line, _lobbyText);
+        }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        // A page can't close its own browser tab; the player closes it instead.
+        private static readonly bool CanQuit = false;
+#else
+        private static readonly bool CanQuit = true;
+#endif
+
+        // Set by the first click on Quit game, so a second one is needed to actually quit.
+        private bool _confirmQuit;
+
+        // Escape during a game: resume, back to the create/join screen, log out to the login
+        // screen, or quit. A spectator has no login, so it gets no Log out.
+        private void DrawMenu(float screenW, float screenH)
+        {
+            if (_title == null) CreateLobbyStyles();
+
+            bool canLogOut = _client.LoggedIn;
+            int buttons = 2 + (canLogOut ? 1 : 0) + (CanQuit ? 1 : 0);
+            float height = LobbyRowHeight * (buttons + 1) + (buttons - 1) * 10f + 38f;
+            var rect = new Rect((screenW - LobbyWidth) / 2f, (screenH - height) / 2f, LobbyWidth, height);
+
+            GUI.color = Color.white;
+            GUI.DrawTexture(rect, _slotBorder);
+            GUI.DrawTexture(new Rect(rect.x + 2f, rect.y + 2f, rect.width - 4f, rect.height - 4f), _slotFill);
+
+            float x = rect.x + 20f;
+            float width = rect.width - 40f;
+            float y = rect.y + 14f;
+
+            _title.normal.textColor = LabelGold;
+            GUI.Label(new Rect(x, y, width, LobbyRowHeight), "MENU", _title);
+            y += LobbyRowHeight + 8f;
+
+            if (MenuButton(x, ref y, width, "Resume")) _input.CloseMenu();
+            if (MenuButton(x, ref y, width, "Back to start screen")) _input.Restart();
+            if (canLogOut && MenuButton(x, ref y, width, "Log out")) _input.LogOut();
+            if (!CanQuit) return;
+
+            if (!_confirmQuit)
+            {
+                if (GUI.Button(new Rect(x, y, width, LobbyRowHeight), "Quit game", _button)) _confirmQuit = true;
+                return;
+            }
+
+            float half = (width - 8f) / 2f;
+            if (GUI.Button(new Rect(x, y, half, LobbyRowHeight), "Really quit", _button)) QuitGame();
+            if (GUI.Button(new Rect(x + half + 8f, y, half, LobbyRowHeight), "Cancel", _button)) _confirmQuit = false;
+        }
+
+        // One full-width menu button, advancing y past it.
+        private bool MenuButton(float x, ref float y, float width, string text)
+        {
+            bool clicked = GUI.Button(new Rect(x, y, width, LobbyRowHeight), text, _button);
+            y += LobbyRowHeight + 10f;
+            return clicked;
+        }
+
+        private static void QuitGame()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
         }
 
         // Final standings, highest net worth first, with how much each player traded to get there.

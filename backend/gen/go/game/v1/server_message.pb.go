@@ -984,6 +984,94 @@ func (x *GameStatus) GetRemainingMs() int32 {
 	return 0
 }
 
+type AccountCreateResult struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Rejection     AccountCreateRejection `protobuf:"varint,1,opt,name=rejection,proto3,enum=game.v1.AccountCreateRejection" json:"rejection,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AccountCreateResult) Reset() {
+	*x = AccountCreateResult{}
+	mi := &file_game_v1_server_message_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AccountCreateResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AccountCreateResult) ProtoMessage() {}
+
+func (x *AccountCreateResult) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_server_message_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AccountCreateResult.ProtoReflect.Descriptor instead.
+func (*AccountCreateResult) Descriptor() ([]byte, []int) {
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *AccountCreateResult) GetRejection() AccountCreateRejection {
+	if x != nil {
+		return x.Rejection
+	}
+	return AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED
+}
+
+type LoginResult struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Rejection     LoginRejection         `protobuf:"varint,1,opt,name=rejection,proto3,enum=game.v1.LoginRejection" json:"rejection,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginResult) Reset() {
+	*x = LoginResult{}
+	mi := &file_game_v1_server_message_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginResult) ProtoMessage() {}
+
+func (x *LoginResult) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_server_message_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginResult.ProtoReflect.Descriptor instead.
+func (*LoginResult) Descriptor() ([]byte, []int) {
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *LoginResult) GetRejection() LoginRejection {
+	if x != nil {
+		return x.Rejection
+	}
+	return LoginRejection_LOGIN_REJECTION_UNSPECIFIED
+}
+
 // Discriminated wrapper for all server messages.
 // Add new server message types as new oneof members.
 type ServerMessage struct {
@@ -999,6 +1087,8 @@ type ServerMessage struct {
 	//	*ServerMessage_GameStatus
 	//	*ServerMessage_InitialState
 	//	*ServerMessage_JoinRejected
+	//	*ServerMessage_AccountCreateResult
+	//	*ServerMessage_LoginResult
 	//	*ServerMessage_Trade
 	//	*ServerMessage_PlayerInventory
 	//	*ServerMessage_GameOver
@@ -1012,7 +1102,7 @@ type ServerMessage struct {
 
 func (x *ServerMessage) Reset() {
 	*x = ServerMessage{}
-	mi := &file_game_v1_server_message_proto_msgTypes[15]
+	mi := &file_game_v1_server_message_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1024,7 +1114,7 @@ func (x *ServerMessage) String() string {
 func (*ServerMessage) ProtoMessage() {}
 
 func (x *ServerMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_server_message_proto_msgTypes[15]
+	mi := &file_game_v1_server_message_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1037,7 +1127,7 @@ func (x *ServerMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerMessage.ProtoReflect.Descriptor instead.
 func (*ServerMessage) Descriptor() ([]byte, []int) {
-	return file_game_v1_server_message_proto_rawDescGZIP(), []int{15}
+	return file_game_v1_server_message_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ServerMessage) GetMsg() isServerMessage_Msg {
@@ -1123,6 +1213,24 @@ func (x *ServerMessage) GetJoinRejected() *JoinRejected {
 	if x != nil {
 		if x, ok := x.Msg.(*ServerMessage_JoinRejected); ok {
 			return x.JoinRejected
+		}
+	}
+	return nil
+}
+
+func (x *ServerMessage) GetAccountCreateResult() *AccountCreateResult {
+	if x != nil {
+		if x, ok := x.Msg.(*ServerMessage_AccountCreateResult); ok {
+			return x.AccountCreateResult
+		}
+	}
+	return nil
+}
+
+func (x *ServerMessage) GetLoginResult() *LoginResult {
+	if x != nil {
+		if x, ok := x.Msg.(*ServerMessage_LoginResult); ok {
+			return x.LoginResult
 		}
 	}
 	return nil
@@ -1225,6 +1333,15 @@ type ServerMessage_JoinRejected struct {
 	JoinRejected *JoinRejected `protobuf:"bytes,8,opt,name=join_rejected,json=joinRejected,proto3,oneof"`
 }
 
+type ServerMessage_AccountCreateResult struct {
+	// Account
+	AccountCreateResult *AccountCreateResult `protobuf:"bytes,16,opt,name=account_create_result,json=accountCreateResult,proto3,oneof"`
+}
+
+type ServerMessage_LoginResult struct {
+	LoginResult *LoginResult `protobuf:"bytes,17,opt,name=login_result,json=loginResult,proto3,oneof"`
+}
+
 type ServerMessage_Trade struct {
 	// Private inventory updates (sent only to owning player)
 	Trade *TradeReceipt `protobuf:"bytes,6,opt,name=trade,proto3,oneof"`
@@ -1269,6 +1386,10 @@ func (*ServerMessage_GameStatus) isServerMessage_Msg() {}
 func (*ServerMessage_InitialState) isServerMessage_Msg() {}
 
 func (*ServerMessage_JoinRejected) isServerMessage_Msg() {}
+
+func (*ServerMessage_AccountCreateResult) isServerMessage_Msg() {}
+
+func (*ServerMessage_LoginResult) isServerMessage_Msg() {}
 
 func (*ServerMessage_Trade) isServerMessage_Msg() {}
 
@@ -1363,7 +1484,11 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	"\fplayer_count\x18\x02 \x01(\x05R\vplayerCount\x12\x1f\n" +
 	"\vmin_players\x18\x03 \x01(\x05R\n" +
 	"minPlayers\x12!\n" +
-	"\fremaining_ms\x18\x04 \x01(\x05R\vremainingMs\"\xd4\a\n" +
+	"\fremaining_ms\x18\x04 \x01(\x05R\vremainingMs\"T\n" +
+	"\x13AccountCreateResult\x12=\n" +
+	"\trejection\x18\x01 \x01(\x0e2\x1f.game.v1.AccountCreateRejectionR\trejection\"D\n" +
+	"\vLoginResult\x125\n" +
+	"\trejection\x18\x01 \x01(\x0e2\x17.game.v1.LoginRejectionR\trejection\"\xe3\b\n" +
 	"\rServerMessage\x12?\n" +
 	"\x0eworld_snapshot\x18\x01 \x01(\v2\x16.game.v1.WorldSnapshotH\x00R\rworldSnapshot\x129\n" +
 	"\fmarket_state\x18\x02 \x01(\v2\x14.game.v1.MarketStateH\x00R\vmarketState\x12C\n" +
@@ -1375,7 +1500,9 @@ const file_game_v1_server_message_proto_rawDesc = "" +
 	" \x01(\v2\x13.game.v1.GameStatusH\x00R\n" +
 	"gameStatus\x12@\n" +
 	"\rinitial_state\x18\x05 \x01(\v2\x19.game.v1.InitialGameStateH\x00R\finitialState\x12<\n" +
-	"\rjoin_rejected\x18\b \x01(\v2\x15.game.v1.JoinRejectedH\x00R\fjoinRejected\x12-\n" +
+	"\rjoin_rejected\x18\b \x01(\v2\x15.game.v1.JoinRejectedH\x00R\fjoinRejected\x12R\n" +
+	"\x15account_create_result\x18\x10 \x01(\v2\x1c.game.v1.AccountCreateResultH\x00R\x13accountCreateResult\x129\n" +
+	"\flogin_result\x18\x11 \x01(\v2\x14.game.v1.LoginResultH\x00R\vloginResult\x12-\n" +
 	"\x05trade\x18\x06 \x01(\v2\x15.game.v1.TradeReceiptH\x00R\x05trade\x12E\n" +
 	"\x10player_inventory\x18\a \x01(\v2\x18.game.v1.PlayerInventoryH\x00R\x0fplayerInventory\x120\n" +
 	"\tgame_over\x18\t \x01(\v2\x11.game.v1.GameOverH\x00R\bgameOver\x12,\n" +
@@ -1396,7 +1523,7 @@ func file_game_v1_server_message_proto_rawDescGZIP() []byte {
 	return file_game_v1_server_message_proto_rawDescData
 }
 
-var file_game_v1_server_message_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_game_v1_server_message_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_game_v1_server_message_proto_goTypes = []any{
 	(*PowerUp)(nil),               // 0: game.v1.PowerUp
 	(*PowerUpSpawned)(nil),        // 1: game.v1.PowerUpSpawned
@@ -1413,60 +1540,68 @@ var file_game_v1_server_message_proto_goTypes = []any{
 	(*JoinRejected)(nil),          // 12: game.v1.JoinRejected
 	(*GameOver)(nil),              // 13: game.v1.GameOver
 	(*GameStatus)(nil),            // 14: game.v1.GameStatus
-	(*ServerMessage)(nil),         // 15: game.v1.ServerMessage
-	(PowerUpType)(0),              // 16: game.v1.PowerUpType
-	(RandomCommodityEventType)(0), // 17: game.v1.RandomCommodityEventType
-	(CommodityType)(0),            // 18: game.v1.CommodityType
-	(*PlayerState)(nil),           // 19: game.v1.PlayerState
-	(TradeRejection)(0),           // 20: game.v1.TradeRejection
-	(OrderIntent)(0),              // 21: game.v1.OrderIntent
-	(JoinRejection)(0),            // 22: game.v1.JoinRejection
-	(*PlayerFinalStanding)(nil),   // 23: game.v1.PlayerFinalStanding
-	(GamePhase)(0),                // 24: game.v1.GamePhase
-	(*PlayerInventory)(nil),       // 25: game.v1.PlayerInventory
-	(*Episode)(nil),               // 26: game.v1.Episode
-	(*PlaybackSpeed)(nil),         // 27: game.v1.PlaybackSpeed
-	(*SpectatingOver)(nil),        // 28: game.v1.SpectatingOver
+	(*AccountCreateResult)(nil),   // 15: game.v1.AccountCreateResult
+	(*LoginResult)(nil),           // 16: game.v1.LoginResult
+	(*ServerMessage)(nil),         // 17: game.v1.ServerMessage
+	(PowerUpType)(0),              // 18: game.v1.PowerUpType
+	(RandomCommodityEventType)(0), // 19: game.v1.RandomCommodityEventType
+	(CommodityType)(0),            // 20: game.v1.CommodityType
+	(*PlayerState)(nil),           // 21: game.v1.PlayerState
+	(TradeRejection)(0),           // 22: game.v1.TradeRejection
+	(OrderIntent)(0),              // 23: game.v1.OrderIntent
+	(JoinRejection)(0),            // 24: game.v1.JoinRejection
+	(*PlayerFinalStanding)(nil),   // 25: game.v1.PlayerFinalStanding
+	(GamePhase)(0),                // 26: game.v1.GamePhase
+	(AccountCreateRejection)(0),   // 27: game.v1.AccountCreateRejection
+	(LoginRejection)(0),           // 28: game.v1.LoginRejection
+	(*PlayerInventory)(nil),       // 29: game.v1.PlayerInventory
+	(*Episode)(nil),               // 30: game.v1.Episode
+	(*PlaybackSpeed)(nil),         // 31: game.v1.PlaybackSpeed
+	(*SpectatingOver)(nil),        // 32: game.v1.SpectatingOver
 }
 var file_game_v1_server_message_proto_depIdxs = []int32{
-	16, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
+	18, // 0: game.v1.PowerUp.type:type_name -> game.v1.PowerUpType
 	0,  // 1: game.v1.PowerUpSpawned.power_up:type_name -> game.v1.PowerUp
-	17, // 2: game.v1.RandomEventOccurred.event_type:type_name -> game.v1.RandomCommodityEventType
-	18, // 3: game.v1.RandomEventOccurred.commodity:type_name -> game.v1.CommodityType
-	17, // 4: game.v1.RandomEventEnded.event_type:type_name -> game.v1.RandomCommodityEventType
-	18, // 5: game.v1.RandomEventEnded.commodity:type_name -> game.v1.CommodityType
-	19, // 6: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
+	19, // 2: game.v1.RandomEventOccurred.event_type:type_name -> game.v1.RandomCommodityEventType
+	20, // 3: game.v1.RandomEventOccurred.commodity:type_name -> game.v1.CommodityType
+	19, // 4: game.v1.RandomEventEnded.event_type:type_name -> game.v1.RandomCommodityEventType
+	20, // 5: game.v1.RandomEventEnded.commodity:type_name -> game.v1.CommodityType
+	21, // 6: game.v1.WorldSnapshot.players:type_name -> game.v1.PlayerState
 	7,  // 7: game.v1.MarketState.quotes:type_name -> game.v1.PriceQuote
-	18, // 8: game.v1.PriceQuote.commodity:type_name -> game.v1.CommodityType
+	20, // 8: game.v1.PriceQuote.commodity:type_name -> game.v1.CommodityType
 	8,  // 9: game.v1.PriceQuote.orders:type_name -> game.v1.OrderQuote
-	20, // 10: game.v1.TradeReceipt.rejection:type_name -> game.v1.TradeRejection
-	21, // 11: game.v1.TradeReceipt.intent:type_name -> game.v1.OrderIntent
-	18, // 12: game.v1.TradeReceipt.commodity:type_name -> game.v1.CommodityType
-	18, // 13: game.v1.TradingStation.commodity:type_name -> game.v1.CommodityType
+	22, // 10: game.v1.TradeReceipt.rejection:type_name -> game.v1.TradeRejection
+	23, // 11: game.v1.TradeReceipt.intent:type_name -> game.v1.OrderIntent
+	20, // 12: game.v1.TradeReceipt.commodity:type_name -> game.v1.CommodityType
+	20, // 13: game.v1.TradingStation.commodity:type_name -> game.v1.CommodityType
 	10, // 14: game.v1.InitialGameState.station_layout:type_name -> game.v1.TradingStation
-	22, // 15: game.v1.JoinRejected.reason:type_name -> game.v1.JoinRejection
-	23, // 16: game.v1.GameOver.standings:type_name -> game.v1.PlayerFinalStanding
-	24, // 17: game.v1.GameStatus.phase:type_name -> game.v1.GamePhase
-	5,  // 18: game.v1.ServerMessage.world_snapshot:type_name -> game.v1.WorldSnapshot
-	6,  // 19: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
-	1,  // 20: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
-	4,  // 21: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
-	2,  // 22: game.v1.ServerMessage.random_event_occurred:type_name -> game.v1.RandomEventOccurred
-	3,  // 23: game.v1.ServerMessage.random_event_ended:type_name -> game.v1.RandomEventEnded
-	14, // 24: game.v1.ServerMessage.game_status:type_name -> game.v1.GameStatus
-	11, // 25: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
-	12, // 26: game.v1.ServerMessage.join_rejected:type_name -> game.v1.JoinRejected
-	9,  // 27: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
-	25, // 28: game.v1.ServerMessage.player_inventory:type_name -> game.v1.PlayerInventory
-	13, // 29: game.v1.ServerMessage.game_over:type_name -> game.v1.GameOver
-	26, // 30: game.v1.ServerMessage.episode:type_name -> game.v1.Episode
-	27, // 31: game.v1.ServerMessage.playback_speed:type_name -> game.v1.PlaybackSpeed
-	28, // 32: game.v1.ServerMessage.spectating_over:type_name -> game.v1.SpectatingOver
-	33, // [33:33] is the sub-list for method output_type
-	33, // [33:33] is the sub-list for method input_type
-	33, // [33:33] is the sub-list for extension type_name
-	33, // [33:33] is the sub-list for extension extendee
-	0,  // [0:33] is the sub-list for field type_name
+	24, // 15: game.v1.JoinRejected.reason:type_name -> game.v1.JoinRejection
+	25, // 16: game.v1.GameOver.standings:type_name -> game.v1.PlayerFinalStanding
+	26, // 17: game.v1.GameStatus.phase:type_name -> game.v1.GamePhase
+	27, // 18: game.v1.AccountCreateResult.rejection:type_name -> game.v1.AccountCreateRejection
+	28, // 19: game.v1.LoginResult.rejection:type_name -> game.v1.LoginRejection
+	5,  // 20: game.v1.ServerMessage.world_snapshot:type_name -> game.v1.WorldSnapshot
+	6,  // 21: game.v1.ServerMessage.market_state:type_name -> game.v1.MarketState
+	1,  // 22: game.v1.ServerMessage.power_up_spawned:type_name -> game.v1.PowerUpSpawned
+	4,  // 23: game.v1.ServerMessage.power_up_despawned:type_name -> game.v1.PowerUpDespawned
+	2,  // 24: game.v1.ServerMessage.random_event_occurred:type_name -> game.v1.RandomEventOccurred
+	3,  // 25: game.v1.ServerMessage.random_event_ended:type_name -> game.v1.RandomEventEnded
+	14, // 26: game.v1.ServerMessage.game_status:type_name -> game.v1.GameStatus
+	11, // 27: game.v1.ServerMessage.initial_state:type_name -> game.v1.InitialGameState
+	12, // 28: game.v1.ServerMessage.join_rejected:type_name -> game.v1.JoinRejected
+	15, // 29: game.v1.ServerMessage.account_create_result:type_name -> game.v1.AccountCreateResult
+	16, // 30: game.v1.ServerMessage.login_result:type_name -> game.v1.LoginResult
+	9,  // 31: game.v1.ServerMessage.trade:type_name -> game.v1.TradeReceipt
+	29, // 32: game.v1.ServerMessage.player_inventory:type_name -> game.v1.PlayerInventory
+	13, // 33: game.v1.ServerMessage.game_over:type_name -> game.v1.GameOver
+	30, // 34: game.v1.ServerMessage.episode:type_name -> game.v1.Episode
+	31, // 35: game.v1.ServerMessage.playback_speed:type_name -> game.v1.PlaybackSpeed
+	32, // 36: game.v1.ServerMessage.spectating_over:type_name -> game.v1.SpectatingOver
+	37, // [37:37] is the sub-list for method output_type
+	37, // [37:37] is the sub-list for method input_type
+	37, // [37:37] is the sub-list for extension type_name
+	37, // [37:37] is the sub-list for extension extendee
+	0,  // [0:37] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_server_message_proto_init() }
@@ -1477,7 +1612,7 @@ func file_game_v1_server_message_proto_init() {
 	file_game_v1_common_proto_init()
 	file_game_v1_player_proto_init()
 	file_game_v1_spectator_proto_init()
-	file_game_v1_server_message_proto_msgTypes[15].OneofWrappers = []any{
+	file_game_v1_server_message_proto_msgTypes[17].OneofWrappers = []any{
 		(*ServerMessage_WorldSnapshot)(nil),
 		(*ServerMessage_MarketState)(nil),
 		(*ServerMessage_PowerUpSpawned)(nil),
@@ -1487,6 +1622,8 @@ func file_game_v1_server_message_proto_init() {
 		(*ServerMessage_GameStatus)(nil),
 		(*ServerMessage_InitialState)(nil),
 		(*ServerMessage_JoinRejected)(nil),
+		(*ServerMessage_AccountCreateResult)(nil),
+		(*ServerMessage_LoginResult)(nil),
 		(*ServerMessage_Trade)(nil),
 		(*ServerMessage_PlayerInventory)(nil),
 		(*ServerMessage_GameOver)(nil),
@@ -1500,7 +1637,7 @@ func file_game_v1_server_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_server_message_proto_rawDesc), len(file_game_v1_server_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

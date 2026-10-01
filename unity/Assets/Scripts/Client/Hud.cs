@@ -61,9 +61,21 @@ namespace Game.Client
             _input = GetComponent<GameInput>();
         }
 
-        private void OnEnable() => _client.OnTradeReceipt += OnReceipt;
+        private void OnEnable()
+        {
+            _client.OnTradeReceipt += OnReceipt;
+            _client.OnLoginResult += OnLoginResult;
+            _client.OnAccountCreateResult += OnAccountCreateResult;
+            _client.OnLoggedOut += OnLoggedOut;
+        }
 
-        private void OnDisable() => _client.OnTradeReceipt -= OnReceipt;
+        private void OnDisable()
+        {
+            _client.OnTradeReceipt -= OnReceipt;
+            _client.OnLoginResult -= OnLoginResult;
+            _client.OnAccountCreateResult -= OnAccountCreateResult;
+            _client.OnLoggedOut -= OnLoggedOut;
+        }
 
         private void OnReceipt(TradeReceipt r)
         {
@@ -116,10 +128,12 @@ namespace Game.Client
             var statusRect = new Rect(screenW - topWidth - EdgeMargin, EdgeMargin, topWidth, TopBoxHeight);
             DrawTopBox(statusRect, status, Color.white);
 
-            // In the lobby there is no game to draw yet, only the create/join panel.
+            // In the lobby there is no game to draw yet: the account panel until this connection
+            // is logged in, then the create/join panel.
             if (!_state.Joined)
             {
-                DrawLobby(screenW, screenH);
+                if (_client.LoggedIn) DrawLobby(screenW, screenH);
+                else DrawAccount(screenW, screenH);
                 return;
             }
 
@@ -129,14 +143,20 @@ namespace Game.Client
             DrawTrainingProgress(speedRect);
             if (_state.SpectatingOver) DrawSpectatingOver(screenW, screenH);
 
-            if (_state.Position == null) return;
+            if (_state.Position != null)
+            {
+                DrawStats();
+                DrawHotbar(screenW, screenH);
+                DrawMultiplier(screenW, screenH);
+                DrawReceipt(screenW, screenH);
 
-            DrawStats();
-            DrawHotbar(screenW, screenH);
-            DrawMultiplier(screenW, screenH);
-            DrawReceipt(screenW, screenH);
+                // Not under the menu: both sit in the middle and their buttons would overlap.
+                if (_state.Standings != null && !_input.MenuOpen) DrawStandings(screenW, screenH);
+            }
 
-            if (_state.Standings != null) DrawStandings(screenW, screenH);
+            // Last, so it draws over everything else.
+            if (_input.MenuOpen) DrawMenu(screenW, screenH);
+            else _confirmQuit = false; // a reopened menu asks again
         }
 
         // The last trade's result, centered above the order-size row, until it expires.

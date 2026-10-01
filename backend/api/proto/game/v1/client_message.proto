@@ -14,13 +14,10 @@ message MovementCommand {
 }
 
 // TODO: add create game config params
-message CreateGame {
-  string player_name = 1;
-}
+message CreateGame {}
 
 message JoinGame {
   string game_id = 1;
-  string player_name = 2;
 }
 
 message SpawnBot {
@@ -38,6 +35,18 @@ message TradeRequest {
   uint64 price_cents = 4;
 }
 
+message CreateAccount {
+  string name = 1;
+  string password = 2;
+}
+
+message Login {
+  string name = 1;
+  string password = 2;
+}
+
+message Logout {}
+
 // Client -> Server: Discriminated wrapper for all client commands.
 message ClientMessage {
   oneof cmd {
@@ -49,5 +58,9 @@ message ClientMessage {
 
     // Spectator only
     PlaybackSpeed set_playback_speed = 6;
+
+    CreateAccount create_account = 7;
+    Login login = 8;
+    Logout logout = 9;
   }
 }

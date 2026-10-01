@@ -48,15 +48,32 @@ namespace Game.V1 {
             "ChpKT0lOX1JFSkVDVElPTl9VTlNQRUNJRklFRBAAEiEKHUpPSU5fUkVKRUNU",
             "SU9OX0dBTUVfTk9UX0ZPVU5EEAESHAoYSk9JTl9SRUpFQ1RJT05fR0FNRV9G",
             "VUxMEAISIwofSk9JTl9SRUpFQ1RJT05fR0FNRV9JTl9QUk9HUkVTUxADEh4K",
-            "GkpPSU5fUkVKRUNUSU9OX1NFUlZFUl9GVUxMEAQqigEKCUdhbWVQaGFzZRIa",
-            "ChZHQU1FX1BIQVNFX1VOU1BFQ0lGSUVEEAASFgoSR0FNRV9QSEFTRV9XQUlU",
-            "SU5HEAESGAoUR0FNRV9QSEFTRV9DT1VOVERPV04QAhIWChJHQU1FX1BIQVNF",
-            "X1JVTk5JTkcQAxIXChNHQU1FX1BIQVNFX0ZJTklTSEVEEARCRlo6Z2l0aHVi",
-            "LmNvbS9hbGNhcmVzL21tb3NlcnZlci9iYWNrZW5kL2dlbi9nby9nYW1lL3Yx",
-            "O2dhbWV2MaoCB0dhbWUuVjFiBnByb3RvMw=="));
+            "GkpPSU5fUkVKRUNUSU9OX1NFUlZFUl9GVUxMEAQq/wQKFkFjY291bnRDcmVh",
+            "dGVSZWplY3Rpb24SKAokQUNDT1VOVF9DUkVBVEVfUkVKRUNUSU9OX1VOU1BF",
+            "Q0lGSUVEEAASKwonQUNDT1VOVF9DUkVBVEVfUkVKRUNUSU9OX1VTRVJOQU1F",
+            "X1RBS0VOEAESLworQUNDT1VOVF9DUkVBVEVfUkVKRUNUSU9OX1VTRVJOQU1F",
+            "X1RPT19TSE9SVBACEi4KKkFDQ09VTlRfQ1JFQVRFX1JFSkVDVElPTl9VU0VS",
+            "TkFNRV9UT09fTE9ORxAJEjgKNEFDQ09VTlRfQ1JFQVRFX1JFSkVDVElPTl9V",
+            "U0VSTkFNRV9JTlZBTElEX0NIQVJBQ1RFUlMQChI8CjhBQ0NPVU5UX0NSRUFU",
+            "RV9SRUpFQ1RJT05fVVNFUk5BTUVfU1VSUk9VTkRJTkdfV0hJVEVTUEFDRRAL",
+            "Ei8KK0FDQ09VTlRfQ1JFQVRFX1JFSkVDVElPTl9QQVNTV09SRF9UT09fU0hP",
+            "UlQQAxIuCipBQ0NPVU5UX0NSRUFURV9SRUpFQ1RJT05fUEFTU1dPUkRfVE9P",
+            "X0xPTkcQBBIwCixBQ0NPVU5UX0NSRUFURV9SRUpFQ1RJT05fUEFTU1dPUkRf",
+            "VE9PX0NPTU1PThAFEjUKMUFDQ09VTlRfQ1JFQVRFX1JFSkVDVElPTl9QQVNT",
+            "V09SRF9NSVNTSU5HX05VTUJFUlMQBhJACjxBQ0NPVU5UX0NSRUFURV9SRUpF",
+            "Q1RJT05fUEFTU1dPUkRfTUlTU0lOR19TUEVDSUFMX0NIQVJBQ1RFUlMQBxIp",
+            "CiVBQ0NPVU5UX0NSRUFURV9SRUpFQ1RJT05fU0VSVkVSX0VSUk9SEAgqfAoO",
+            "TG9naW5SZWplY3Rpb24SHwobTE9HSU5fUkVKRUNUSU9OX1VOU1BFQ0lGSUVE",
+            "EAASJwojTE9HSU5fUkVKRUNUSU9OX0lOVkFMSURfQ1JFREVOVElBTFMQARIg",
+            "ChxMT0dJTl9SRUpFQ1RJT05fU0VSVkVSX0VSUk9SEAIqigEKCUdhbWVQaGFz",
+            "ZRIaChZHQU1FX1BIQVNFX1VOU1BFQ0lGSUVEEAASFgoSR0FNRV9QSEFTRV9X",
+            "QUlUSU5HEAESGAoUR0FNRV9QSEFTRV9DT1VOVERPV04QAhIWChJHQU1FX1BI",
+            "QVNFX1JVTk5JTkcQAxIXChNHQU1FX1BIQVNFX0ZJTklTSEVEEARCRlo6Z2l0",
+            "aHViLmNvbS9hbGNhcmVzL21tb3NlcnZlci9iYWNrZW5kL2dlbi9nby9nYW1l",
+            "L3YxO2dhbWV2MaoCB0dhbWUuVjFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Game.V1.PowerUpType), typeof(global::Game.V1.RandomCommodityEventType), typeof(global::Game.V1.CommodityType), typeof(global::Game.V1.OrderIntent), typeof(global::Game.V1.TradeRejection), typeof(global::Game.V1.JoinRejection), typeof(global::Game.V1.GamePhase), }, null, null));
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Game.V1.PowerUpType), typeof(global::Game.V1.RandomCommodityEventType), typeof(global::Game.V1.CommodityType), typeof(global::Game.V1.OrderIntent), typeof(global::Game.V1.TradeRejection), typeof(global::Game.V1.JoinRejection), typeof(global::Game.V1.AccountCreateRejection), typeof(global::Game.V1.LoginRejection), typeof(global::Game.V1.GamePhase), }, null, null));
     }
     #endregion
 
@@ -154,6 +171,51 @@ namespace Game.V1 {
     /// This server already hosts its maximum number of games
     /// </summary>
     [pbr::OriginalName("JOIN_REJECTION_SERVER_FULL")] ServerFull = 4,
+  }
+
+  public enum AccountCreateRejection {
+    /// <summary>
+    /// Not rejected: the account was created
+    /// </summary>
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_UNSPECIFIED")] Unspecified = 0,
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN")] UsernameTaken = 1,
+    /// <summary>
+    /// Wrong length or characters
+    /// </summary>
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT")] UsernameTooShort = 2,
+    /// <summary>
+    /// Wrong length or characters
+    /// </summary>
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_USERNAME_TOO_LONG")] UsernameTooLong = 9,
+    /// <summary>
+    /// Wrong length or characters
+    /// </summary>
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_USERNAME_INVALID_CHARACTERS")] UsernameInvalidCharacters = 10,
+    /// <summary>
+    /// Starts or ends with a space
+    /// </summary>
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_USERNAME_SURROUNDING_WHITESPACE")] UsernameSurroundingWhitespace = 11,
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT")] PasswordTooShort = 3,
+    /// <summary>
+    /// bcrypt's 72-byte limit
+    /// </summary>
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG")] PasswordTooLong = 4,
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON")] PasswordTooCommon = 5,
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_NUMBERS")] PasswordMissingNumbers = 6,
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_SPECIAL_CHARACTERS")] PasswordMissingSpecialCharacters = 7,
+    /// <summary>
+    /// Not the player's fault; try again later
+    /// </summary>
+    [pbr::OriginalName("ACCOUNT_CREATE_REJECTION_SERVER_ERROR")] ServerError = 8,
+  }
+
+  public enum LoginRejection {
+    [pbr::OriginalName("LOGIN_REJECTION_UNSPECIFIED")] Unspecified = 0,
+    [pbr::OriginalName("LOGIN_REJECTION_INVALID_CREDENTIALS")] InvalidCredentials = 1,
+    /// <summary>
+    /// Not the player's fault; try again later
+    /// </summary>
+    [pbr::OriginalName("LOGIN_REJECTION_SERVER_ERROR")] ServerError = 2,
   }
 
   public enum GamePhase {
