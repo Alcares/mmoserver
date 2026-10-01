@@ -60,6 +60,7 @@ enum AccountCreateRejection {
   ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT                  = 2; // Wrong length or characters
   ACCOUNT_CREATE_REJECTION_USERNAME_TOO_LONG                   = 9; // Wrong length or characters
   ACCOUNT_CREATE_REJECTION_USERNAME_INVALID_CHARACTERS         = 10; // Wrong length or characters
+  ACCOUNT_CREATE_REJECTION_USERNAME_SURROUNDING_WHITESPACE     = 11; // Starts or ends with a space
   ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT                  = 3;
   ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG                   = 4; // bcrypt's 72-byte limit
   ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON                 = 5;

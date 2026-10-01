@@ -24,6 +24,9 @@ import (
 	sqlite3 "modernc.org/sqlite/lib"
 )
 
+// dummyPasswordHash exist to make it impossible to tell if a username exists or not by timing
+const dummyPasswordHash = "$2a$10$D4Y.N8T8nCu2STIhLuDHy.hbA73FOpjnF7LQjRI/rvyZr2Bx.IRBy"
+
 // Open creates a single connection to the SQLite DB. Caller has to close.
 func Open(path string) (*sql.DB, error) {
 	q := url.Values{}
@@ -122,7 +125,9 @@ type Session struct {
 func (a *Accounts) Login(ctx context.Context, username, password string) (*Session, pb.LoginRejection) {
 	account, err := a.queries.GetAccount(ctx, username)
 	switch {
-	case errors.Is(err, sql.ErrNoRows):
+	case errors.Is(err, sql.ErrNoRows), err == nil && account.Name != username:
+		// The lookup ignores case, but a login has to match the name exactly
+		_ = bcrypt.CompareHashAndPassword([]byte(dummyPasswordHash), []byte(password))
 		return nil, pb.LoginRejection_LOGIN_REJECTION_INVALID_CREDENTIALS // no such user
 	case err != nil:
 		slog.Error("load account", "err", err)
@@ -152,12 +157,10 @@ func (a *Accounts) Login(ctx context.Context, username, password string) (*Sessi
 }
 
 func (a *Accounts) CreateNewAccount(ctx context.Context, username, password string) (*Session, pb.AccountCreateRejection) {
-	username = strings.TrimSpace(username)
-
 	if reason := validateUsername(username); reason != pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED {
 		return nil, reason
 	}
-	if reason := validatePassword(username, password); reason != pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED {
+	if reason := validatePassword(password); reason != pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED {
 		return nil, reason
 	}
 
@@ -222,7 +225,7 @@ var commonPasswords = func() map[string]struct{} {
 	return m
 }()
 
-func validatePassword(username, password string) pb.AccountCreateRejection {
+func validatePassword(password string) pb.AccountCreateRejection {
 	switch {
 	case utf8.RuneCountInString(password) < passwordMinLength:
 		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT
@@ -231,7 +234,7 @@ func validatePassword(username, password string) pb.AccountCreateRejection {
 	}
 
 	lower := strings.ToLower(password)
-	if _, common := commonPasswords[lower]; common || strings.Contains(lower, strings.ToLower(username)) {
+	if _, common := commonPasswords[lower]; common {
 		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON
 	}
 
@@ -258,6 +261,8 @@ func validatePassword(username, password string) pb.AccountCreateRejection {
 
 func validateUsername(username string) pb.AccountCreateRejection {
 	switch {
+	case username != strings.TrimSpace(username):
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_SURROUNDING_WHITESPACE
 	case utf8.RuneCountInString(username) < usernameMinLength:
 		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT
 	case utf8.RuneCountInString(username) > usernameMaxLength:

@@ -4,7 +4,8 @@
   - [ ] Grafana
 
 # Robustness
-- [ ] Ping/pong so silently dead connections leave their game
+- [x] Ping/pong so silently dead connections leave their game
+- [ ] Rate limiting
 
 # Game Feel
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
@@ -22,8 +23,9 @@
   - [ ] bot reached goal
 
 # Gameplay
-- [ ] Add a warning countdown (5s) before next random event
-- [ ] Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
+- [ ] Rework core game loop and improve skill expression potential
+  - [ ] Add a warning countdown (5s) before next random event
+  - (maybe) [ ] Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
 
 # Training
 - [ ] Train on GPU instead of CPU (only if the network grows in size enough to justify)

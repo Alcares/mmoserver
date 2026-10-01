@@ -160,6 +160,7 @@ namespace Game.Client
             AccountCreateRejection.UsernameTooShort => "Username is too short",
             AccountCreateRejection.UsernameTooLong => "Username is too long",
             AccountCreateRejection.UsernameInvalidCharacters => "Username has characters that aren't allowed",
+            AccountCreateRejection.UsernameSurroundingWhitespace => "Username can't start or end with a space",
             AccountCreateRejection.PasswordTooShort => "Password is too short",
             AccountCreateRejection.PasswordTooLong => "Password is too long",
             AccountCreateRejection.PasswordTooCommon => "Password is too common",
