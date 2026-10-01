@@ -18,7 +18,8 @@ const (
 	WorldMinY        = 0.0
 	WorldMaxY        = 250.0
 	TickDuration     = 0.05 // 50ms = 20Hz
-	TradeRange       = 4.0  // Max distance to a station a player can trade from. Have to be kept in sync with its mirrors
+	TickFrequency    = 1000 / (TickDuration * 1000)
+	TradeRange       = 4.0 // Max distance to a station a player can trade from. Have to be kept in sync with its mirrors
 	PlayerRadius     = 1.0
 	StationRadius    = 2.0
 	PlayerLimit      = 20 // the most players any game may be configured for

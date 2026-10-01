@@ -36,6 +36,7 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 		SequenceId: o.SequenceID,
 		Intent:     o.Intent,
 	}
+
 	// set once the station is known, so a rejection before that still logs, without pool state
 	var pool *CommodityState
 	reject := func(reason pb.TradeRejection) *pb.TradeReceipt {

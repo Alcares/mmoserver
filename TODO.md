@@ -24,6 +24,7 @@
 
 # Gameplay
 - [ ] Rework core game loop and improve skill expression potential
+  - [x] Implement "A" from market redesign
   - [ ] Add a warning countdown (5s) before next random event
   - (maybe) [ ] Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
 

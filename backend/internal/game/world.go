@@ -119,6 +119,7 @@ func (w *World) logTrade(player *Player, o TradeOrder, receipt *pb.TradeReceipt,
 		slog.Uint64("total_cents", receipt.TotalBalanceChange),
 		slog.Uint64("balance_cents", receipt.NewCashBalanceCents),
 		slog.Uint64("holding_units", receipt.NewHoldingUnits),
+		slog.Uint64("decayed_cents", player.decayed),
 	}
 	if !receipt.Success {
 		attrs = append(attrs, slog.String("rejection", receipt.Rejection.String()))
@@ -168,8 +169,12 @@ func (w *World) logPlayerLeave(player *Player) {
 	if !w.loggerEnabled() {
 		return
 	}
-
-	w.log("leave", slog.Uint64("player", uint64(player.ID)), slog.String("name", player.Name))
+	w.log("leave",
+		slog.Uint64("player", uint64(player.ID)),
+		slog.String("name", player.Name),
+		slog.Uint64("balance_cents", player.balance),
+		slog.Uint64("decayed_cents", player.decayed),
+	)
 }
 
 // logEvent records a random event starting or ending
@@ -183,5 +188,21 @@ func (w *World) logEvent(msg string, id uint64, e *RandomEvent) {
 		slog.Uint64("end_tick", e.endTick),
 		slog.String("type", e.eventType.String()),
 		slog.String("commodity", e.commodity.String()),
+	)
+}
+
+func (w *World) logStanding(player *Player, netWorth uint64) {
+	if !w.loggerEnabled() {
+		return
+	}
+
+	w.log("standing",
+		slog.Uint64("player", uint64(player.ID)),
+		slog.String("name", player.Name),
+		slog.Uint64("net_worth", netWorth),
+		slog.Uint64("balance_cents", player.balance),
+		slog.Uint64("units_traded", player.unitsTraded),
+		slog.Uint64("trade_volume_cents", player.tradeVolume),
+		slog.Uint64("decayed_cents", player.decayed),
 	)
 }

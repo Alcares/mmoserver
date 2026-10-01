@@ -21,6 +21,7 @@ type Player struct {
 	commodities map[pb.CommodityType]uint64 // whole units
 	tradeVolume uint64
 	unitsTraded uint64
+	decayed     uint64 // running total of money lost to "inflation"
 }
 
 func NewPlayer(id uint32, pos geometry.Vec2f, name string) *Player {
