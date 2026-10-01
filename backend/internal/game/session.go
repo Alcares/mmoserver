@@ -77,6 +77,9 @@ func (w *World) removePlayer(playerID uint32) {
 	w.logPlayerLeave(player)
 
 	delete(w.players, playerID)
+	if w.phase != pb.GamePhase_GAME_PHASE_RUNNING {
+		w.departed[playerID] = player
+	}
 	delete(w.clients, playerID)
 
 	w.statusDirty = true

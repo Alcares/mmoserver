@@ -85,12 +85,15 @@ func (w *World) finish() {
 			UnitsTraded:      player.unitsTraded,
 		})
 	}
+	for _, player := range w.departed {
+		w.logStanding(player, w.netWorth(player))
+	}
+
 	sort.Slice(standings, func(i, j int) bool {
 		return standings[i].NetWorth > standings[j].NetWorth
 	})
 
 	w.endAllEvents()
-
 	w.statusDirty = false
 	w.sendToAll(&pb.ServerMessage{
 		Msg: &pb.ServerMessage_GameStatus{GameStatus: w.toProtoGameStatus()},

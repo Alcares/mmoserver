@@ -282,4 +282,14 @@ func (w *World) decayCash() {
 			Msg: &pb.ServerMessage_PlayerInventory{PlayerInventory: player.ToProtoInventory()},
 		})
 	}
+
+	// exiting the game should not be a strategy to avoid inflation
+	for _, player := range w.departed {
+		amount := ceilDiv(player.balance*DecayBasisPoints, wholeBasisPoints)
+		if amount == 0 {
+			continue
+		}
+		player.decayed += amount
+		player.balance -= amount
+	}
 }

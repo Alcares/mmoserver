@@ -6,6 +6,7 @@
 # Robustness
 - [x] Ping/pong so silently dead connections leave their game
 - [ ] Rate limiting
+- [ ] Ability for players to reconnect
 
 # Game Feel
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
