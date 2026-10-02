@@ -155,6 +155,42 @@ func (x *JoinGame) GetGameId() string {
 	return ""
 }
 
+type FindGame struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FindGame) Reset() {
+	*x = FindGame{}
+	mi := &file_game_v1_client_message_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FindGame) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FindGame) ProtoMessage() {}
+
+func (x *FindGame) ProtoReflect() protoreflect.Message {
+	mi := &file_game_v1_client_message_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FindGame.ProtoReflect.Descriptor instead.
+func (*FindGame) Descriptor() ([]byte, []int) {
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{3}
+}
+
 type SpawnBot struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -164,7 +200,7 @@ type SpawnBot struct {
 
 func (x *SpawnBot) Reset() {
 	*x = SpawnBot{}
-	mi := &file_game_v1_client_message_proto_msgTypes[3]
+	mi := &file_game_v1_client_message_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -176,7 +212,7 @@ func (x *SpawnBot) String() string {
 func (*SpawnBot) ProtoMessage() {}
 
 func (x *SpawnBot) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_client_message_proto_msgTypes[3]
+	mi := &file_game_v1_client_message_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -189,7 +225,7 @@ func (x *SpawnBot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SpawnBot.ProtoReflect.Descriptor instead.
 func (*SpawnBot) Descriptor() ([]byte, []int) {
-	return file_game_v1_client_message_proto_rawDescGZIP(), []int{3}
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SpawnBot) GetName() string {
@@ -215,7 +251,7 @@ type TradeRequest struct {
 
 func (x *TradeRequest) Reset() {
 	*x = TradeRequest{}
-	mi := &file_game_v1_client_message_proto_msgTypes[4]
+	mi := &file_game_v1_client_message_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -227,7 +263,7 @@ func (x *TradeRequest) String() string {
 func (*TradeRequest) ProtoMessage() {}
 
 func (x *TradeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_client_message_proto_msgTypes[4]
+	mi := &file_game_v1_client_message_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -240,7 +276,7 @@ func (x *TradeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TradeRequest.ProtoReflect.Descriptor instead.
 func (*TradeRequest) Descriptor() ([]byte, []int) {
-	return file_game_v1_client_message_proto_rawDescGZIP(), []int{4}
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *TradeRequest) GetSequenceId() uint32 {
@@ -281,7 +317,7 @@ type CreateAccount struct {
 
 func (x *CreateAccount) Reset() {
 	*x = CreateAccount{}
-	mi := &file_game_v1_client_message_proto_msgTypes[5]
+	mi := &file_game_v1_client_message_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -293,7 +329,7 @@ func (x *CreateAccount) String() string {
 func (*CreateAccount) ProtoMessage() {}
 
 func (x *CreateAccount) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_client_message_proto_msgTypes[5]
+	mi := &file_game_v1_client_message_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -306,7 +342,7 @@ func (x *CreateAccount) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAccount.ProtoReflect.Descriptor instead.
 func (*CreateAccount) Descriptor() ([]byte, []int) {
-	return file_game_v1_client_message_proto_rawDescGZIP(), []int{5}
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CreateAccount) GetName() string {
@@ -333,7 +369,7 @@ type Login struct {
 
 func (x *Login) Reset() {
 	*x = Login{}
-	mi := &file_game_v1_client_message_proto_msgTypes[6]
+	mi := &file_game_v1_client_message_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -345,7 +381,7 @@ func (x *Login) String() string {
 func (*Login) ProtoMessage() {}
 
 func (x *Login) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_client_message_proto_msgTypes[6]
+	mi := &file_game_v1_client_message_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -358,7 +394,7 @@ func (x *Login) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Login.ProtoReflect.Descriptor instead.
 func (*Login) Descriptor() ([]byte, []int) {
-	return file_game_v1_client_message_proto_rawDescGZIP(), []int{6}
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Login) GetName() string {
@@ -383,7 +419,7 @@ type Logout struct {
 
 func (x *Logout) Reset() {
 	*x = Logout{}
-	mi := &file_game_v1_client_message_proto_msgTypes[7]
+	mi := &file_game_v1_client_message_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -395,7 +431,7 @@ func (x *Logout) String() string {
 func (*Logout) ProtoMessage() {}
 
 func (x *Logout) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_client_message_proto_msgTypes[7]
+	mi := &file_game_v1_client_message_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -408,7 +444,7 @@ func (x *Logout) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Logout.ProtoReflect.Descriptor instead.
 func (*Logout) Descriptor() ([]byte, []int) {
-	return file_game_v1_client_message_proto_rawDescGZIP(), []int{7}
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{8}
 }
 
 // Client -> Server: Discriminated wrapper for all client commands.
@@ -420,6 +456,7 @@ type ClientMessage struct {
 	//	*ClientMessage_Trade
 	//	*ClientMessage_CreateGame
 	//	*ClientMessage_JoinGame
+	//	*ClientMessage_FindGame
 	//	*ClientMessage_SpawnBot
 	//	*ClientMessage_SetPlaybackSpeed
 	//	*ClientMessage_CreateAccount
@@ -432,7 +469,7 @@ type ClientMessage struct {
 
 func (x *ClientMessage) Reset() {
 	*x = ClientMessage{}
-	mi := &file_game_v1_client_message_proto_msgTypes[8]
+	mi := &file_game_v1_client_message_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -444,7 +481,7 @@ func (x *ClientMessage) String() string {
 func (*ClientMessage) ProtoMessage() {}
 
 func (x *ClientMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_game_v1_client_message_proto_msgTypes[8]
+	mi := &file_game_v1_client_message_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -457,7 +494,7 @@ func (x *ClientMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientMessage.ProtoReflect.Descriptor instead.
 func (*ClientMessage) Descriptor() ([]byte, []int) {
-	return file_game_v1_client_message_proto_rawDescGZIP(), []int{8}
+	return file_game_v1_client_message_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ClientMessage) GetCmd() isClientMessage_Cmd {
@@ -498,6 +535,15 @@ func (x *ClientMessage) GetJoinGame() *JoinGame {
 	if x != nil {
 		if x, ok := x.Cmd.(*ClientMessage_JoinGame); ok {
 			return x.JoinGame
+		}
+	}
+	return nil
+}
+
+func (x *ClientMessage) GetFindGame() *FindGame {
+	if x != nil {
+		if x, ok := x.Cmd.(*ClientMessage_FindGame); ok {
+			return x.FindGame
 		}
 	}
 	return nil
@@ -568,6 +614,10 @@ type ClientMessage_JoinGame struct {
 	JoinGame *JoinGame `protobuf:"bytes,4,opt,name=join_game,json=joinGame,proto3,oneof"`
 }
 
+type ClientMessage_FindGame struct {
+	FindGame *FindGame `protobuf:"bytes,10,opt,name=find_game,json=findGame,proto3,oneof"`
+}
+
 type ClientMessage_SpawnBot struct {
 	SpawnBot *SpawnBot `protobuf:"bytes,5,opt,name=spawn_bot,json=spawnBot,proto3,oneof"`
 }
@@ -597,6 +647,8 @@ func (*ClientMessage_CreateGame) isClientMessage_Cmd() {}
 
 func (*ClientMessage_JoinGame) isClientMessage_Cmd() {}
 
+func (*ClientMessage_FindGame) isClientMessage_Cmd() {}
+
 func (*ClientMessage_SpawnBot) isClientMessage_Cmd() {}
 
 func (*ClientMessage_SetPlaybackSpeed) isClientMessage_Cmd() {}
@@ -618,7 +670,9 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\n" +
 	"CreateGame\"#\n" +
 	"\bJoinGame\x12\x17\n" +
-	"\agame_id\x18\x01 \x01(\tR\x06gameId\"\x1e\n" +
+	"\agame_id\x18\x01 \x01(\tR\x06gameId\"\n" +
+	"\n" +
+	"\bFindGame\"\x1e\n" +
 	"\bSpawnBot\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"\x94\x01\n" +
 	"\fTradeRequest\x12\x1f\n" +
@@ -634,13 +688,15 @@ const file_game_v1_client_message_proto_rawDesc = "" +
 	"\x05Login\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"\b\n" +
-	"\x06Logout\"\xef\x03\n" +
+	"\x06Logout\"\xa1\x04\n" +
 	"\rClientMessage\x120\n" +
 	"\x05input\x18\x01 \x01(\v2\x18.game.v1.MovementCommandH\x00R\x05input\x12-\n" +
 	"\x05trade\x18\x02 \x01(\v2\x15.game.v1.TradeRequestH\x00R\x05trade\x126\n" +
 	"\vcreate_game\x18\x03 \x01(\v2\x13.game.v1.CreateGameH\x00R\n" +
 	"createGame\x120\n" +
 	"\tjoin_game\x18\x04 \x01(\v2\x11.game.v1.JoinGameH\x00R\bjoinGame\x120\n" +
+	"\tfind_game\x18\n" +
+	" \x01(\v2\x11.game.v1.FindGameH\x00R\bfindGame\x120\n" +
 	"\tspawn_bot\x18\x05 \x01(\v2\x11.game.v1.SpawnBotH\x00R\bspawnBot\x12F\n" +
 	"\x12set_playback_speed\x18\x06 \x01(\v2\x16.game.v1.PlaybackSpeedH\x00R\x10setPlaybackSpeed\x12?\n" +
 	"\x0ecreate_account\x18\a \x01(\v2\x16.game.v1.CreateAccountH\x00R\rcreateAccount\x12&\n" +
@@ -660,36 +716,38 @@ func file_game_v1_client_message_proto_rawDescGZIP() []byte {
 	return file_game_v1_client_message_proto_rawDescData
 }
 
-var file_game_v1_client_message_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_game_v1_client_message_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_game_v1_client_message_proto_goTypes = []any{
 	(*MovementCommand)(nil), // 0: game.v1.MovementCommand
 	(*CreateGame)(nil),      // 1: game.v1.CreateGame
 	(*JoinGame)(nil),        // 2: game.v1.JoinGame
-	(*SpawnBot)(nil),        // 3: game.v1.SpawnBot
-	(*TradeRequest)(nil),    // 4: game.v1.TradeRequest
-	(*CreateAccount)(nil),   // 5: game.v1.CreateAccount
-	(*Login)(nil),           // 6: game.v1.Login
-	(*Logout)(nil),          // 7: game.v1.Logout
-	(*ClientMessage)(nil),   // 8: game.v1.ClientMessage
-	(OrderIntent)(0),        // 9: game.v1.OrderIntent
-	(*PlaybackSpeed)(nil),   // 10: game.v1.PlaybackSpeed
+	(*FindGame)(nil),        // 3: game.v1.FindGame
+	(*SpawnBot)(nil),        // 4: game.v1.SpawnBot
+	(*TradeRequest)(nil),    // 5: game.v1.TradeRequest
+	(*CreateAccount)(nil),   // 6: game.v1.CreateAccount
+	(*Login)(nil),           // 7: game.v1.Login
+	(*Logout)(nil),          // 8: game.v1.Logout
+	(*ClientMessage)(nil),   // 9: game.v1.ClientMessage
+	(OrderIntent)(0),        // 10: game.v1.OrderIntent
+	(*PlaybackSpeed)(nil),   // 11: game.v1.PlaybackSpeed
 }
 var file_game_v1_client_message_proto_depIdxs = []int32{
-	9,  // 0: game.v1.TradeRequest.intent:type_name -> game.v1.OrderIntent
+	10, // 0: game.v1.TradeRequest.intent:type_name -> game.v1.OrderIntent
 	0,  // 1: game.v1.ClientMessage.input:type_name -> game.v1.MovementCommand
-	4,  // 2: game.v1.ClientMessage.trade:type_name -> game.v1.TradeRequest
+	5,  // 2: game.v1.ClientMessage.trade:type_name -> game.v1.TradeRequest
 	1,  // 3: game.v1.ClientMessage.create_game:type_name -> game.v1.CreateGame
 	2,  // 4: game.v1.ClientMessage.join_game:type_name -> game.v1.JoinGame
-	3,  // 5: game.v1.ClientMessage.spawn_bot:type_name -> game.v1.SpawnBot
-	10, // 6: game.v1.ClientMessage.set_playback_speed:type_name -> game.v1.PlaybackSpeed
-	5,  // 7: game.v1.ClientMessage.create_account:type_name -> game.v1.CreateAccount
-	6,  // 8: game.v1.ClientMessage.login:type_name -> game.v1.Login
-	7,  // 9: game.v1.ClientMessage.logout:type_name -> game.v1.Logout
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	3,  // 5: game.v1.ClientMessage.find_game:type_name -> game.v1.FindGame
+	4,  // 6: game.v1.ClientMessage.spawn_bot:type_name -> game.v1.SpawnBot
+	11, // 7: game.v1.ClientMessage.set_playback_speed:type_name -> game.v1.PlaybackSpeed
+	6,  // 8: game.v1.ClientMessage.create_account:type_name -> game.v1.CreateAccount
+	7,  // 9: game.v1.ClientMessage.login:type_name -> game.v1.Login
+	8,  // 10: game.v1.ClientMessage.logout:type_name -> game.v1.Logout
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_game_v1_client_message_proto_init() }
@@ -699,11 +757,12 @@ func file_game_v1_client_message_proto_init() {
 	}
 	file_game_v1_common_proto_init()
 	file_game_v1_spectator_proto_init()
-	file_game_v1_client_message_proto_msgTypes[8].OneofWrappers = []any{
+	file_game_v1_client_message_proto_msgTypes[9].OneofWrappers = []any{
 		(*ClientMessage_Input)(nil),
 		(*ClientMessage_Trade)(nil),
 		(*ClientMessage_CreateGame)(nil),
 		(*ClientMessage_JoinGame)(nil),
+		(*ClientMessage_FindGame)(nil),
 		(*ClientMessage_SpawnBot)(nil),
 		(*ClientMessage_SetPlaybackSpeed)(nil),
 		(*ClientMessage_CreateAccount)(nil),
@@ -716,7 +775,7 @@ func file_game_v1_client_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_v1_client_message_proto_rawDesc), len(file_game_v1_client_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

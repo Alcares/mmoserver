@@ -95,7 +95,10 @@ func (w *World) finish() {
 		w.logStanding(i+1, player, netWorth[player.ID])
 	}
 
-	w.updateElo(standings)
+	// Only matchmade games are rated: a private one could be set up with alt accounts to farm rating
+	if w.config.IsPublic {
+		w.updateElo(standings)
+	}
 
 	w.endAllEvents()
 	w.statusDirty = false

@@ -98,7 +98,7 @@ namespace Game.Client
 
             if (kb.eKey.wasPressedThisFrame) TryTrade(OrderIntent.IntentBuy);
             if (kb.qKey.wasPressedThisFrame) TryTrade(OrderIntent.IntentSell);
-            if (kb.bKey.wasPressedThisFrame) _client.SendSpawnBot($"BOT {++_botsRequested}");
+            if (kb.bKey.wasPressedThisFrame && !_client.InPublicGame) _client.SendSpawnBot($"BOT {++_botsRequested}");
 
             if (_state.PlaybackSpeed is { } speed)
             {

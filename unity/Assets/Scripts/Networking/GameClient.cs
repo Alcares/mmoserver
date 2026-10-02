@@ -28,6 +28,9 @@ namespace Game.Networking
         public string Username { get; private set; } = "";
         /// <summary>True between sending a login or sign-up and the server's answer.</summary>
         public bool AwaitingAccountReply { get; private set; }
+        /// <summary>Whether the last game asked for was matchmade. The server only lets private
+        /// games be joined by code, so a public game's code is not worth showing.</summary>
+        public bool InPublicGame { get; private set; }
 
         // The password stays in memory only, never on disk: it lets Reconnect log the new
         // connection in again. A failed login forgets it.
@@ -98,6 +101,7 @@ namespace Game.Networking
             Connection = NewConnection();
             LoggedIn = false;
             AwaitingAccountReply = false;
+            InPublicGame = false;
             await Connection.ConnectAsync(Url);
 
             if (_password != null) SendLogin(Username, _password);
@@ -232,22 +236,33 @@ namespace Game.Networking
             AwaitingAccountReply = true;
         }
 
-        /// <summary>Asks the server for a new game; it answers with InitialGameState carrying the join code.</summary>
+        /// <summary>Asks the server to put us in a public game, an open one if it has any or else
+        /// a new one; it answers with either InitialGameState or JoinRejected.</summary>
+        public void SendFindGame()
+        {
+            InPublicGame = true;
+            Connection?.Send(new ClientMessage { FindGame = new FindGame() });
+        }
+
+        /// <summary>Asks the server for a new private game; it answers with InitialGameState carrying the join code.</summary>
         public void SendCreateGame()
         {
+            InPublicGame = false;
             Connection?.Send(new ClientMessage { CreateGame = new CreateGame() });
         }
 
-        /// <summary>Joins an existing game by its code. The server trims and upper-cases it,
+        /// <summary>Joins a private game by its code. The server trims and upper-cases it,
         /// and answers with either InitialGameState or JoinRejected.</summary>
         public void SendJoinGame(string code)
         {
+            InPublicGame = false;
             Connection?.Send(new ClientMessage { JoinGame = new JoinGame { GameId = code } });
         }
 
         /// <summary>Asks the server to add a policy-driven bot to the game this client is in.
         /// The name travels for later; the server ignores it today. Join only accepts new
-        /// players before the round starts, so this does nothing once the phase is Running.</summary>
+        /// players before the round starts, so this does nothing once the phase is Running,
+        /// and public games refuse bots altogether.</summary>
         public void SendSpawnBot(string name)
         {
             Connection?.Send(new ClientMessage { SpawnBot = new SpawnBot { Name = name } });

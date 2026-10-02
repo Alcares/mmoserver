@@ -165,6 +165,7 @@ func (c *WebsocketClient) ReadSession(s *Sessions, a *store.Accounts, msg *pb.Cl
 func (c *WebsocketClient) ReadWorld(m *game.Master, cfg game.WorldConfig, msg *pb.ClientMessage) {
 	switch cmd := msg.Cmd.(type) {
 	case *pb.ClientMessage_CreateGame:
+		cfg.IsPublic = false
 		world, err := m.Create(createConfig(cfg, cmd.CreateGame))
 		if err != nil {
 			c.rejectJoin(joinRejection(err))
@@ -174,7 +175,7 @@ func (c *WebsocketClient) ReadWorld(m *game.Master, cfg game.WorldConfig, msg *p
 			c.rejectJoin(joinRejection(err))
 		}
 	case *pb.ClientMessage_JoinGame:
-		world, exists := m.Get(cmd.JoinGame.GameId)
+		world, exists := m.GetPrivate(cmd.JoinGame.GameId)
 		if !exists {
 			c.rejectJoin(pb.JoinRejection_JOIN_REJECTION_GAME_NOT_FOUND)
 			return
@@ -182,7 +183,31 @@ func (c *WebsocketClient) ReadWorld(m *game.Master, cfg game.WorldConfig, msg *p
 		if err := c.joinWorld(world); err != nil {
 			c.rejectJoin(joinRejection(err))
 		}
+	case *pb.ClientMessage_FindGame:
+		// TODO: move somewhere more appropriate
+		cfg.StartCountdown = 10 * time.Second
+		if err := c.findGame(m, cfg); err != nil {
+			c.rejectJoin(joinRejection(err))
+		}
 	}
+}
+
+// findGame joins a public game. A game can fill up or start between being found and joined,
+// so that is retried once, and a matchmade player is not told about a game they never chose.
+func (c *WebsocketClient) findGame(m *game.Master, cfg game.WorldConfig) error {
+	var err error
+	for range 2 {
+		var world *game.World
+		world, err = m.FindPublicGame(cfg)
+		if err != nil {
+			return err
+		}
+		err = c.joinWorld(world)
+		if !errors.Is(err, game.ErrGameFull) && !errors.Is(err, game.ErrGameInProgress) {
+			return err
+		}
+	}
+	return err
 }
 
 func (c *WebsocketClient) ReadCommand(msg *pb.ClientMessage) {
@@ -202,7 +227,7 @@ func (c *WebsocketClient) ReadCommand(msg *pb.ClientMessage) {
 			PriceCents: cmd.Trade.GetPriceCents(),
 		})
 	case *pb.ClientMessage_SpawnBot:
-		// Refused once the lobby closes or fills up; SendSpawnBot documents that it does nothing then
+		// Refused in public games and once the lobby closes or fills up; SendSpawnBot documents that it does nothing then
 		_, _ = c.World.SpawnBot()
 	}
 }

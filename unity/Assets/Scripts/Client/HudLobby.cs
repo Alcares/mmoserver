@@ -29,13 +29,13 @@ namespace Game.Client
         private static readonly Color Dim = new Color32(0xa1, 0xa1, 0xaa, 0xff);
         private static readonly Color Bad = new Color32(0xf8, 0x71, 0x71, 0xff);
 
-        // Create a game or join one by its code, as the logged-in account. Drawn until the server
+        // Find a public game, create a private one, or join one by its code, as the logged-in account. Drawn until the server
         // confirms a join, and a rejection leaves the panel up so the code can be retyped on the same connection.
         private void DrawLobby(float screenW, float screenH)
         {
             if (_title == null) CreateLobbyStyles();
 
-            float height = LobbyRowHeight * 6f + 46f;
+            float height = LobbyRowHeight * 7f + 54f;
             var rect = new Rect((screenW - LobbyWidth) / 2f, (screenH - height) / 2f, LobbyWidth, height);
 
             GUI.color = Color.white;
@@ -61,7 +61,13 @@ namespace Game.Client
             GUI.Label(new Rect(x, y, width, LobbyRowHeight), $"playing as {_client.Username}  (Esc logs out)", _lobbyText);
             y += LobbyRowHeight;
 
-            if (GUI.Button(new Rect(x, y, width, LobbyRowHeight), "Create a new game", _button))
+            if (GUI.Button(new Rect(x, y, width, LobbyRowHeight), "Find a game", _button))
+            {
+                _client.SendFindGame();
+            }
+            y += LobbyRowHeight + 8f;
+
+            if (GUI.Button(new Rect(x, y, width, LobbyRowHeight), "Create a private game", _button))
             {
                 _client.SendCreateGame();
             }
@@ -102,7 +108,7 @@ namespace Game.Client
             _ => "Could not join that game",
         };
 
-        // While waiting or counting down: the code to share, how many players are in, and
+        // While waiting or counting down: the code to share (private games only), how many players are in, and
         // the countdown. During the round it becomes the remaining time.
         // Returns the lowest box drawn, or above if none, so more boxes can stack under it.
         private Rect DrawPhaseBanner(Rect above)
@@ -122,13 +128,13 @@ namespace Game.Client
             var rect = new Rect(above.x, above.yMax + TopGap, above.width, TopBoxHeight);
             DrawTopBox(rect, line, _state.Phase == GamePhase.Running ? Color.white : LabelGold);
 
-            if (!string.IsNullOrEmpty(_state.GameId) && _state.Phase != GamePhase.Running)
+            if (!string.IsNullOrEmpty(_state.GameId) && !_client.InPublicGame && _state.Phase != GamePhase.Running)
             {
                 rect.y += TopBoxHeight + TopGap;
                 DrawTopBox(rect, $"CODE  {_state.GameId}", Color.white);
             }
 
-            if (_state.Phase == GamePhase.Waiting)
+            if (_state.Phase == GamePhase.Waiting && !_client.InPublicGame)
             {
                 rect.y += TopBoxHeight + TopGap;
                 DrawTopBox(rect, "B ADDS A BOT", Dim);
