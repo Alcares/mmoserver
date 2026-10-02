@@ -1,27 +1,22 @@
 package game
 
 import (
-	"sync"
-	"time"
-
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
-	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 )
 
-func (w *World) addPlayer(client Client, name string) (*Player, error) {
+func (w *World) addPlayer(c Client, a Account) (*Player, error) {
 	if len(w.players) >= w.config.MaxPlayers {
 		return nil, ErrGameFull
 	}
 
 	playerID := w.nextPlayerID
 	w.nextPlayerID++
-	player := NewPlayer(playerID, SpawnPos, name)
+	player := NewPlayer(playerID, SpawnPos, a)
 	// Which client drives it is the only thing that makes a player a bot, and it is decided here.
-	_, player.IsBot = client.(*BotClient)
+	_, player.IsBot = c.(*BotClient)
 
 	w.players[playerID] = player
-	w.clients[playerID] = client
+	w.clients[playerID] = c
 
 	w.statusDirty = true
 
@@ -29,7 +24,7 @@ func (w *World) addPlayer(client Client, name string) (*Player, error) {
 }
 
 // Join adds a player for c and queues its InitialGameState and PlayerInventory ahead of any WorldSnapshot
-func (w *World) Join(c Client, name string) (*Player, error) {
+func (w *World) Join(c Client, a Account) (*Player, error) {
 	w.Mu.Lock()
 	defer w.Mu.Unlock()
 
@@ -39,7 +34,7 @@ func (w *World) Join(c Client, name string) (*Player, error) {
 		return nil, ErrGameInProgress
 	}
 
-	player, err := w.addPlayer(c, name)
+	player, err := w.addPlayer(c, a)
 	if err != nil {
 		w.logPlayerJoin(nil, err)
 		return nil, err
@@ -72,50 +67,22 @@ func (w *World) initialState() *pb.InitialGameState {
 	}
 }
 
+// Leave removes a player whose client has gone; safe from any goroutine
+func (w *World) Leave(playerID uint32) {
+	w.Mu.Lock()
+	defer w.Mu.Unlock()
+	w.removePlayer(playerID)
+}
+
 func (w *World) removePlayer(playerID uint32) {
 	player := w.players[playerID]
 	w.logPlayerLeave(player)
 
 	delete(w.players, playerID)
-	if w.phase != pb.GamePhase_GAME_PHASE_RUNNING {
+	if w.phase == pb.GamePhase_GAME_PHASE_RUNNING {
 		w.departed[playerID] = player
 	}
 	delete(w.clients, playerID)
 
 	w.statusDirty = true
-}
-
-type Sessions struct {
-	mu     sync.Mutex
-	active map[uuid.UUID]*WebsocketClient // key: string(accountID)
-}
-
-func NewSessions() *Sessions {
-	return &Sessions{
-		active: make(map[uuid.UUID]*WebsocketClient),
-	}
-}
-
-// replace makes c the account's session and disconnects the one it replaces
-func (s *Sessions) replace(id uuid.UUID, c *WebsocketClient) {
-	s.mu.Lock()
-	old := s.active[id]
-	s.active[id] = c
-	s.mu.Unlock()
-
-	if old != nil {
-		old.Conn.WriteControl(websocket.CloseMessage,
-			websocket.FormatCloseMessage(4001, "logged in elsewhere"),
-			time.Now().Add(time.Second))
-		old.Conn.Close()
-	}
-}
-
-// remove forgets c's session unless a newer login has already replaced it
-func (s *Sessions) remove(id uuid.UUID, c *WebsocketClient) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	if s.active[id] == c {
-		delete(s.active, id)
-	}
 }

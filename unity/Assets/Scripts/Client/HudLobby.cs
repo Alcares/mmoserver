@@ -14,7 +14,7 @@ namespace Game.Client
         private const float LobbyWidth = 320f;
         private const float LobbyRowHeight = 30f;
         private const int CodeLength = 6;
-        // Username limits, copies of usernameMinLength/usernameMaxLength in backend/internal/store/store.go.
+        // Username limits, copies of usernameMinLength/usernameMaxLength in backend/internal/transport/account_validation.go.
         private const int NameLength = 20;
         private const int MinNameLength = 2;
 

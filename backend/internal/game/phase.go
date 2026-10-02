@@ -73,8 +73,8 @@ func (w *World) netWorth(p *Player) uint64 {
 func (w *World) finish() {
 	w.setPhase(pb.GamePhase_GAME_PHASE_FINISHED, 0)
 
-	standings := make([]*pb.PlayerFinalStanding, 0, len(w.players))
-	for _, player := range w.players {
+	standings := make([]*pb.PlayerFinalStanding, 0, len(w.players)+len(w.departed))
+	for player := range w.everyone() {
 		netWorth := w.netWorth(player)
 		w.logStanding(player, netWorth)
 		standings = append(standings, &pb.PlayerFinalStanding{
@@ -85,13 +85,12 @@ func (w *World) finish() {
 			UnitsTraded:      player.unitsTraded,
 		})
 	}
-	for _, player := range w.departed {
-		w.logStanding(player, w.netWorth(player))
-	}
 
 	sort.Slice(standings, func(i, j int) bool {
 		return standings[i].NetWorth > standings[j].NetWorth
 	})
+
+	w.updateElo(standings)
 
 	w.endAllEvents()
 	w.statusDirty = false

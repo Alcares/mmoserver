@@ -31,7 +31,7 @@ namespace Game.Networking
         public event Action OnDisconnected;
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-        // Mirrors the server's own Client.Send buffer size (backend/internal/game/client.go);
+        // Mirrors the server's own Client.Send buffer size (SendBufferSize in backend/internal/game/send.go);
         // outgoing sends are non-blocking and dropped when this fills up.
         private const int MaxOutgoingQueue = 32;
 

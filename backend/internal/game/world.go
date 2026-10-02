@@ -2,11 +2,13 @@ package game
 
 import (
 	"context"
+	"iter"
 	"log/slog"
 	"sync"
 	"time"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/google/uuid"
 )
 
 // World represents the central authoritative game state
@@ -20,7 +22,7 @@ type World struct {
 	phaseEndTick uint64 // tick at which the current phase ends; 0 = open-ended
 	statusDirty  bool   // broadcast GameStatus on the next tick
 	players      map[uint32]*Player
-	departed     map[uint32]*Player // left during RUNNING; still ranked at finish. String because name is unique
+	departed     map[uint32]*Player // left during RUNNING; still ranked at finish
 	clients      map[uint32]Client
 	Stations     []*TradingStation
 	Commodities  map[pb.CommodityType]*CommodityState
@@ -36,6 +38,9 @@ type World struct {
 
 	// ID generator counter
 	nextPlayerID uint32
+
+	// Eng game updates
+	ratingChanges map[uuid.UUID]float64 // account ID to rating change
 
 	// Game configuration
 	config WorldConfig
@@ -59,6 +64,15 @@ func NewWorld(gameID string, cfg WorldConfig) *World {
 		tradeQueue:    make(chan TradeOrder, 64),
 		nextPlayerID:  1,
 		config:        cfg,
+	}
+}
+
+// EnqueueTrade - safe from any goroutine
+func (w *World) EnqueueTrade(o TradeOrder) {
+	select {
+	case w.tradeQueue <- o:
+	default:
+		// Buffer full
 	}
 }
 
@@ -87,6 +101,25 @@ func (w *World) Run() {
 			return
 		}
 	}
+}
+
+func (w *World) everyone() iter.Seq[*Player] {
+	return func(yield func(*Player) bool) {
+		for _, p := range w.players {
+			if !yield(p) {
+				return
+			}
+		}
+		for _, p := range w.departed {
+			if !yield(p) {
+				return
+			}
+		}
+	}
+}
+
+func (w *World) GetResult() Result {
+	return Result{GameID: w.gameID, RatingChanges: w.ratingChanges}
 }
 
 // loggerEnabled - sim and the tests discard, so skip building the record for them

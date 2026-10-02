@@ -38,7 +38,7 @@ func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 	w := testWorld(t)
 	c := NewSendQueue()
 
-	if _, err := w.Join(c, ""); err != nil {
+	if _, err := w.Join(c, Account{}); err != nil {
 		t.Fatal(err)
 	}
 	w.Tick(NewSpatialGrid())
@@ -71,7 +71,7 @@ func TestJoinSendsStationsBeforeSnapshots(t *testing.T) {
 func TestJoinSpawnsAtCentre(t *testing.T) {
 	w := testWorld(t)
 	for range 3 {
-		player, err := w.Join(NewSendQueue(), "")
+		player, err := w.Join(NewSendQueue(), Account{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -86,13 +86,13 @@ func TestJoinRejectsWhenFull(t *testing.T) {
 	const maxPlayers = 3
 	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1)), MaxPlayers: maxPlayers})
 	for range maxPlayers {
-		if _, err := w.Join(NewSendQueue(), ""); err != nil {
+		if _, err := w.Join(NewSendQueue(), Account{}); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	c := NewSendQueue()
-	if _, err := w.Join(c, ""); !errors.Is(err, ErrGameFull) {
+	if _, err := w.Join(c, Account{}); !errors.Is(err, ErrGameFull) {
 		t.Fatalf("Join with %d players already in: got %v, want ErrGameFull", maxPlayers, err)
 	}
 	if len(w.players) != maxPlayers || len(c.Send) != 0 {
@@ -106,11 +106,11 @@ func TestCloseWhenEmptyFinishesWhenHumansLeave(t *testing.T) {
 	w := NewWorld("test", WorldConfig{Rng: rand.New(rand.NewSource(1)), MinPlayers: 3, CloseWhenEmpty: true})
 	grid := NewSpatialGrid()
 
-	human, err := w.Join(NewSendQueue(), "")
+	human, err := w.Join(NewSendQueue(), Account{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	bot, err := w.Join(NewSendQueue(), "")
+	bot, err := w.Join(NewSendQueue(), Account{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,7 +126,7 @@ func TestCloseWhenEmptyFinishesWhenHumansLeave(t *testing.T) {
 	if w.phase != pb.GamePhase_GAME_PHASE_FINISHED {
 		t.Fatalf("phase after the last human left = %v, want FINISHED", w.phase)
 	}
-	if _, err := w.Join(NewSendQueue(), ""); !errors.Is(err, ErrGameInProgress) {
+	if _, err := w.Join(NewSendQueue(), Account{}); !errors.Is(err, ErrGameInProgress) {
 		t.Errorf("Join after closing: got %v, want ErrGameInProgress", err)
 	}
 }
@@ -145,7 +145,7 @@ func TestBotOnlyWorldRunsWithoutCloseWhenEmpty(t *testing.T) {
 	w := testWorld(t)
 	grid := NewSpatialGrid()
 
-	bot, err := w.Join(NewSendQueue(), "")
+	bot, err := w.Join(NewSendQueue(), Account{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +181,7 @@ func TestMovementDistanceTraveled(t *testing.T) {
 	w := testWorld(t)
 
 	c := NewSendQueue()
-	player, err := w.Join(c, "")
+	player, err := w.Join(c, Account{})
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -5,6 +5,7 @@
 
 # Robustness
 - [x] Ping/pong so silently dead connections leave their game
+- [ ] Stop players from joining multiple games
 - [ ] Rate limiting
 - [ ] Ability for players to reconnect
 

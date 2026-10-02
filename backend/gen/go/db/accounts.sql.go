@@ -64,3 +64,20 @@ func (q *Queries) TouchLastSeen(ctx context.Context, id []byte) error {
 	_, err := q.db.ExecContext(ctx, touchLastSeen, id)
 	return err
 }
+
+const updateRating = `-- name: UpdateRating :one
+UPDATE accounts SET rating = rating + ? WHERE id = ?
+RETURNING rating
+`
+
+type UpdateRatingParams struct {
+	Rating float64
+	ID     []byte
+}
+
+func (q *Queries) UpdateRating(ctx context.Context, arg UpdateRatingParams) (float64, error) {
+	row := q.db.QueryRowContext(ctx, updateRating, arg.Rating, arg.ID)
+	var rating float64
+	err := row.Scan(&rating)
+	return rating, err
+}

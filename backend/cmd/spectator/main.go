@@ -17,6 +17,7 @@ import (
 	"github.com/alcares/mmoserver/backend/internal/game"
 	"github.com/alcares/mmoserver/backend/internal/logging"
 	"github.com/alcares/mmoserver/backend/internal/sim"
+	"github.com/alcares/mmoserver/backend/internal/transport"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 )
@@ -35,11 +36,11 @@ const (
 )
 
 // hub fans the bot's stream out to spectators and replays the episode's InitialGameState,
-// Episode and the playback speed to late joiners. A spectator is a game.WebsocketClient
+// Episode and the playback speed to late joiners. A spectator is a transport.WebsocketClient
 // that never joins a world.
 type hub struct {
 	mu      sync.Mutex
-	clients map[*game.WebsocketClient]struct{}
+	clients map[*transport.WebsocketClient]struct{}
 	initial []byte
 	episode []byte
 	speed   float32
@@ -56,14 +57,14 @@ type hub struct {
 
 func newHub(onFirstJoin func()) *hub {
 	return &hub{
-		clients:     make(map[*game.WebsocketClient]struct{}),
+		clients:     make(map[*transport.WebsocketClient]struct{}),
 		speed:       1,
 		retime:      make(chan time.Duration, 1),
 		onFirstJoin: onFirstJoin,
 	}
 }
 
-func (h *hub) add(c *game.WebsocketClient) {
+func (h *hub) add(c *transport.WebsocketClient) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	if h.over != nil {
@@ -85,7 +86,7 @@ func (h *hub) add(c *game.WebsocketClient) {
 
 // remove closes Send under broadcast's lock, so nothing enqueues after it. A client not in
 // clients had its Send closed already, by add or finish.
-func (h *hub) remove(c *game.WebsocketClient) {
+func (h *hub) remove(c *transport.WebsocketClient) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	if _, ok := h.clients[c]; !ok {
@@ -198,7 +199,7 @@ func (h *hub) serve(w http.ResponseWriter, r *http.Request) {
 		slog.Error("upgrade failed", "err", err)
 		return
 	}
-	c := game.NewWebsocketClient(conn)
+	c := transport.NewWebsocketClient(conn)
 	h.add(c)
 	defer h.remove(c)
 	go c.WritePump()
