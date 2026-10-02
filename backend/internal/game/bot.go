@@ -37,8 +37,13 @@ type BotClient struct {
 }
 
 // SpawnBot joins a policy-driven client to w and starts the goroutine that drives it. The
-// goroutine ends when the bot's queue is closed.
+// goroutine ends when the bot's queue is closed. Public games refuse bots.
 func (w *World) SpawnBot() (*BotClient, error) {
+	// bots count as players, so one player could start a public match alone or fill it up
+	if w.config.IsPublic {
+		return nil, ErrBotsNotAllowed
+	}
+
 	c := &BotClient{
 		SendQueue: NewSendQueue(),
 		world:     w,

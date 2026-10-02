@@ -38,8 +38,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Defaults for every game created on this server; a client's CreateGame may
-	// override them, within the bounds WorldConfig.sanitize enforces.
+	// Defaults for every game created on this server, public or private; a client's CreateGame
+	// may override them, within the bounds WorldConfig.sanitize enforces.
 	defaults := game.WorldConfig{
 		MinPlayers:     2,
 		MaxPlayers:     3,

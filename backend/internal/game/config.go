@@ -37,6 +37,7 @@ const (
 var (
 	ErrGameInProgress = errors.New("game already in progress")
 	ErrGameFull       = errors.New("game is full")
+	ErrBotsNotAllowed = errors.New("bots can only be added to private games")
 )
 
 // SpawnPos is where every player joins: the centre of the map
@@ -44,6 +45,7 @@ var SpawnPos = geometry.Vec2f{X: (WorldMinX + WorldMaxX) / 2, Y: (WorldMinY + Wo
 
 // WorldConfig holds one game's settings
 type WorldConfig struct {
+	IsPublic       bool          // matchmade; false means joinable only by code
 	Duration       time.Duration // How long a round lasts once it starts
 	StartCountdown time.Duration // Delay between reaching MinPlayers and the round starting
 	LobbyTTL       time.Duration // How long a game waits for MinPlayers before giving up

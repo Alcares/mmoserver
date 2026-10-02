@@ -20,6 +20,8 @@ message JoinGame {
   string game_id = 1;
 }
 
+message FindGame {}
+
 message SpawnBot {
   string name = 1;
 }
@@ -54,6 +56,7 @@ message ClientMessage {
     TradeRequest trade = 2;
     CreateGame create_game = 3;
     JoinGame join_game = 4;
+    FindGame find_game = 10;
     SpawnBot spawn_bot = 5;
 
     // Spectator only
