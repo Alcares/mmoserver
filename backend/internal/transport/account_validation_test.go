@@ -1,4 +1,4 @@
-package store
+package transport
 
 import (
 	"strings"

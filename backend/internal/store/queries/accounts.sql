@@ -9,3 +9,7 @@ RETURNING *;
 
 -- name: TouchLastSeen :exec
 UPDATE accounts SET last_seen = CURRENT_TIMESTAMP WHERE id = ?;
+
+-- name: UpdateRating :one
+UPDATE accounts SET rating = rating + ? WHERE id = ?
+RETURNING rating;

@@ -3,15 +3,23 @@ package game
 import (
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 	"github.com/alcares/mmoserver/backend/internal/geometry"
+	"github.com/google/uuid"
 )
 
 const (
 	StartingBalance = 1000_00 // cents, i.e. $1000.00
 )
 
-type Player struct {
-	ID        uint32
+// Account is who a player is outside the game; bots and the sim leave AccountID as uuid.Nil
+type Account struct {
+	AccountID uuid.UUID
 	Name      string
+	Rating    float64
+}
+
+type Player struct {
+	ID uint32
+	Account
 	IsBot     bool
 	Pos       geometry.Vec2f
 	TargetDir geometry.Vec2f // Current intended movement heading (-1 to 1)
@@ -21,9 +29,10 @@ type Player struct {
 	commodities map[pb.CommodityType]uint64 // whole units
 	tradeVolume uint64
 	unitsTraded uint64
+	decayed     uint64 // running total of money lost to "inflation"
 }
 
-func NewPlayer(id uint32, pos geometry.Vec2f, name string) *Player {
+func NewPlayer(id uint32, pos geometry.Vec2f, account Account) *Player {
 	commodityTypes := GetCommodityTypes()
 
 	ownedCommodities := make(map[pb.CommodityType]uint64, len(commodityTypes))
@@ -33,7 +42,7 @@ func NewPlayer(id uint32, pos geometry.Vec2f, name string) *Player {
 
 	return &Player{
 		ID:          id,
-		Name:        name,
+		Account:     account,
 		Pos:         pos,
 		Speed:       MoveSpeed,
 		balance:     StartingBalance,

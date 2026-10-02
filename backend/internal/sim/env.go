@@ -21,6 +21,7 @@ const MaxSteps = 600
 const layoutStations = 40
 
 const botName = "Timmy"
+const fakeRating = 1000
 
 // Reward shaping
 const (
@@ -95,7 +96,7 @@ func (e *Env) Reset(seed int64) (*bot.Observation, error) {
 	e.client = game.NewSendQueue()
 	e.observer = bot.Observer{}
 
-	player, err := e.world.Join(e.client, botName)
+	player, err := e.world.Join(e.client, game.Account{Name: botName, Rating: fakeRating})
 	if err != nil {
 		return nil, err
 	}

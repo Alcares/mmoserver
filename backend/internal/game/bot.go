@@ -47,7 +47,7 @@ func (w *World) SpawnBot() (*BotClient, error) {
 		goalIdx:   -1,
 	}
 
-	player, err := w.Join(c, botNames[c.rng.Intn(len(botNames))])
+	player, err := w.Join(c, Account{Name: botNames[c.rng.Intn(len(botNames))]})
 	if err != nil {
 		return nil, err
 	}

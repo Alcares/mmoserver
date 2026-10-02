@@ -243,7 +243,7 @@ learned.
       `Config` constants, there are no flags; it logs to `backend/spectator.log`.
 - [x] **18. The stream.** `Env.OnMessage` forwards the bot's own outgoing messages, so the bot
       is `players[0]` on the far end: the camera follows it and shows exactly its FOV. Each
-      viewer is a `game.WebsocketClient` that never joins a world, so slow viewers drop frames
+      viewer is a `transport.WebsocketClient` that never joins a world, so slow viewers drop frames
       like players do. A viewer joining mid-episode is replayed the `InitialGameState`,
       `Episode` and `PlaybackSpeed`. On a reset the new `InitialGameState` makes Unity rebuild
       the stations and discard its player views, so the bot reappears at spawn rather than

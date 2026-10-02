@@ -1,4 +1,4 @@
-package game
+package transport
 
 import (
 	"context"
@@ -7,13 +7,11 @@ import (
 	"time"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/alcares/mmoserver/backend/internal/game"
 	"github.com/alcares/mmoserver/backend/internal/store"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 )
-
-// SendBufferSize is how many outgoing messages a client can have queued before new ones are dropped
-const SendBufferSize = 32
 
 // PongWait is how long a connection may go without a pong before it counts as dead; pings go out
 // every PingPeriod, so a live client always answers in time however long it sits idle
@@ -24,39 +22,18 @@ const PingPeriod = PongWait * 9 / 10
 // one closes the connection
 const MaxMessageSize = 4096
 
-// Client is all the world needs from a participant: somewhere to put outgoing frames.
-type Client interface {
-	Enqueue(payload []byte)
-}
-
-type SendQueue struct {
-	Send chan []byte
-}
-
-func NewSendQueue() *SendQueue {
-	return &SendQueue{Send: make(chan []byte, SendBufferSize)}
-}
-
-func (q *SendQueue) Enqueue(payload []byte) {
-	select {
-	case q.Send <- payload:
-	default:
-		// Client buffer is full; drop this frame to keep tick rate steady
-	}
-}
-
 // WebsocketClient represents an active WebSocket connection
 type WebsocketClient struct {
-	*SendQueue
+	*game.SendQueue
 	ID      uint32
 	Conn    *websocket.Conn
-	World   *World
+	World   *game.World
 	Session *store.Session
 }
 
 // NewWebsocketClient takes no ID: the world assigns one on join, and JoinWorld records it.
 func NewWebsocketClient(conn *websocket.Conn) *WebsocketClient {
-	return &WebsocketClient{SendQueue: NewSendQueue(), Conn: conn}
+	return &WebsocketClient{SendQueue: game.NewSendQueue(), Conn: conn}
 }
 
 func (c *WebsocketClient) WritePump() {
@@ -89,7 +66,7 @@ func (c *WebsocketClient) WritePump() {
 	}
 }
 
-func (c *WebsocketClient) ReadPump(m *Master, a *store.Accounts, s *Sessions, cfg WorldConfig) {
+func (c *WebsocketClient) ReadPump(m *game.Master, a *store.Accounts, s *Sessions, cfg game.WorldConfig) {
 	defer c.closeConnection(s)
 
 	c.Conn.SetReadLimit(MaxMessageSize)
@@ -134,9 +111,7 @@ func (c *WebsocketClient) ReadPump(m *Master, a *store.Accounts, s *Sessions, cf
 
 func (c *WebsocketClient) closeConnection(s *Sessions) {
 	if c.World != nil {
-		c.World.Mu.Lock()
-		c.World.removePlayer(c.ID)
-		c.World.Mu.Unlock()
+		c.World.Leave(c.ID)
 	}
 
 	if c.Session != nil {
@@ -151,16 +126,29 @@ func (c *WebsocketClient) ReadSession(s *Sessions, a *store.Accounts, msg *pb.Cl
 
 	switch cmd := msg.Cmd.(type) {
 	case *pb.ClientMessage_CreateAccount:
-		var reason pb.AccountCreateRejection
-		session, reason = a.CreateNewAccount(context.Background(), cmd.CreateAccount.Name, cmd.CreateAccount.Password)
+		isOk := func(reason pb.AccountCreateRejection) bool {
+			return reason == pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED
+		}
+
+		name, password := cmd.CreateAccount.Name, cmd.CreateAccount.Password
+		reason := validateUsername(name)
+		if isOk(reason) {
+			reason = validatePassword(password)
+		}
+		if isOk(reason) {
+			var err error
+			session, err = a.CreateNewAccount(context.Background(), name, password)
+			reason = accountCreateRejection(err)
+		}
 		c.sendMsg(&pb.ServerMessage{
 			Msg: &pb.ServerMessage_AccountCreateResult{
 				AccountCreateResult: &pb.AccountCreateResult{Rejection: reason},
 			},
 		})
 	case *pb.ClientMessage_Login:
-		var reason pb.LoginRejection
-		session, reason = a.Login(context.Background(), cmd.Login.Name, cmd.Login.Password)
+		var err error
+		session, err = a.Login(context.Background(), cmd.Login.Name, cmd.Login.Password)
+		reason := loginRejection(err)
 		c.sendMsg(&pb.ServerMessage{
 			Msg: &pb.ServerMessage_LoginResult{
 				LoginResult: &pb.LoginResult{Rejection: reason},
@@ -174,7 +162,7 @@ func (c *WebsocketClient) ReadSession(s *Sessions, a *store.Accounts, msg *pb.Cl
 	}
 }
 
-func (c *WebsocketClient) ReadWorld(m *Master, cfg WorldConfig, msg *pb.ClientMessage) {
+func (c *WebsocketClient) ReadWorld(m *game.Master, cfg game.WorldConfig, msg *pb.ClientMessage) {
 	switch cmd := msg.Cmd.(type) {
 	case *pb.ClientMessage_CreateGame:
 		world, err := m.Create(createConfig(cfg, cmd.CreateGame))
@@ -200,25 +188,19 @@ func (c *WebsocketClient) ReadWorld(m *Master, cfg WorldConfig, msg *pb.ClientMe
 func (c *WebsocketClient) ReadCommand(msg *pb.ClientMessage) {
 	switch cmd := msg.Cmd.(type) {
 	case *pb.ClientMessage_Input:
-		c.World.EnqueueMovement(PlayerMovementInput{
+		c.World.EnqueueMovement(game.PlayerMovementInput{
 			PlayerID: c.ID,
 			Vx:       float64(cmd.Input.GetVx()),
 			Vy:       float64(cmd.Input.GetVy()),
 		})
 	case *pb.ClientMessage_Trade:
-		o := TradeOrder{
+		c.World.EnqueueTrade(game.TradeOrder{
 			PlayerID:   c.ID,
 			SequenceID: cmd.Trade.GetSequenceId(),
 			Intent:     cmd.Trade.GetIntent(),
 			Units:      uint64(cmd.Trade.GetUnits()),
 			PriceCents: cmd.Trade.GetPriceCents(),
-		}
-
-		select {
-		case c.World.tradeQueue <- o:
-		default:
-			// Buffer full
-		}
+		})
 	case *pb.ClientMessage_SpawnBot:
 		// Refused once the lobby closes or fills up; SendSpawnBot documents that it does nothing then
 		_, _ = c.World.SpawnBot()
@@ -228,14 +210,40 @@ func (c *WebsocketClient) ReadCommand(msg *pb.ClientMessage) {
 // joinRejection maps a create or join failure onto the reason sent to the client
 func joinRejection(err error) pb.JoinRejection {
 	switch {
-	case errors.Is(err, ErrGameFull):
+	case errors.Is(err, game.ErrGameFull):
 		return pb.JoinRejection_JOIN_REJECTION_GAME_FULL
-	case errors.Is(err, ErrGameInProgress):
+	case errors.Is(err, game.ErrGameInProgress):
 		return pb.JoinRejection_JOIN_REJECTION_GAME_IN_PROGRESS
-	case errors.Is(err, ErrServerFull):
+	case errors.Is(err, game.ErrServerFull):
 		return pb.JoinRejection_JOIN_REJECTION_SERVER_FULL
 	default:
 		return pb.JoinRejection_JOIN_REJECTION_UNSPECIFIED
+	}
+}
+
+// loginRejection maps a login failure onto the reason sent to the client
+func loginRejection(err error) pb.LoginRejection {
+	switch {
+	case err == nil:
+		return pb.LoginRejection_LOGIN_REJECTION_UNSPECIFIED
+	case errors.Is(err, store.ErrInvalidCredentials):
+		return pb.LoginRejection_LOGIN_REJECTION_INVALID_CREDENTIALS
+	default:
+		slog.Error("login", "err", err)
+		return pb.LoginRejection_LOGIN_REJECTION_SERVER_ERROR // DB broken, timeout, ...
+	}
+}
+
+// accountCreateRejection maps a sign-up failure after validation onto the reason sent to the client
+func accountCreateRejection(err error) pb.AccountCreateRejection {
+	switch {
+	case err == nil:
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED
+	case errors.Is(err, store.ErrUsernameTaken):
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN
+	default:
+		slog.Error("create account", "err", err)
+		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_SERVER_ERROR
 	}
 }
 
@@ -262,14 +270,14 @@ func (c *WebsocketClient) sendMsg(data *pb.ServerMessage) {
 // createConfig overlays the settings a client asked for onto the server's defaults.
 // CreateGame carries none yet; when it does, an unset field keeps the default and
 // NewWorld's sanitize clamps whatever the client sent.
-func createConfig(defaults WorldConfig, req *pb.CreateGame) WorldConfig {
+func createConfig(defaults game.WorldConfig, req *pb.CreateGame) game.WorldConfig {
 	cfg := defaults
 	_ = req
 	return cfg
 }
 
-func (c *WebsocketClient) joinWorld(world *World) error {
-	player, err := world.Join(c, c.Session.Name)
+func (c *WebsocketClient) joinWorld(world *game.World) error {
+	player, err := world.Join(c, game.Account{AccountID: c.Session.AccountID, Name: c.Session.Name, Rating: c.Session.Rating})
 	if err != nil {
 		return err
 	}

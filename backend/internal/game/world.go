@@ -2,11 +2,13 @@ package game
 
 import (
 	"context"
+	"iter"
 	"log/slog"
 	"sync"
 	"time"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
+	"github.com/google/uuid"
 )
 
 // World represents the central authoritative game state
@@ -20,6 +22,7 @@ type World struct {
 	phaseEndTick uint64 // tick at which the current phase ends; 0 = open-ended
 	statusDirty  bool   // broadcast GameStatus on the next tick
 	players      map[uint32]*Player
+	departed     map[uint32]*Player // left during RUNNING; still ranked at finish
 	clients      map[uint32]Client
 	Stations     []*TradingStation
 	Commodities  map[pb.CommodityType]*CommodityState
@@ -36,6 +39,9 @@ type World struct {
 	// ID generator counter
 	nextPlayerID uint32
 
+	// Eng game updates
+	ratingChanges map[uuid.UUID]float64 // account ID to rating change
+
 	// Game configuration
 	config WorldConfig
 }
@@ -49,6 +55,7 @@ func NewWorld(gameID string, cfg WorldConfig) *World {
 		tick:          0,
 		phase:         pb.GamePhase_GAME_PHASE_WAITING,
 		players:       make(map[uint32]*Player),
+		departed:      make(map[uint32]*Player),
 		clients:       make(map[uint32]Client),
 		activeEvents:  make(map[uint64]*RandomEvent),
 		Stations:      cfg.Layout(cfg.Rng),
@@ -57,6 +64,15 @@ func NewWorld(gameID string, cfg WorldConfig) *World {
 		tradeQueue:    make(chan TradeOrder, 64),
 		nextPlayerID:  1,
 		config:        cfg,
+	}
+}
+
+// EnqueueTrade - safe from any goroutine
+func (w *World) EnqueueTrade(o TradeOrder) {
+	select {
+	case w.tradeQueue <- o:
+	default:
+		// Buffer full
 	}
 }
 
@@ -85,6 +101,25 @@ func (w *World) Run() {
 			return
 		}
 	}
+}
+
+func (w *World) everyone() iter.Seq[*Player] {
+	return func(yield func(*Player) bool) {
+		for _, p := range w.players {
+			if !yield(p) {
+				return
+			}
+		}
+		for _, p := range w.departed {
+			if !yield(p) {
+				return
+			}
+		}
+	}
+}
+
+func (w *World) GetResult() Result {
+	return Result{GameID: w.gameID, RatingChanges: w.ratingChanges}
 }
 
 // loggerEnabled - sim and the tests discard, so skip building the record for them
@@ -119,6 +154,7 @@ func (w *World) logTrade(player *Player, o TradeOrder, receipt *pb.TradeReceipt,
 		slog.Uint64("total_cents", receipt.TotalBalanceChange),
 		slog.Uint64("balance_cents", receipt.NewCashBalanceCents),
 		slog.Uint64("holding_units", receipt.NewHoldingUnits),
+		slog.Uint64("decayed_cents", player.decayed),
 	}
 	if !receipt.Success {
 		attrs = append(attrs, slog.String("rejection", receipt.Rejection.String()))
@@ -168,8 +204,12 @@ func (w *World) logPlayerLeave(player *Player) {
 	if !w.loggerEnabled() {
 		return
 	}
-
-	w.log("leave", slog.Uint64("player", uint64(player.ID)), slog.String("name", player.Name))
+	w.log("leave",
+		slog.Uint64("player", uint64(player.ID)),
+		slog.String("name", player.Name),
+		slog.Uint64("balance_cents", player.balance),
+		slog.Uint64("decayed_cents", player.decayed),
+	)
 }
 
 // logEvent records a random event starting or ending
@@ -183,5 +223,23 @@ func (w *World) logEvent(msg string, id uint64, e *RandomEvent) {
 		slog.Uint64("end_tick", e.endTick),
 		slog.String("type", e.eventType.String()),
 		slog.String("commodity", e.commodity.String()),
+	)
+}
+
+// logStanding records a player's final result; rank is 1-based, best first
+func (w *World) logStanding(rank int, player *Player, netWorth uint64) {
+	if !w.loggerEnabled() {
+		return
+	}
+
+	w.log("standing",
+		slog.Int("rank", rank),
+		slog.Uint64("player", uint64(player.ID)),
+		slog.String("name", player.Name),
+		slog.Uint64("net_worth", netWorth),
+		slog.Uint64("balance_cents", player.balance),
+		slog.Uint64("units_traded", player.unitsTraded),
+		slog.Uint64("trade_volume_cents", player.tradeVolume),
+		slog.Uint64("decayed_cents", player.decayed),
 	)
 }

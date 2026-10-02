@@ -5,7 +5,9 @@
 
 # Robustness
 - [x] Ping/pong so silently dead connections leave their game
+- [ ] Stop players from joining multiple games
 - [ ] Rate limiting
+- [ ] Ability for players to reconnect
 
 # Game Feel
 - [ ] Make the player suit golden if his net worth exceeded 10x his starting cash
@@ -24,6 +26,7 @@
 
 # Gameplay
 - [ ] Rework core game loop and improve skill expression potential
+  - [x] Implement "A" from market redesign
   - [ ] Add a warning countdown (5s) before next random event
   - (maybe) [ ] Add power ups spawning in the middle of the arena (player should make a choice to risk camping for the power up)
 

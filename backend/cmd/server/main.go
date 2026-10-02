@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"math/rand"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/alcares/mmoserver/backend/internal/game"
 	"github.com/alcares/mmoserver/backend/internal/logging"
 	"github.com/alcares/mmoserver/backend/internal/store"
+	"github.com/alcares/mmoserver/backend/internal/transport"
 )
 
 // logPath and webClientDir are relative to the repo root the binary runs from.
@@ -56,9 +58,6 @@ func main() {
 		defaults.BotPolicy = policy
 	}
 
-	sessions := game.NewSessions()
-	gameMaster := game.NewMaster(rand.New(rand.NewSource(time.Now().UnixNano())))
-
 	c, err := store.Open(dbFile)
 	if err != nil {
 		slog.Error("open DB connection", "err", err)
@@ -66,6 +65,18 @@ func main() {
 	}
 	defer c.Close()
 	accounts := store.NewAccounts(c)
+
+	sessions := transport.NewSessions()
+	gameMaster := game.NewMaster(
+		rand.New(rand.NewSource(time.Now().UnixNano())),
+		func(r game.Result) {
+			if r.RatingChanges != nil {
+				if err := accounts.ApplyRatingChanges(context.Background(), r.RatingChanges); err != nil {
+					slog.Error("save ratings", "game", r.GameID, "err", err)
+				}
+			}
+		},
+	)
 
 	slog.Info("server initialized")
 

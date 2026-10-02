@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"strings"
 	"sync"
+
+	"github.com/google/uuid"
 )
 
 // ErrServerFull means this server already hosts maxGames games
@@ -16,18 +18,26 @@ const (
 	maxGames     = 5
 )
 
-type Master struct {
-	mu       sync.Mutex
-	games    map[string]*World
-	maxGames int
-	rng      *rand.Rand
+type Result struct {
+	GameID        string
+	RatingChanges map[uuid.UUID]float64 // account ID to rating change
+	// later: standings, end reason, ...
 }
 
-func NewMaster(rng *rand.Rand) *Master {
+type Master struct {
+	mu        sync.Mutex
+	games     map[string]*World
+	maxGames  int
+	rng       *rand.Rand
+	onGameEnd func(Result)
+}
+
+func NewMaster(rng *rand.Rand, onGameEnd func(Result)) *Master {
 	return &Master{
-		games:    make(map[string]*World),
-		maxGames: maxGames,
-		rng:      rng,
+		games:     make(map[string]*World),
+		maxGames:  maxGames,
+		rng:       rng,
+		onGameEnd: onGameEnd,
 	}
 }
 
@@ -63,6 +73,9 @@ func (m *Master) Create(config WorldConfig) (*World, error) {
 
 	go func() {
 		world.Run()
+		if m.onGameEnd != nil {
+			m.onGameEnd(world.GetResult())
+		}
 		m.mu.Lock()
 		defer m.mu.Unlock()
 		delete(m.games, id)

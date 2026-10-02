@@ -13,6 +13,7 @@ import (
 
 	"github.com/alcares/mmoserver/backend/internal/game"
 	"github.com/alcares/mmoserver/backend/internal/store"
+	"github.com/alcares/mmoserver/backend/internal/transport"
 	"github.com/gorilla/websocket"
 )
 
@@ -59,13 +60,13 @@ func webClient(dir string) http.Handler {
 
 // handleWS upgrades the connection and hands it to the pumps. The client starts in the
 // lobby with no world; ReadPump joins it to one when a CreateGame or JoinGame arrives.
-func handleWS(master *game.Master, accounts *store.Accounts, sessions *game.Sessions, defaults game.WorldConfig, upgrader *websocket.Upgrader, w http.ResponseWriter, r *http.Request) {
+func handleWS(master *game.Master, accounts *store.Accounts, sessions *transport.Sessions, defaults game.WorldConfig, upgrader *websocket.Upgrader, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		slog.Error("upgrade failed", "err", err)
 		return
 	}
-	client := game.NewWebsocketClient(conn)
+	client := transport.NewWebsocketClient(conn)
 
 	go client.WritePump()
 	go client.ReadPump(master, accounts, sessions, defaults)

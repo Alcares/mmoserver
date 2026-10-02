@@ -52,19 +52,24 @@ commands only once `c.World` is set.
   of cgo. `store.Open` sets WAL, `busy_timeout`, `foreign_keys` and `_txlock=immediate` in the
   DSN so every pooled connection gets them, and caps the pool at one connection.
 - **sqlc** generates `../backend/gen/go/db` from `migrations/` (the schema) and `queries/`
-  (`make sqlc`). Nothing outside `store` imports `gen/go/db` or the SQLite driver.
+  (`make sqlc`). Nothing outside `store` imports `gen/go/db` or the SQLite driver, and `store`
+  imports no wire protocol: it returns Go errors (`ErrInvalidCredentials`, `ErrUsernameTaken`),
+  which `transport` maps onto the rejection sent to the client. `game` imports `store` not at all:
+  `Join` takes a `game.Account`, and finished games report `game.RatingChange`s that
+  `cmd/server` converts for `store`.
 - **Migrations** are numbered files in `internal/store/migrations`, applied in order at startup
   and tracked with `PRAGMA user_version`. One that has run anywhere is never edited; a change
   is a new file.
 
 | File | Holds |
 | --- | --- |
-| `backend/internal/store/store.go` | `Open`, `Accounts` (`Login`, `CreateNewAccount`), `Session`, the validators |
+| `backend/internal/store/store.go` | `Open`, `Accounts` (`Login`, `CreateNewAccount`), `Session`, the errors |
+| `backend/internal/transport/account_validation.go` | `validateUsername` / `validatePassword` and the common-password list |
 | `backend/internal/store/migrations/*.sql` | the schema, one numbered file per change |
 | `backend/internal/store/queries/*.sql` | the sqlc queries |
 | `backend/sqlc.yaml` | sqlc config; output goes to `backend/gen/go/db` |
-| `backend/internal/game/session.go` | `Sessions`: the account ID to connection registry |
-| `backend/internal/game/client.go` | `ReadSession`, and the `Sessions.remove` call in `closeConnection` |
+| `backend/internal/transport/session.go` | `Sessions`: the account ID to connection registry |
+| `backend/internal/transport/client.go` | `ReadSession`, which validates sign-ups and maps store errors onto rejections, and the `Sessions.remove` call in `closeConnection` |
 
 ## Moving to Postgres
 

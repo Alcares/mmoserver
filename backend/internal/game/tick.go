@@ -16,6 +16,7 @@ func (w *World) Tick(grid *SpatialGrid) {
 
 	w.drainInputs()
 	w.stepMovement()
+	w.decayCash()
 	w.poolTrade() // pool after player trades - else player trade would be rejected
 	w.replicate(grid)
 	w.broadcastMarket()
@@ -256,5 +257,29 @@ func (w *World) poolTrade() {
 		total := trade(pool, units)
 		e.movedBasisPoints = moved
 		w.logPoolTrade(id, e, intent, units, total, pool)
+	}
+}
+
+const (
+	DecayBasisPoints   = 10 // per DecayIntervalTicks, 0.1%
+	DecayIntervalTicks = TickFrequency * 1
+)
+
+// decayCash per DecayIntervalTicks. Forces players to actively trade
+func (w *World) decayCash() {
+	if w.phase != pb.GamePhase_GAME_PHASE_RUNNING || w.tick%DecayIntervalTicks != 0 {
+		return
+	}
+
+	for player := range w.everyone() {
+		amount := ceilDiv(player.balance*DecayBasisPoints, wholeBasisPoints)
+		if amount == 0 {
+			continue
+		}
+		player.decayed += amount
+		player.balance -= amount
+		w.sendTo(player.ID, &pb.ServerMessage{
+			Msg: &pb.ServerMessage_PlayerInventory{PlayerInventory: player.ToProtoInventory()},
+		})
 	}
 }

@@ -12,11 +12,8 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"unicode"
-	"unicode/utf8"
 
 	"github.com/alcares/mmoserver/backend/gen/go/db"
-	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"modernc.org/sqlite"
@@ -52,9 +49,6 @@ func Open(path string) (*sql.DB, error) {
 	}
 	return conn, nil
 }
-
-//go:embed common_passwords.txt
-var commonPasswordsFile string
 
 //go:embed migrations/*.sql
 var migrations embed.FS
@@ -109,40 +103,64 @@ func migrate(conn *sql.DB) error {
 
 // Accounts creates and authenticates player accounts
 type Accounts struct {
+	conn    *sql.DB
 	queries *db.Queries
 }
 
 func NewAccounts(conn *sql.DB) *Accounts {
-	return &Accounts{queries: db.New(conn)}
+	return &Accounts{conn: conn, queries: db.New(conn)}
 }
 
 // Session identifies the account behind a connection
 type Session struct {
 	AccountID uuid.UUID
 	Name      string
+	Rating    float64
 }
 
-func (a *Accounts) Login(ctx context.Context, username, password string) (*Session, pb.LoginRejection) {
+// ApplyRatingChanges adds each account's rating change, all or none
+func (a *Accounts) ApplyRatingChanges(ctx context.Context, changes map[uuid.UUID]float64) error {
+	tx, err := a.conn.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback() // no-op after Commit
+
+	q := a.queries.WithTx(tx)
+	for id, delta := range changes {
+		if _, err = q.UpdateRating(ctx, db.UpdateRatingParams{Rating: delta, ID: id[:]}); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
+// ErrInvalidCredentials means the username doesn't exist or the password is wrong; the two are
+// deliberately indistinguishable
+var ErrInvalidCredentials = errors.New("invalid username or password")
+
+// ErrUsernameTaken means another account already has the name, ignoring case
+var ErrUsernameTaken = errors.New("username taken")
+
+func (a *Accounts) Login(ctx context.Context, username, password string) (*Session, error) {
 	account, err := a.queries.GetAccount(ctx, username)
 	switch {
 	case errors.Is(err, sql.ErrNoRows), err == nil && account.Name != username:
 		// The lookup ignores case, but a login has to match the name exactly
 		_ = bcrypt.CompareHashAndPassword([]byte(dummyPasswordHash), []byte(password))
-		return nil, pb.LoginRejection_LOGIN_REJECTION_INVALID_CREDENTIALS // no such user
+		return nil, ErrInvalidCredentials // no such user
 	case err != nil:
-		slog.Error("load account", "err", err)
-		return nil, pb.LoginRejection_LOGIN_REJECTION_SERVER_ERROR // DB broken, timeout, ...
+		return nil, fmt.Errorf("load account: %w", err)
 	}
 
 	id, err := uuid.FromBytes(account.ID)
 	if err != nil {
-		slog.Error("parse account id", "err", err)
-		return nil, pb.LoginRejection_LOGIN_REJECTION_SERVER_ERROR
+		return nil, fmt.Errorf("parse account id: %w", err)
 	}
 
 	err = bcrypt.CompareHashAndPassword(account.PasswordHash, []byte(password))
 	if err != nil {
-		return nil, pb.LoginRejection_LOGIN_REJECTION_INVALID_CREDENTIALS
+		return nil, ErrInvalidCredentials
 	}
 
 	if err := a.queries.TouchLastSeen(ctx, account.ID); err != nil {
@@ -153,26 +171,19 @@ func (a *Accounts) Login(ctx context.Context, username, password string) (*Sessi
 	return &Session{
 		AccountID: id,
 		Name:      account.Name,
-	}, pb.LoginRejection_LOGIN_REJECTION_UNSPECIFIED
+		Rating:    account.Rating,
+	}, nil
 }
 
-func (a *Accounts) CreateNewAccount(ctx context.Context, username, password string) (*Session, pb.AccountCreateRejection) {
-	if reason := validateUsername(username); reason != pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED {
-		return nil, reason
-	}
-	if reason := validatePassword(password); reason != pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED {
-		return nil, reason
-	}
-
+// CreateNewAccount stores a new account and logs it in; the caller validates username and password
+func (a *Accounts) CreateNewAccount(ctx context.Context, username, password string) (*Session, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		slog.Error("hash password", "err", err)
-		return nil, pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_SERVER_ERROR
+		return nil, fmt.Errorf("hash password: %w", err)
 	}
 	id, err := uuid.NewV7()
 	if err != nil {
-		slog.Error("generate account id", "err", err)
-		return nil, pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_SERVER_ERROR
+		return nil, fmt.Errorf("generate account id: %w", err)
 	}
 
 	account, err := a.queries.CreateAccount(ctx, db.CreateAccountParams{
@@ -184,16 +195,14 @@ func (a *Accounts) CreateNewAccount(ctx context.Context, username, password stri
 	var sqlErr *sqlite.Error
 	switch {
 	case errors.As(err, &sqlErr) && sqlErr.Code() == sqlite3.SQLITE_CONSTRAINT_UNIQUE:
-		return nil, pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TAKEN
+		return nil, ErrUsernameTaken
 	case err != nil:
-		slog.Error("insert account", "err", err)
-		return nil, pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_SERVER_ERROR
+		return nil, fmt.Errorf("insert account: %w", err)
 	}
 
 	id, err = uuid.FromBytes(account.ID)
 	if err != nil {
-		slog.Error("parse account id", "err", err)
-		return nil, pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_SERVER_ERROR
+		return nil, fmt.Errorf("parse account id: %w", err)
 	}
 
 	slog.Info("account created", "id", id)
@@ -201,80 +210,6 @@ func (a *Accounts) CreateNewAccount(ctx context.Context, username, password stri
 	return &Session{
 		AccountID: id,
 		Name:      account.Name,
-	}, pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED
-}
-
-const (
-	passwordMinLength       = 8
-	passwordMaxLength       = 72
-	passwordMinNumbers      = 1
-	passwordMinSpecialChars = 1
-
-	usernameMinLength = 2
-	usernameMaxLength = 20
-)
-
-// commonPasswords holds the embedded list, lowercased, built once at startup
-var commonPasswords = func() map[string]struct{} {
-	m := make(map[string]struct{})
-	for line := range strings.SplitSeq(commonPasswordsFile, "\n") {
-		if p := strings.TrimSpace(line); p != "" {
-			m[strings.ToLower(p)] = struct{}{}
-		}
-	}
-	return m
-}()
-
-func validatePassword(password string) pb.AccountCreateRejection {
-	switch {
-	case utf8.RuneCountInString(password) < passwordMinLength:
-		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_SHORT
-	case len(password) > passwordMaxLength: // bcrypt's limit is 72 bytes
-		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_LONG
-	}
-
-	lower := strings.ToLower(password)
-	if _, common := commonPasswords[lower]; common {
-		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_TOO_COMMON
-	}
-
-	var numbers, specialChars int
-	r := []rune(password)
-	for _, c := range r {
-		if unicode.IsNumber(c) {
-			numbers++
-		}
-		if unicode.IsSymbol(c) || unicode.IsPunct(c) {
-			specialChars++
-		}
-	}
-
-	switch {
-	case numbers < passwordMinNumbers:
-		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_NUMBERS
-	case specialChars < passwordMinSpecialChars:
-		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_PASSWORD_MISSING_SPECIAL_CHARACTERS
-	}
-
-	return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED
-}
-
-func validateUsername(username string) pb.AccountCreateRejection {
-	switch {
-	case username != strings.TrimSpace(username):
-		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_SURROUNDING_WHITESPACE
-	case utf8.RuneCountInString(username) < usernameMinLength:
-		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TOO_SHORT
-	case utf8.RuneCountInString(username) > usernameMaxLength:
-		return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_TOO_LONG
-	}
-
-	r := []rune(username)
-	for _, c := range r {
-		if !unicode.IsLetter(c) && !unicode.IsNumber(c) && c != ' ' {
-			return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_USERNAME_INVALID_CHARACTERS
-		}
-	}
-
-	return pb.AccountCreateRejection_ACCOUNT_CREATE_REJECTION_UNSPECIFIED
+		Rating:    account.Rating,
+	}, nil
 }
