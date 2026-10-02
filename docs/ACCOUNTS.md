@@ -7,8 +7,8 @@ account lives in memory in `game.Sessions`. This records how it fits together an
 ## Flow
 
 ```
-connect ──▶ Login / CreateAccount ──▶ CreateGame / JoinGame ──▶ MovementCommand, TradeRequest, ...
-            (ReadSession)               (ReadWorld)              (ReadCommand)
+connect ──▶ Login / CreateAccount ──▶ FindGame / CreateGame / JoinGame ──▶ MovementCommand, TradeRequest, ...
+            (ReadSession)               (ReadWorld)                         (ReadCommand)
 ```
 
 `ReadPump` moves through three stages and drops any message that doesn't belong to the current
@@ -18,7 +18,7 @@ commands only once `c.World` is set.
 ## Decisions
 
 - **One global username, no separate display name.** The username is the login and the name
-  other players see; `CreateGame` and `JoinGame` no longer carry a name. A display name was
+  other players see; `FindGame`, `CreateGame` and `JoinGame` carry no name. A display name was
   considered and dropped: it needs its own uniqueness rules, and without them anyone can show up
   as anyone.
 - **The per-world `Player.ID` stays.** It is the 4-byte handle in every `WorldSnapshot`, the key

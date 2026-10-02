@@ -60,11 +60,12 @@ func (m *Master) newCode() string { // caller holds m.mu
 }
 
 // joinable reports whether Join would currently accept a player
-func (w *World) joinable() bool {
+func (w *World) joinable() (float64, bool) {
 	w.Mu.Lock()
 	defer w.Mu.Unlock()
-	return (w.phase == pb.GamePhase_GAME_PHASE_WAITING || w.phase == pb.GamePhase_GAME_PHASE_COUNTDOWN) &&
-		len(w.players) < w.config.MaxPlayers
+
+	fill := float64(len(w.players)) / float64(w.config.MaxPlayers)
+	return fill, (w.phase == pb.GamePhase_GAME_PHASE_WAITING || w.phase == pb.GamePhase_GAME_PHASE_COUNTDOWN) && fill < 1.0
 }
 
 func (m *Master) FindPublicGame(config WorldConfig) (*World, error) {
@@ -73,11 +74,18 @@ func (m *Master) FindPublicGame(config WorldConfig) (*World, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	for _, world := range m.publicGames {
-		if world.joinable() {
-			return world, nil
+	var world *World
+	mostFilled := -1.0
+
+	for _, w := range m.publicGames {
+		if fill, ok := w.joinable(); ok && fill > mostFilled {
+			world, mostFilled = w, fill
 		}
 	}
+	if world != nil {
+		return world, nil
+	}
+
 	return m.create(config)
 }
 

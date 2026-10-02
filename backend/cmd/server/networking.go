@@ -59,7 +59,7 @@ func webClient(dir string) http.Handler {
 }
 
 // handleWS upgrades the connection and hands it to the pumps. The client starts in the
-// lobby with no world; ReadPump joins it to one when a CreateGame or JoinGame arrives.
+// lobby with no world; ReadPump joins it to one when a FindGame, CreateGame or JoinGame arrives.
 func handleWS(master *game.Master, accounts *store.Accounts, sessions *transport.Sessions, defaults game.WorldConfig, upgrader *websocket.Upgrader, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
