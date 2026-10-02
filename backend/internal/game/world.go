@@ -226,12 +226,14 @@ func (w *World) logEvent(msg string, id uint64, e *RandomEvent) {
 	)
 }
 
-func (w *World) logStanding(player *Player, netWorth uint64) {
+// logStanding records a player's final result; rank is 1-based, best first
+func (w *World) logStanding(rank int, player *Player, netWorth uint64) {
 	if !w.loggerEnabled() {
 		return
 	}
 
 	w.log("standing",
+		slog.Int("rank", rank),
 		slog.Uint64("player", uint64(player.ID)),
 		slog.String("name", player.Name),
 		slog.Uint64("net_worth", netWorth),

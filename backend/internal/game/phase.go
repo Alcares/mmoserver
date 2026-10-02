@@ -1,6 +1,7 @@
 package game
 
 import (
+	"slices"
 	"sort"
 	"time"
 
@@ -73,22 +74,26 @@ func (w *World) netWorth(p *Player) uint64 {
 func (w *World) finish() {
 	w.setPhase(pb.GamePhase_GAME_PHASE_FINISHED, 0)
 
-	standings := make([]*pb.PlayerFinalStanding, 0, len(w.players)+len(w.departed))
-	for player := range w.everyone() {
-		netWorth := w.netWorth(player)
-		w.logStanding(player, netWorth)
+	players := slices.Collect(w.everyone())
+	netWorth := make(map[uint32]uint64, len(players))
+	for _, player := range players {
+		netWorth[player.ID] = w.netWorth(player)
+	}
+	sort.Slice(players, func(i, j int) bool {
+		return netWorth[players[i].ID] > netWorth[players[j].ID]
+	})
+
+	standings := make([]*pb.PlayerFinalStanding, 0, len(players))
+	for i, player := range players {
 		standings = append(standings, &pb.PlayerFinalStanding{
 			Id:               player.ID,
 			Name:             player.Name,
-			NetWorth:         netWorth,
+			NetWorth:         netWorth[player.ID],
 			TradeVolumeCents: player.tradeVolume,
 			UnitsTraded:      player.unitsTraded,
 		})
+		w.logStanding(i+1, player, netWorth[player.ID])
 	}
-
-	sort.Slice(standings, func(i, j int) bool {
-		return standings[i].NetWorth > standings[j].NetWorth
-	})
 
 	w.updateElo(standings)
 

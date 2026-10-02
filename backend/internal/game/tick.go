@@ -271,7 +271,7 @@ func (w *World) decayCash() {
 		return
 	}
 
-	for _, player := range w.players {
+	for player := range w.everyone() {
 		amount := ceilDiv(player.balance*DecayBasisPoints, wholeBasisPoints)
 		if amount == 0 {
 			continue
@@ -281,15 +281,5 @@ func (w *World) decayCash() {
 		w.sendTo(player.ID, &pb.ServerMessage{
 			Msg: &pb.ServerMessage_PlayerInventory{PlayerInventory: player.ToProtoInventory()},
 		})
-	}
-
-	// exiting the game should not be a strategy to avoid inflation
-	for _, player := range w.departed {
-		amount := ceilDiv(player.balance*DecayBasisPoints, wholeBasisPoints)
-		if amount == 0 {
-			continue
-		}
-		player.decayed += amount
-		player.balance -= amount
 	}
 }

@@ -48,6 +48,6 @@ func (w *World) updateElo(standings []*pb.PlayerFinalStanding) {
 
 	w.ratingChanges = make(map[uuid.UUID]float64, n)
 	for i, p := range ranked {
-		w.ratingChanges[p.AccountID] += delta[i]
+		w.ratingChanges[p.AccountID] += delta[i] / float64(n-1)
 	}
 }
