@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"sync"
 	"time"
 
 	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
@@ -25,13 +26,16 @@ const MaxMessageSize = 4096
 // WebsocketClient represents an active WebSocket connection
 type WebsocketClient struct {
 	*game.SendQueue
-	ID      uint32
 	Conn    *websocket.Conn
-	World   *game.World
 	Session *store.Session
+
+	// The matchmaker places a client from its own goroutine, so these are guarded by mu
+	mu    sync.Mutex
+	id    uint32
+	world *game.World
 }
 
-// NewWebsocketClient takes no ID: the world assigns one on join, and JoinWorld records it.
+// NewWebsocketClient takes no ID: the world assigns one on join, and setWorld records it.
 func NewWebsocketClient(conn *websocket.Conn) *WebsocketClient {
 	return &WebsocketClient{SendQueue: game.NewSendQueue(), Conn: conn}
 }
@@ -67,7 +71,7 @@ func (c *WebsocketClient) WritePump() {
 }
 
 func (c *WebsocketClient) ReadPump(m *game.Master, a *store.Accounts, s *Sessions, cfg game.WorldConfig) {
-	defer c.closeConnection(s)
+	defer c.closeConnection(m, s)
 
 	c.Conn.SetReadLimit(MaxMessageSize)
 	err := c.Conn.SetReadDeadline(time.Now().Add(PongWait))
@@ -98,7 +102,7 @@ func (c *WebsocketClient) ReadPump(m *game.Master, a *store.Accounts, s *Session
 			continue
 		}
 
-		if c.World == nil {
+		if world, _ := c.inWorld(); world == nil {
 			c.ReadWorld(m, cfg, &msg)
 			continue
 		}
@@ -109,9 +113,11 @@ func (c *WebsocketClient) ReadPump(m *game.Master, a *store.Accounts, s *Session
 	}
 }
 
-func (c *WebsocketClient) closeConnection(s *Sessions) {
-	if c.World != nil {
-		c.World.Leave(c.ID)
+func (c *WebsocketClient) closeConnection(m *game.Master, s *Sessions) {
+	// Out of the queue first, so the matchmaker can't place c after the world check below
+	m.Dequeue(c)
+	if world, id := c.inWorld(); world != nil {
+		world.Leave(id)
 	}
 
 	if c.Session != nil {
@@ -162,9 +168,14 @@ func (c *WebsocketClient) ReadSession(s *Sessions, a *store.Accounts, msg *pb.Cl
 	}
 }
 
+// ReadWorld handles a client that isn't in a game: cfg is the default for private games, and
+// public games go through the matchmaker, which answers once it has placed the client
 func (c *WebsocketClient) ReadWorld(m *game.Master, cfg game.WorldConfig, msg *pb.ClientMessage) {
 	switch cmd := msg.Cmd.(type) {
 	case *pb.ClientMessage_CreateGame:
+		if !c.leaveQueue(m) {
+			return
+		}
 		cfg.IsPublic = false
 		world, err := m.Create(createConfig(cfg, cmd.CreateGame))
 		if err != nil {
@@ -175,6 +186,9 @@ func (c *WebsocketClient) ReadWorld(m *game.Master, cfg game.WorldConfig, msg *p
 			c.rejectJoin(joinRejection(err))
 		}
 	case *pb.ClientMessage_JoinGame:
+		if !c.leaveQueue(m) {
+			return
+		}
 		world, exists := m.GetPrivate(cmd.JoinGame.GameId)
 		if !exists {
 			c.rejectJoin(pb.JoinRejection_JOIN_REJECTION_GAME_NOT_FOUND)
@@ -184,43 +198,30 @@ func (c *WebsocketClient) ReadWorld(m *game.Master, cfg game.WorldConfig, msg *p
 			c.rejectJoin(joinRejection(err))
 		}
 	case *pb.ClientMessage_FindGame:
-		// TODO: move somewhere more appropriate
-		cfg.StartCountdown = 10 * time.Second
-		if err := c.findGame(m, cfg); err != nil {
-			c.rejectJoin(joinRejection(err))
-		}
+		m.Enqueue(c, c.account(), c.setWorld)
 	}
 }
 
-// findGame joins a public game. A game can fill up or start between being found and joined,
-// so that is retried once, and a matchmade player is not told about a game they never chose.
-func (c *WebsocketClient) findGame(m *game.Master, cfg game.WorldConfig) error {
-	var err error
-	for range 2 {
-		var world *game.World
-		world, err = m.FindPublicGame(cfg)
-		if err != nil {
-			return err
-		}
-		err = c.joinWorld(world)
-		if !errors.Is(err, game.ErrGameFull) && !errors.Is(err, game.ErrGameInProgress) {
-			return err
-		}
-	}
-	return err
+// leaveQueue takes c out of the matchmaking queue, and reports whether c is still in no game:
+// the matchmaker may have placed it since the read loop last looked
+func (c *WebsocketClient) leaveQueue(m *game.Master) bool {
+	m.Dequeue(c)
+	world, _ := c.inWorld()
+	return world == nil
 }
 
 func (c *WebsocketClient) ReadCommand(msg *pb.ClientMessage) {
+	world, id := c.inWorld()
 	switch cmd := msg.Cmd.(type) {
 	case *pb.ClientMessage_Input:
-		c.World.EnqueueMovement(game.PlayerMovementInput{
-			PlayerID: c.ID,
+		world.EnqueueMovement(game.PlayerMovementInput{
+			PlayerID: id,
 			Vx:       float64(cmd.Input.GetVx()),
 			Vy:       float64(cmd.Input.GetVy()),
 		})
 	case *pb.ClientMessage_Trade:
-		c.World.EnqueueTrade(game.TradeOrder{
-			PlayerID:   c.ID,
+		world.EnqueueTrade(game.TradeOrder{
+			PlayerID:   id,
 			SequenceID: cmd.Trade.GetSequenceId(),
 			Intent:     cmd.Trade.GetIntent(),
 			Units:      uint64(cmd.Trade.GetUnits()),
@@ -228,7 +229,7 @@ func (c *WebsocketClient) ReadCommand(msg *pb.ClientMessage) {
 		})
 	case *pb.ClientMessage_SpawnBot:
 		// Refused in public games and once the lobby closes or fills up; SendSpawnBot documents that it does nothing then
-		_, _ = c.World.SpawnBot()
+		_, _ = world.SpawnBot()
 	}
 }
 
@@ -302,13 +303,27 @@ func createConfig(defaults game.WorldConfig, req *pb.CreateGame) game.WorldConfi
 }
 
 func (c *WebsocketClient) joinWorld(world *game.World) error {
-	player, err := world.Join(c, game.Account{AccountID: c.Session.AccountID, Name: c.Session.Name, Rating: c.Session.Rating})
+	player, err := world.Join(c, c.account())
 	if err != nil {
 		return err
 	}
-
-	c.ID = player.ID
-	c.World = world
-
+	c.setWorld(world, player)
 	return nil
+}
+
+func (c *WebsocketClient) account() game.Account {
+	return game.Account{AccountID: c.Session.AccountID, Name: c.Session.Name, Rating: c.Session.Rating}
+}
+
+func (c *WebsocketClient) setWorld(world *game.World, player *game.Player) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.world, c.id = world, player.ID
+}
+
+// inWorld returns the game c is in and its player ID there, or nil before it has joined one
+func (c *WebsocketClient) inWorld() (*game.World, uint32) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.world, c.id
 }

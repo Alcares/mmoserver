@@ -61,6 +61,22 @@ namespace Game.Client
             GUI.Label(new Rect(x, y, width, LobbyRowHeight), $"playing as {_client.Username}  (Esc logs out)", _lobbyText);
             y += LobbyRowHeight;
 
+            // While queued: how long so far, and a way out. Reconnecting cancels, as the server
+            // forgets a connection's place in the queue when it closes.
+            if (_client.SearchingSince is float since)
+            {
+                _lobbyText.normal.textColor = Color.white;
+                int waited = Mathf.FloorToInt(Time.realtimeSinceStartup - since);
+                GUI.Label(new Rect(x, y, width, LobbyRowHeight), $"Finding a game...  {waited}s", _lobbyText);
+                y += LobbyRowHeight + 8f;
+
+                if (GUI.Button(new Rect(x, y, width, LobbyRowHeight), "Cancel", _button))
+                {
+                    _client.Reconnect();
+                }
+                return;
+            }
+
             if (GUI.Button(new Rect(x, y, width, LobbyRowHeight), "Find a game", _button))
             {
                 _client.SendFindGame();

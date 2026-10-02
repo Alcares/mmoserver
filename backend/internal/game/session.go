@@ -28,8 +28,8 @@ func (w *World) Join(c Client, a Account) (*Player, error) {
 	w.Mu.Lock()
 	defer w.Mu.Unlock()
 
-	// Allow late joins
-	if w.phase != pb.GamePhase_GAME_PHASE_WAITING && w.phase != pb.GamePhase_GAME_PHASE_COUNTDOWN {
+	// Allow late joins, except into matchmade games: the matchmaker picked who plays them
+	if w.phase != pb.GamePhase_GAME_PHASE_WAITING && (w.config.IsPublic || w.phase != pb.GamePhase_GAME_PHASE_COUNTDOWN) {
 		w.logPlayerJoin(nil, ErrGameInProgress)
 		return nil, ErrGameInProgress
 	}
