@@ -124,5 +124,6 @@ func (w *World) executeTrade(player *Player, o TradeOrder) *pb.TradeReceipt {
 	receipt.NewCashBalanceCents = player.balance
 	receipt.NewHoldingUnits = player.commodities[station.Commodity]
 	w.logTrade(player, o, receipt, pool)
+
 	return receipt
 }

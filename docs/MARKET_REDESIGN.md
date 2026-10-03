@@ -211,10 +211,21 @@ batch and clears each commodity in one step:
    uses, so rounding favours the pool as it does now.
 3. Every order in the batch fills at `P`: buyers pay `P` per unit, sellers receive `P`. Buyers pay
    `B·P`, sellers receive `S·P`, the pool receives `net·P`, so the cash balances exactly.
-4. **Limits.** Each order still carries `price_cents`, its worst acceptable price. If `P` breaks
-   some orders' limits, the order with the worst-violated limit is dropped, and the batch is
-   recomputed, until no limit is broken. Ties are broken deterministically. Dropped orders are
-   rejected with a `TradeReceipt` reason, as today.
+4. **Limits.** Each order still carries `price_cents`, its worst acceptable price. The batch
+   clears as a uniform-price call auction, in one sorted sweep:
+   - For a threshold `t`, the batch holds every buy with a limit of at least `t` and every sell
+     with a limit of at most `t`. Its `net(t)` falls as `t` rises, and the pool's price `P(t)`
+     rises with `net`, so `P(t) − t` crosses zero once. The crossing is the clearing price.
+   - The candidates for `t` are the orders' own limits. Sort buys and sells by limit once, keep
+     running sums of units, and sweep or binary-search: no recompute loop.
+   - Orders fill whole, so at the crossing one marginal order on each side may not fit; it is
+     dropped, a single check. Ties are broken deterministically.
+
+   An order is rejected only if it couldn't fill at the final price, whatever order the others
+   arrived or were dropped in. Dropping orders one at a time and recomputing was rejected: each
+   drop moves `P`, which can push out an order on the other side, and a dropped order never comes
+   back even when the final price would have filled it. Rejected orders get a `TradeReceipt`
+   reason, as today.
 
 When `net` is 0, the pool doesn't trade and `P` needs defining another way; the one-unit sell
 price is a reasonable choice. That case needs pinning down with a test, and it's shared with B.
