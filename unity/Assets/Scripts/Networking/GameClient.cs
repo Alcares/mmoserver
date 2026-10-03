@@ -31,6 +31,9 @@ namespace Game.Networking
         /// <summary>Whether the last game asked for was matchmade. The server only lets private
         /// games be joined by code, so a public game's code is not worth showing.</summary>
         public bool InPublicGame { get; private set; }
+        /// <summary>When this client asked to be matched, in realtimeSinceStartup, or null when it
+        /// isn't waiting for a match. Cleared once the server places it in a game or rejects it.</summary>
+        public float? SearchingSince { get; private set; }
 
         // The password stays in memory only, never on disk: it lets Reconnect log the new
         // connection in again. A failed login forgets it.
@@ -102,6 +105,7 @@ namespace Game.Networking
             LoggedIn = false;
             AwaitingAccountReply = false;
             InPublicGame = false;
+            SearchingSince = null;
             await Connection.ConnectAsync(Url);
 
             if (_password != null) SendLogin(Username, _password);
@@ -146,6 +150,7 @@ namespace Game.Networking
                     OnMarketState?.Invoke(message.MarketState);
                     break;
                 case ServerMessage.MsgOneofCase.InitialState:
+                    SearchingSince = null;
                     OnInitialState?.Invoke(message.InitialState);
                     break;
                 case ServerMessage.MsgOneofCase.PlayerInventory:
@@ -170,6 +175,7 @@ namespace Game.Networking
                     OnGameStatus?.Invoke(message.GameStatus);
                     break;
                 case ServerMessage.MsgOneofCase.JoinRejected:
+                    SearchingSince = null;
                     OnJoinRejected?.Invoke(message.JoinRejected);
                     break;
                 case ServerMessage.MsgOneofCase.GameOver:
@@ -236,11 +242,13 @@ namespace Game.Networking
             AwaitingAccountReply = true;
         }
 
-        /// <summary>Asks the server to put us in a public game, an open one if it has any or else
-        /// a new one; it answers with either InitialGameState or JoinRejected.</summary>
+        /// <summary>Queues for a public game. The server answers with InitialGameState only once
+        /// the matchmaker has found players of a similar rating, which can take a while; dropping
+        /// the connection is how a search is cancelled.</summary>
         public void SendFindGame()
         {
             InPublicGame = true;
+            SearchingSince = Time.realtimeSinceStartup;
             Connection?.Send(new ClientMessage { FindGame = new FindGame() });
         }
 

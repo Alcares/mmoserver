@@ -38,9 +38,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Defaults for every game created on this server, public or private; a client's CreateGame
-	// may override them, within the bounds WorldConfig.sanitize enforces.
-	defaults := game.WorldConfig{
+	// Defaults for private games; a client's CreateGame may override them, within the bounds
+	// WorldConfig.sanitize enforces.
+	private := game.WorldConfig{
 		MinPlayers:     2,
 		MaxPlayers:     3,
 		StartCountdown: 3 * time.Second,
@@ -55,8 +55,13 @@ func main() {
 	if policy, err := bot.LoadMLPPolicy("rl-training/policy.pb"); err != nil {
 		slog.Warn("no trained policy; bots run the scripted baseline", "err", err)
 	} else {
-		defaults.BotPolicy = policy
+		private.BotPolicy = policy
 	}
+
+	// Matchmade games: the matchmaker picks who plays before they start, so the countdown is only time to get ready
+	public := private
+	public.IsPublic = true
+	public.StartCountdown = 10 * time.Second
 
 	c, err := store.Open(dbFile)
 	if err != nil {
@@ -78,12 +83,14 @@ func main() {
 		},
 	)
 
+	go gameMaster.RunMatchmaker(public)
+
 	slog.Info("server initialized")
 
 	upgrader := newUpgrader()
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		handleWS(gameMaster, accounts, sessions, defaults, upgrader, w, r)
+		handleWS(gameMaster, accounts, sessions, private, upgrader, w, r)
 	})
 	// Same origin as /ws, so the web client needs no CORS and no configured server address.
 	http.Handle("/", webClient(webClientDir))

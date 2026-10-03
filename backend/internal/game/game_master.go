@@ -7,7 +7,6 @@ import (
 	"strings"
 	"sync"
 
-	pb "github.com/alcares/mmoserver/backend/gen/go/game/v1"
 	"github.com/google/uuid"
 )
 
@@ -16,7 +15,7 @@ var ErrServerFull = errors.New("server is hosting the maximum number of games")
 
 const (
 	codeAlphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
-	maxGames     = 5
+	maxGames     = 20
 )
 
 type Result struct {
@@ -29,6 +28,7 @@ type Master struct {
 	mu           sync.Mutex
 	privateGames map[string]*World
 	publicGames  map[string]*World
+	queue        []*ticket // players waiting for a public game
 	maxGames     int
 	rng          *rand.Rand
 	onGameEnd    func(Result)
@@ -59,36 +59,6 @@ func (m *Master) newCode() string { // caller holds m.mu
 	}
 }
 
-// joinable reports whether Join would currently accept a player
-func (w *World) joinable() (float64, bool) {
-	w.Mu.Lock()
-	defer w.Mu.Unlock()
-
-	fill := float64(len(w.players)) / float64(w.config.MaxPlayers)
-	return fill, (w.phase == pb.GamePhase_GAME_PHASE_WAITING || w.phase == pb.GamePhase_GAME_PHASE_COUNTDOWN) && fill < 1.0
-}
-
-func (m *Master) FindPublicGame(config WorldConfig) (*World, error) {
-	config.IsPublic = true
-
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	var world *World
-	mostFilled := -1.0
-
-	for _, w := range m.publicGames {
-		if fill, ok := w.joinable(); ok && fill > mostFilled {
-			world, mostFilled = w, fill
-		}
-	}
-	if world != nil {
-		return world, nil
-	}
-
-	return m.create(config)
-}
-
 func (m *Master) Create(config WorldConfig) (*World, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -97,6 +67,16 @@ func (m *Master) Create(config WorldConfig) (*World, error) {
 
 // create builds and starts a world; caller holds m.mu
 func (m *Master) create(config WorldConfig) (*World, error) {
+	world, err := m.register(config)
+	if err != nil {
+		return nil, err
+	}
+	m.start(world)
+	return world, nil
+}
+
+// register builds a world and counts it against maxGames without running it yet; caller holds m.mu
+func (m *Master) register(config WorldConfig) (*World, error) {
 	gameCount := len(m.publicGames) + len(m.privateGames)
 	if gameCount >= m.maxGames {
 		return nil, ErrServerFull
@@ -116,7 +96,12 @@ func (m *Master) create(config WorldConfig) (*World, error) {
 	gameCount++
 
 	slog.Info("game started", "game", id, "active_games", gameCount)
+	return world, nil
+}
 
+// start runs a registered world, and forgets it once it ends
+func (m *Master) start(world *World) {
+	id := world.gameID
 	go func() {
 		world.Run()
 		if m.onGameEnd != nil {
@@ -133,8 +118,6 @@ func (m *Master) create(config WorldConfig) (*World, error) {
 		}
 		slog.Info("game ended", "game", id, "active_games", len(m.publicGames)+len(m.privateGames))
 	}()
-
-	return world, nil
 }
 
 func (m *Master) GetPrivate(id string) (*World, bool) {
