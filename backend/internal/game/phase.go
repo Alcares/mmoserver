@@ -60,25 +60,29 @@ func (w *World) advancePhase() {
 	}
 }
 
-func (w *World) netWorth(p *Player) uint64 {
-	total := p.balance
-	for cType, units := range p.commodities {
-		if units == 0 {
-			continue
-		}
-		total += units * w.Commodities[cType].sellPrice(units)
-	}
-	return total
-}
-
 func (w *World) finish() {
 	w.setPhase(pb.GamePhase_GAME_PHASE_FINISHED, 0)
 
 	players := slices.Collect(w.everyone())
+
+	commodityUnits := make(map[pb.CommodityType]uint64, len(GetCommodityTypes()))
+	commodityPrice := make(map[pb.CommodityType]uint64, len(GetCommodityTypes()))
 	netWorth := make(map[uint32]uint64, len(players))
+
 	for _, player := range players {
-		netWorth[player.ID] = w.netWorth(player)
+		for cType, count := range player.commodities {
+			commodityUnits[cType] += count
+		}
 	}
+
+	for _, cType := range GetCommodityTypes() {
+		commodityPrice[cType] = w.Commodities[cType].sellPrice(commodityUnits[cType])
+	}
+
+	for _, player := range players {
+		netWorth[player.ID] = playerNetWorth(player, commodityPrice)
+	}
+
 	sort.Slice(players, func(i, j int) bool {
 		return netWorth[players[i].ID] > netWorth[players[j].ID]
 	})
@@ -118,4 +122,12 @@ func (w *World) countBots() int {
 		}
 	}
 	return n
+}
+
+func playerNetWorth(p *Player, prices map[pb.CommodityType]uint64) uint64 {
+	total := p.balance
+	for cType, units := range p.commodities {
+		total += units * prices[cType]
+	}
+	return total
 }

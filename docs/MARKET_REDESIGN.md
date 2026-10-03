@@ -1,7 +1,8 @@
 # Market Redesign
 
-**Status: proposal. Nothing here is implemented.** It changes the rules in `PRICING.md`, and it
-replaces the market that Stage 2 of `BOT_TRAINING.md` assumes. Stage 2 should not start until the
+**Status: proposal, partly implemented.** A (cash decay) and the final settlement of B are in;
+everything else is not. Both went in ahead of the harness and D, against the rollout order below.
+It changes the rules in `PRICING.md`, and it replaces the market that Stage 2 of `BOT_TRAINING.md` assumes. Stage 2 should not start until the
 validation gates at the end of this document pass. Earlier editions of this proposal are in git
 history.
 
@@ -42,7 +43,7 @@ count clearly more (see "Design principles").
 
 ## The problem
 
-Under the current rules, not trading is close to the best strategy, and a trading bot that
+Under the rules before A and B, not trading was close to the best strategy, and a trading bot that
 learned to idle would just be reporting on the game.
 
 - **The pool is everyone's only counterparty, and it takes a cut.** Any buy followed by a sell
@@ -163,6 +164,10 @@ they know, who's in it, when will they leave, and where should I stand to see it
 `decayBasisPoints`. The amount lost is rounded up, so that cash stays whole cents and rounding
 never favours the player, matching the pool's rule. The lost cash disappears. The ranking is by
 net worth, so it doesn't matter where the money goes.
+
+**Implemented** in `decayCash` (`tick.go`): a flat 0.1% (`DecayBasisPoints`) every second
+(`DecayIntervalTicks`), while the round is running. Each player's total loss is kept in
+`Player.decayed` and logged. The rate was picked by hand, not tuned with the harness.
 
 **What it does.**
 - Idling now loses by a known amount, so any strategy that trades at a profit beats it.
@@ -291,6 +296,14 @@ Longs and shorts are matched against each other at the pool's price, and only th
 touches the pool. The `net = 0` case is the same as D's.
 
 After settlement the commodity reopens at whatever price the pool is left at, which is near `V`.
+
+**Implemented:** the final settlement only, in `finish()` (`phase.go`). Holdings are long-only, so
+`net = L`: it sums every player's units per commodity, players who left mid-round included, prices
+one sell of `L` at `sellPrice(L)`, and values every player's holding at that `P`. Standings and
+ELO use the result. It's a valuation: the pool isn't actually traded, since the round is over.
+Without E, the field as a whole ends near zero (the pool returns to its starting reserves) and the
+settlement only decides who wins inside each crowd. Not implemented: the HUD's mid-round mark,
+which still uses each player's one-unit sell price (`HUD_NET_WORTH.md`).
 
 **What it does.**
 - **A crowd pays for its own crowding.** Everyone in the same commodity gets the same price. With
@@ -599,6 +612,38 @@ stay at least the walk from the centre to the ring.
 **For the bot.** Other players drop out of view more often, so the observation needs memory of
 who was last seen where. Pathing (Stage 1b/1c) matters more on a wider map.
 
+## Borrowed from real exchanges
+
+Brokers like XTB and eToro, and peer-to-peer markets like Steam's, were considered as whole models
+and rejected:
+
+- **Broker model (an outside price feed, trading against the house).** Trades don't move the price,
+  so players stop interacting. A random-walk feed makes rank pure variance; a feed with structure
+  is a puzzle, solved once. Leverage under rank scoring makes the best play a maximum-size coin
+  flip, which ELO would then reward.
+- **Continuous order book (Steam).** With 2–8 players the books are empty; the pool exists to
+  supply that liquidity. Steam trades because items have use value and supply keeps arriving from
+  drops; without that, the no-trade theorem bites harder. Queue priority and picking off stale
+  orders bring back the reflex races D removes, and a zero-latency bot wins them as market maker.
+
+D is already the useful part of an exchange: a call auction, with the pool as the market maker
+that absorbs the difference. Three smaller pieces are worth taking:
+
+- **Resting limit orders.** An order can carry over from batch to batch until it fills, is
+  cancelled, or the round ends. A cancel takes effect from the next batch, so an order stays
+  irrevocable in the batch it's in, and the bar still can't be spoofed. It's a pure decision
+  ("buy lithium at $9.20"), not a reflex. Placing one requires standing at the station; filling
+  doesn't, which weakens 4 a little.
+- **Stop-loss and take-profit.** They trigger at the next clear after the price crosses them.
+  They serve "Manageable": a human can hold several positions without watching each one. With C,
+  a stop is how a careful player gets out ahead of a squeeze; since a stop that fires is a market
+  order, a cascade can trigger many at once, and D still clears them together.
+- **Trade tips instead of copy trading.** "Player X's last trade was a silver buy" as a tip kind in
+  2, not eToro-style copying, which would make positions public.
+
+Not taken: leverage beyond C's margin rules, overnight fees (rounds are 5 minutes), an outside
+price feed, and a continuous order book.
+
 ## Managing the load
 
 - **Rotating active commodities, on by default.** Four of six live each round, chosen at round
@@ -817,7 +862,7 @@ playtests, with the same questions each time:
 2. **D, batch clearing,** with random close and the coarse bar. It changes the trade path
    everything else builds on, so it goes first. Client: pending orders, the window countdown, the
    fill animation.
-3. **A + B** (the final settlement only). Small: decay on balances, and the close in `phase.go`.
+3. **A + B** (the final settlement only). **Done**, before 1 and 2. Small: decay on balances, and the close in `phase.go`.
    Tune the decay rate with the harness. Expected failures: the lone holder, which C fixes, and
    the oil parker, which E fixes. **Playtest.**
 4. **C,** only if the harness gates call for it. Protocol, rules, UI and `PRICING.md`. The
