@@ -18,6 +18,12 @@ const (
 	timeToMax     = 120 * time.Second
 )
 
+// queueable is a client that can wait for a public game
+type queueable interface {
+	Client
+	InWorld() (*World, uint32)
+}
+
 // ticket is one player waiting in the queue for a public game
 type ticket struct {
 	client   Client
@@ -32,13 +38,13 @@ func matchTolerance(waited time.Duration) float64 {
 	return min(curr+baseTolerance, maxTolerance)
 }
 
-// Enqueue queues c for a public game. onMatch runs once c has joined one, on the matchmaker's
-// goroutine; queueing again keeps c's place
-func (m *Master) Enqueue(c Client, a Account, onMatch func(*World, *Player)) {
+// Enqueue queues c for a public game. onMatch runs once c has joined one, on the matchmaker's goroutine
+func (m *Master) Enqueue(c queueable, a Account, onMatch func(*World, *Player)) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	if slices.ContainsFunc(m.queue, func(t *ticket) bool { return t.client == c }) {
+	// check InWorld() to prevent data races which could cause players to double enqueue
+	if w, _ := c.InWorld(); w != nil || slices.ContainsFunc(m.queue, func(t *ticket) bool { return t.client == c }) {
 		return
 	}
 	m.queue = append(m.queue, &ticket{client: c, account: a, queuedAt: time.Now(), onMatch: onMatch})

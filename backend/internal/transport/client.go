@@ -102,7 +102,7 @@ func (c *WebsocketClient) ReadPump(m *game.Master, a *store.Accounts, s *Session
 			continue
 		}
 
-		if world, _ := c.inWorld(); world == nil {
+		if world, _ := c.InWorld(); world == nil {
 			c.ReadWorld(m, cfg, &msg)
 			continue
 		}
@@ -116,7 +116,7 @@ func (c *WebsocketClient) ReadPump(m *game.Master, a *store.Accounts, s *Session
 func (c *WebsocketClient) closeConnection(m *game.Master, s *Sessions) {
 	// Out of the queue first, so the matchmaker can't place c after the world check below
 	m.Dequeue(c)
-	if world, id := c.inWorld(); world != nil {
+	if world, id := c.InWorld(); world != nil {
 		world.Leave(id)
 	}
 
@@ -206,12 +206,12 @@ func (c *WebsocketClient) ReadWorld(m *game.Master, cfg game.WorldConfig, msg *p
 // the matchmaker may have placed it since the read loop last looked
 func (c *WebsocketClient) leaveQueue(m *game.Master) bool {
 	m.Dequeue(c)
-	world, _ := c.inWorld()
+	world, _ := c.InWorld()
 	return world == nil
 }
 
 func (c *WebsocketClient) ReadCommand(msg *pb.ClientMessage) {
-	world, id := c.inWorld()
+	world, id := c.InWorld()
 	switch cmd := msg.Cmd.(type) {
 	case *pb.ClientMessage_Input:
 		world.EnqueueMovement(game.PlayerMovementInput{
@@ -321,8 +321,8 @@ func (c *WebsocketClient) setWorld(world *game.World, player *game.Player) {
 	c.world, c.id = world, player.ID
 }
 
-// inWorld returns the game c is in and its player ID there, or nil before it has joined one
-func (c *WebsocketClient) inWorld() (*game.World, uint32) {
+// InWorld returns the game c is in and its player ID there, or nil before it has joined one
+func (c *WebsocketClient) InWorld() (*game.World, uint32) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	return c.world, c.id
